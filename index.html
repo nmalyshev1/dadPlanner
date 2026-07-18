@@ -70,6 +70,8 @@
     .sync-indicator.offline { background:var(--status-cancelled); }
     .sync-indicator.pending { background:var(--status-pending); }
     .header-btn { background:var(--bg-card); border:1.5px solid var(--border); color:var(--text-secondary); padding:6px 12px; border-radius:20px; font-family:inherit; font-size:0.8rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px; transition:all 0.2s ease; white-space:nowrap; }
+    .header-select { appearance:none; padding-right:24px; background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="gray" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>'); background-repeat: no-repeat; background-position: right 8px center; background-size: 12px; outline:none; cursor:pointer; }
+    [data-theme="dark"] .header-select { background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>'); }
     .header-btn:hover { border-color:var(--gold); color:var(--gold); }
 
     /* ── LAYOUT ─────────────────────────────────────── */
@@ -397,9 +399,10 @@
         </button>
       </div>
       <!-- Language toggle -->
-      <button class="header-btn" onclick="toggleLang()" id="lang-btn">
-        <span id="lang-display">EN</span> <span class="btn-label">/ RU</span>
-      </button>
+      <select class="header-btn header-select" onchange="changeLang(this.value)" id="lang-select">
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+      </select>
       <!-- Theme toggle -->
       <button class="header-btn" onclick="toggleTheme()" id="theme-btn">
         <span id="theme-icon">🌙</span>
@@ -972,11 +975,11 @@ function applyTranslations() {
   if(sb) sb.placeholder = currentLang==='ru' ? 'Поиск по имени, маршруту, телефону...' : 'Search name, route, phone, car...';
   const as = document.getElementById('archive-search');
   if(as) as.placeholder = currentLang==='ru' ? 'Поиск...' : 'Search name, route, phone...';
-  document.getElementById('lang-display').textContent = currentLang.toUpperCase();
+  document.getElementById('lang-select').value = currentLang;
 }
 
-function toggleLang() {
-  currentLang = currentLang === 'en' ? 'ru' : 'en';
+function changeLang(lang) {
+  currentLang = lang;
   localStorage.setItem('vtransfer_lang', currentLang);
   applyTranslations();
   renderSettings();
