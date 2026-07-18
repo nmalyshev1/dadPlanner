@@ -277,6 +277,42 @@
     .settings-add-row { display:flex; gap:9px; align-items:flex-end; flex-wrap:wrap; }
     .settings-add-row .form-group { flex:1; min-width:130px; margin:0; }
 
+    /* ── DISPATCH BOARD ────────────────────────────── */
+    .dispatch-board-wrap { overflow-x:auto; border:1.5px solid var(--border); border-radius:12px; background:var(--bg-card); }
+    .dispatch-hdr-row { display:flex; background:var(--table-hdr); border-bottom:2px solid var(--border-gold); position:sticky; top:0; z-index:10; }
+    .dispatch-label-cell { flex-shrink:0; padding:9px 14px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); border-right:2px solid var(--border-gold); display:flex; align-items:center; }
+    .dispatch-hours-hdr { display:flex; flex:1; }
+    .dispatch-hour-tick { flex-shrink:0; text-align:center; font-size:0.62rem; color:var(--text-muted); padding:9px 0; border-right:1px solid var(--border); font-weight:700; }
+    .dispatch-vehicle-row { display:flex; border-bottom:1px solid var(--border); position:relative; }
+    .dispatch-vehicle-row:last-child { border-bottom:none; }
+    .dispatch-row-label { flex-shrink:0; padding:9px 12px; border-right:2px solid var(--border-gold); background:var(--table-hdr); display:flex; flex-direction:column; justify-content:center; gap:2px; }
+    .dispatch-row-label-name { font-size:0.8rem; font-weight:700; color:var(--text-primary); }
+    .dispatch-row-label-plate { font-size:0.68rem; color:var(--text-muted); font-family:monospace; }
+    .dispatch-timeline { flex:1; position:relative; min-height:60px; }
+    .dispatch-grid-line { position:absolute; top:0; bottom:0; width:1px; background:var(--border); opacity:0.6; pointer-events:none; }
+    .dispatch-grid-line.major { background:var(--border-gold); opacity:0.4; }
+    .dispatch-now-line { position:absolute; top:0; bottom:0; width:2px; background:var(--status-cancelled); opacity:0.7; z-index:8; pointer-events:none; }
+    .dispatch-block { position:absolute; top:7px; bottom:7px; border-radius:6px; padding:3px 8px; cursor:pointer; overflow:hidden; z-index:5; display:flex; flex-direction:column; justify-content:center; border-left:3px solid; transition:transform 0.15s, box-shadow 0.15s, z-index 0s; }
+    .dispatch-block:hover { transform:scaleY(1.08); box-shadow:0 6px 16px rgba(0,0,0,0.25); z-index:20; }
+    .dispatch-block.pending { background:rgba(212,134,10,0.82); border-color:var(--status-pending); color:#fff; }
+    .dispatch-block.confirmed { background:rgba(27,127,74,0.85); border-color:var(--status-confirmed); color:#fff; }
+    .dispatch-block.completed { background:rgba(26,110,168,0.8); border-color:var(--status-completed); color:#fff; }
+    .dispatch-block.cancelled { background:rgba(192,57,43,0.6); border-color:var(--status-cancelled); color:#fff; }
+    .dispatch-block-time { font-size:0.68rem; font-weight:800; line-height:1; }
+    .dispatch-block-name { font-size:0.67rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .dispatch-block-route { font-size:0.6rem; opacity:0.88; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .dispatch-block-driver { font-size:0.58rem; opacity:0.78; margin-top:1px; }
+    .dispatch-empty-row { padding:16px 14px; font-size:0.8rem; color:var(--text-muted); font-style:italic; }
+    .dispatch-sidebar { width:195px; flex-shrink:0; display:flex; flex-direction:column; gap:12px; }
+    .dispatch-sidebar-card { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; padding:13px; }
+    .dispatch-sidebar-title { font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); margin-bottom:9px; }
+    .dispatch-unassigned-item { padding:7px 9px; border-radius:7px; border:1.5px solid rgba(192,57,43,0.3); background:rgba(192,57,43,0.06); cursor:pointer; margin-bottom:5px; transition:all 0.2s; }
+    .dispatch-unassigned-item:hover { border-color:rgba(192,57,43,0.6); background:rgba(192,57,43,0.1); }
+    .dispatch-unassigned-name { font-size:0.78rem; font-weight:700; }
+    .dispatch-unassigned-info { font-size:0.68rem; color:var(--text-muted); }
+    .dispatch-legend-item { display:flex; align-items:center; gap:7px; font-size:0.75rem; color:var(--text-secondary); margin-bottom:5px; }
+    .dispatch-legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
     /* ── MOBILE BOTTOM NAV ──────────────────────────── */
     .mobile-bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:var(--bg-header); backdrop-filter:blur(20px); border-top:1px solid var(--border); z-index:200; padding:6px 0 env(safe-area-inset-bottom,6px); }
     .mobile-bottom-nav-inner { display:flex; justify-content:space-around; align-items:center; }
@@ -437,17 +473,13 @@
           <div class="excel-container">
             <table class="excel-table">
               <thead><tr>
-                <th onclick="sortTable('bookingNumber')"># ⇅</th>
-                <th onclick="sortTable('datetime')" data-i18n="th_datetime">Date &amp; Time ⇅</th>
-                <th onclick="sortTable('name')" data-i18n="th_customer">Customer ⇅</th>
-                <th class="hide-mobile" data-i18n="th_contact">Contact</th>
-                <th onclick="sortTable('pickup')" data-i18n="th_route">Route ⇅</th>
-                <th class="hide-mobile" data-i18n="f_vehicle">Vehicle</th>
-                <th class="hide-mobile" data-i18n="f_driver">Driver</th>
-                <th onclick="sortTable('price')" data-i18n="f_price">Price ⇅</th>
-                <th data-i18n="f_status">Status</th>
-                <th data-i18n="f_payment">Payment</th>
-                <th data-i18n="th_actions">Actions</th>
+                <th onclick="sortTable('bookingNumber')" style="width:46px">#</th>
+                <th onclick="sortTable('name')">Client</th>
+                <th onclick="sortTable('datetime')">Trip</th>
+                <th class="hide-mobile">Car · Driver</th>
+                <th onclick="sortTable('price')" style="width:90px">Price</th>
+                <th style="width:128px">Status</th>
+                <th style="width:96px">Actions</th>
               </tr></thead>
               <tbody id="excel-table-body"></tbody>
             </table>
@@ -568,16 +600,13 @@
           <div class="excel-container">
             <table class="excel-table">
               <thead><tr>
-                <th onclick="sortArchive('bookingNumber')"># ⇅</th>
-                <th onclick="sortArchive('datetime')" data-i18n="th_datetime">Date &amp; Time ⇅</th>
-                <th onclick="sortArchive('name')" data-i18n="th_customer">Customer ⇅</th>
-                <th class="hide-mobile" data-i18n="th_contact">Contact</th>
-                <th data-i18n="th_route">Route</th>
-                <th class="hide-mobile" data-i18n="f_vehicle">Vehicle</th>
-                <th class="hide-mobile" data-i18n="f_driver">Driver</th>
-                <th onclick="sortArchive('price')" data-i18n="f_price">Price ⇅</th>
-                <th data-i18n="f_payment">Payment</th>
-                <th data-i18n="th_actions">Actions</th>
+                <th onclick="sortArchive('bookingNumber')" style="width:48px">#</th>
+                <th onclick="sortArchive('name')">Client</th>
+                <th onclick="sortArchive('datetime')">Trip</th>
+                <th class="hide-mobile">Car · Driver</th>
+                <th onclick="sortArchive('price')" style="width:72px">€</th>
+                <th style="width:100px">Payment</th>
+                <th style="width:80px">Actions</th>
               </tr></thead>
               <tbody id="archive-table-body"></tbody>
             </table>
@@ -1343,48 +1372,68 @@ function renderTable() {
   if(!filtered.length){noData.style.display='block';return;}noData.style.display='none';
   filtered.forEach(b=>tbody.appendChild(buildRow(b,false)));
 }
+function fmtDateCompact(dt){
+  if(!dt)return'TBD';
+  try{
+    const d=new Date(dt);
+    const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const ruDays=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+    const day=(currentLang==='ru'?ruDays:days)[d.getDay()];
+    return `${day} ${pad2(d.getDate())}/${pad2(d.getMonth()+1)} · ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  }catch(e){return'TBD';}
+}
+
 function buildRow(b,archived) {
   const tr=document.createElement('tr');
-  const dateStr=fmtDate(b.datetime);
   const phone=(b.phone||'').trim(),email=(b.email||'').trim().toLowerCase();
   let lc=0;
   if(phone||email)lc=bookings.filter(o=>o.id!==b.id&&((phone&&o.phone&&o.phone.trim()===phone)||(email&&o.email&&o.email.trim().toLowerCase()===email))).length;
-  const lb=lc>0?`<span class="linked-badge" onclick="openModal('${b.id}');setTimeout(()=>document.getElementById('linked-section').scrollIntoView({behavior:'smooth'}),150)">🔗 x${lc+1}</span>`:'';
+  const lb=lc>0?`<span class="linked-badge" onclick="openModal('${b.id}');setTimeout(()=>document.getElementById('linked-section').scrollIntoView({behavior:'smooth'}),150)">🔗${lc+1}</span>`:'';
   const pay=b.paymentStatus||'Unpaid';
   const payIcon=pay==='Paid'?'✅':'💳';
   const notBadge=b.notified?`<span class="notified-dot" title="Client notified"></span>`:'';
-  const driverStr=b.driver?`<span style="font-size:0.78rem;color:var(--text-muted);">👤 ${esc(b.driver)}</span>`:'';
-  const extraBS=(b.childSeats||b.holdBags)?`<div style="font-size:0.68rem;opacity:0.55;margin-top:1px;">👶${b.childSeats||0}/📦${b.holdBags||0}</div>`:'';
+  const dateStr=fmtDateCompact(b.datetime);
+  const carDriver=[b.car?`<span style="color:var(--gold);font-weight:600;font-size:0.78rem">🚗 ${esc(b.car)}</span>`:'',b.driver?`<span style="font-size:0.76rem;color:var(--text-muted)">👤 ${esc(b.driver)}</span>`:''].filter(Boolean).join('<br>');
 
   if(!archived){
     tr.innerHTML=`
-      <td class="booking-num">#${(b.bookingNumber||0).toString().padStart(5,'0')}</td>
-      <td style="font-weight:600">${dateStr}</td>
-      <td><div style="display:flex;align-items:center;flex-wrap:wrap;gap:3px">${esc(b.name)}${lb}${notBadge}</div></td>
-      <td class="hide-mobile"><div style="font-size:0.77rem;color:var(--text-secondary)">📞 ${esc(b.phone||'N/A')}</div><div style="font-size:0.73rem;color:var(--text-muted)">✉️ ${esc(b.email||'N/A')}</div></td>
-      <td><div style="max-width:185px;overflow:hidden;text-overflow:ellipsis;font-size:0.84rem">🛫 ${esc(b.pickup)}<br>🛬 ${esc(b.dropoff)}</div></td>
-      <td class="hide-mobile" style="color:var(--gold);font-weight:600;font-size:0.8rem">${esc(b.car||'')}</td>
-      <td class="hide-mobile">${driverStr}</td>
-      <td style="font-weight:700">€${b.price}</td>
-      <td><select class="status-badge ${b.status.toLowerCase()}" onchange="changeStatus('${b.id}',this.value)" style="padding:3px 6px;font-size:0.68rem;border:none;font-weight:700;background:transparent;cursor:pointer;">
+      <td class="booking-num" style="white-space:nowrap">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td>
+      <td>
+        <div style="font-weight:700;font-size:0.88rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap">${esc(b.name)}${lb}${notBadge}</div>
+        <div style="font-size:0.74rem;color:var(--text-muted);margin-top:2px">📞 ${esc(b.phone||'—')}</div>
+      </td>
+      <td>
+        <div style="font-weight:600;font-size:0.82rem;color:var(--gold);white-space:nowrap">${dateStr}</div>
+        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🛫 ${esc(b.pickup)} ➝ ${esc(b.dropoff)}</div>
+      </td>
+      <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
+      <td>
+        <div style="font-weight:800;font-size:0.95rem">€${b.price}</div>
+        <button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')" style="margin-top:3px;font-size:0.62rem;padding:2px 7px">${payIcon} ${pay}</button>
+      </td>
+      <td><select class="status-badge ${b.status.toLowerCase()}" onchange="changeStatus('${b.id}',this.value)" style="padding:3px 6px;font-size:0.68rem;border:none;font-weight:700;background:transparent;cursor:pointer;width:100%">
         <option value="Pending" ${b.status==='Pending'?'selected':''}>⏳ ${t('s_pending')}</option>
         <option value="Confirmed" ${b.status==='Confirmed'?'selected':''}>✓ ${t('s_confirmed')}</option>
         <option value="Completed" ${b.status==='Completed'?'selected':''}>✈ ${t('s_completed')}</option>
         <option value="Cancelled" ${b.status==='Cancelled'?'selected':''}>✕ ${t('s_cancelled')}</option>
       </select></td>
-      <td><button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')">${payIcon} ${pay}</button></td>
       <td><div class="action-btn-row">${actionBtns(b.id)}</div></td>`;
   } else {
     tr.innerHTML=`
-      <td class="booking-num">#${(b.bookingNumber||0).toString().padStart(5,'0')}</td>
-      <td style="font-weight:600">${dateStr}</td>
-      <td>${esc(b.name)}${notBadge}</td>
-      <td class="hide-mobile"><div style="font-size:0.77rem;color:var(--text-secondary)">📞 ${esc(b.phone||'N/A')}</div></td>
-      <td><div style="max-width:185px;overflow:hidden;text-overflow:ellipsis;font-size:0.84rem">🛫 ${esc(b.pickup)}<br>🛬 ${esc(b.dropoff)}</div></td>
-      <td class="hide-mobile" style="color:var(--gold);font-weight:600;font-size:0.8rem">${esc(b.car||'')}</td>
-      <td class="hide-mobile">${driverStr}</td>
-      <td style="font-weight:700">€${b.price}</td>
-      <td><button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')">${payIcon} ${pay}</button></td>
+      <td class="booking-num" style="white-space:nowrap">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td>
+      <td>
+        <div style="font-weight:700;font-size:0.88rem">${esc(b.name)}${notBadge}</div>
+        <div style="font-size:0.74rem;color:var(--text-muted);margin-top:2px">📞 ${esc(b.phone||'—')}</div>
+      </td>
+      <td>
+        <div style="font-weight:600;font-size:0.82rem;color:var(--gold);white-space:nowrap">${dateStr}</div>
+        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🛫 ${esc(b.pickup)} ➝ ${esc(b.dropoff)}</div>
+      </td>
+      <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
+      <td>
+        <div style="font-weight:800;font-size:0.95rem">€${b.price}</div>
+        <button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')" style="margin-top:3px;font-size:0.62rem;padding:2px 7px">${payIcon} ${pay}</button>
+      </td>
       <td><div class="action-btn-row">${actionBtns(b.id)}</div></td>`;
   }
   tr.addEventListener('dblclick',e=>{if(!['SELECT','BUTTON'].includes(e.target.tagName)&&!e.target.closest('.action-btn-row'))openModal(b.id);});
