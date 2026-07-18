@@ -987,15 +987,44 @@
               let expIds=[];
               if(els){const ec=(els+'').replace(/^"+|"+$/g,'').trim(); if(ec) expIds=ec.split(',');}
 
-              // Fetch bookings
-              const bookingFetches = bookingIds.length ? Promise.all(bookingIds.map(id=>
-                fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}`)
+              // Fetch bookings — supports direct format (planner) AND chunked base64 (website)
+              function fetchBookingById(id) {
+                return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}`)
                   .then(r=>r.json()).then(ds=>{
-                    if(!ds)return null;
-                    const cj=(ds+'').replace(/^"+|"+$/g,'').trim();
-                    try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){return null;}}
-                  }).catch(()=>null)
-              )) : Promise.resolve([]);
+                    if(ds){
+                      const cj=(ds+'').replace(/^"+|"+$/g,'').trim();
+                      if(cj && cj!=='null' && cj!=='undefined' && cj.length>2){
+                        try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){}}
+                      }
+                    }
+                    // Not found directly — try chunked format (website uploads in base64 chunks)
+                    return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}_len`)
+                      .then(r=>r.json()).then(lenDs=>{
+                        const numChunks=parseInt((lenDs+'').replace(/^"+|"+$/g,'').trim())||0;
+                        if(!numChunks) return null;
+                        return Promise.all(
+                          Array.from({length:numChunks},(_,i)=>
+                            fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}_c${i}`)
+                              .then(r=>r.json()).then(cd=>(cd+'').replace(/^"+|"+$/g,'').trim()).catch(()=>'')
+                          )
+                        ).then(chunks=>{
+                          const b64=chunks.join('').replace(/-/g,'+').replace(/_/g,'/');
+                          if(!b64) return null;
+                          const pad=b64.length%4?'='.repeat(4-b64.length%4):'';
+                          try{
+                            const parsed=JSON.parse(decodeURIComponent(escape(atob(b64+pad))));
+                            if(!parsed) return null;
+                            if(parsed.car && parsed.car.includes('V-Class') && !parsed.car.includes('#')) parsed.car='Mercedes V-Class #1';
+                            if(!parsed.paymentStatus) parsed.paymentStatus='Unpaid';
+                            if(!parsed.status) parsed.status='Pending';
+                            if(!parsed.updated_at) parsed.updated_at=parsed.created_at||new Date().toISOString();
+                            return parsed;
+                          }catch(e){return null;}
+                        });
+                      }).catch(()=>null);
+                  }).catch(()=>null);
+              }
+              const bookingFetches = bookingIds.length ? Promise.all(bookingIds.map(id=>fetchBookingById(id))) : Promise.resolve([]);
 
               // Fetch expenses
               const expFetches = expIds.length ? Promise.all(expIds.map(id=>
