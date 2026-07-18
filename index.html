@@ -490,20 +490,52 @@
 
       <!-- TAB: CALENDAR -->
       <div id="calendar-tab" class="tab-content">
-        <div class="panel">
+        <div class="panel" style="padding:14px 16px;">
           <div class="calendar-header">
-            <div class="calendar-title" id="calendar-month-year"></div>
-            <div class="calendar-nav">
-              <div class="cal-view-toggle">
-                <button class="cal-view-btn active" id="cal-month-btn" onclick="setCalView('month')" data-i18n="cal_month">Month</button>
-                <button class="cal-view-btn" id="cal-week-btn" onclick="setCalView('week')" data-i18n="cal_week">Week</button>
-              </div>
-              <button class="btn btn-secondary" style="padding:7px 11px;" onclick="prevPeriod()">◀</button>
-              <button class="btn btn-secondary" style="padding:7px 11px;" onclick="goToToday()" data-i18n="cal_today">Today</button>
-              <button class="btn btn-secondary" style="padding:7px 11px;" onclick="nextPeriod()">▶</button>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-secondary" style="padding:6px 11px;font-size:0.82rem;" onclick="prevPeriod()">◀</button>
+              <div class="calendar-title" id="calendar-month-year" style="min-width:180px;text-align:center;"></div>
+              <button class="btn btn-secondary" style="padding:6px 11px;font-size:0.82rem;" onclick="nextPeriod()">▶</button>
+              <button class="btn btn-secondary" style="padding:6px 13px;font-size:0.82rem;" onclick="goToToday()" data-i18n="cal_today">Today</button>
+            </div>
+            <div class="cal-view-toggle">
+              <button class="cal-view-btn active" id="cal-day-btn" onclick="setCalView('day')">📋 Day</button>
+              <button class="cal-view-btn" id="cal-month-btn" onclick="setCalView('month')" data-i18n="cal_month">Month</button>
             </div>
           </div>
-          <div class="calendar-grid-wrap" id="cal-month-view">
+
+          <!-- DISPATCH (DAY) VIEW -->
+          <div id="cal-day-view">
+            <div style="display:flex;gap:14px;align-items:flex-start;">
+              <!-- Timeline board -->
+              <div style="flex:1;min-width:0;overflow-x:auto;" id="dispatch-scroll-area">
+                <div class="dispatch-board-wrap" id="dispatch-board-container">
+                  <!-- rendered by JS -->
+                </div>
+              </div>
+              <!-- Sidebar -->
+              <div class="dispatch-sidebar" id="dispatch-sidebar">
+                <div class="dispatch-sidebar-card">
+                  <div class="dispatch-sidebar-title" id="dispatch-unassigned-title">⚠️ Unassigned</div>
+                  <div id="dispatch-unassigned-list"><div style="font-size:0.78rem;color:var(--text-muted);">All assigned ✓</div></div>
+                </div>
+                <div class="dispatch-sidebar-card">
+                  <div class="dispatch-sidebar-title">Legend</div>
+                  <div class="dispatch-legend-item"><div class="dispatch-legend-dot" style="background:var(--status-pending)"></div>Pending</div>
+                  <div class="dispatch-legend-item"><div class="dispatch-legend-dot" style="background:var(--status-confirmed)"></div>Confirmed</div>
+                  <div class="dispatch-legend-item"><div class="dispatch-legend-dot" style="background:var(--status-completed)"></div>Completed</div>
+                  <div class="dispatch-legend-item"><div class="dispatch-legend-dot" style="background:var(--status-cancelled)"></div>Cancelled</div>
+                </div>
+                <div class="dispatch-sidebar-card" id="dispatch-assigned-card" style="display:none;">
+                  <div class="dispatch-sidebar-title">✅ Assigned</div>
+                  <div id="dispatch-assigned-list"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MONTH VIEW -->
+          <div id="cal-month-view" style="display:none;">
             <div class="calendar-grid" id="cal-headers">
               <div class="calendar-day-header" data-i18n="day_mon">Mon</div><div class="calendar-day-header" data-i18n="day_tue">Tue</div>
               <div class="calendar-day-header" data-i18n="day_wed">Wed</div><div class="calendar-day-header" data-i18n="day_thu">Thu</div>
@@ -512,7 +544,6 @@
             </div>
             <div class="calendar-grid" id="calendar-days-container"></div>
           </div>
-          <div id="cal-week-view" style="display:none;"><div class="week-grid" id="week-grid-container"></div></div>
           <div class="agenda-view" id="agenda-view-container"></div>
         </div>
       </div>
@@ -1009,7 +1040,7 @@ const DEFAULT_SETTINGS = {
   partners:[]
 };
 let bookings=[], expenses=[], settings={...DEFAULT_SETTINGS};
-let calDate=new Date(), calView='month';
+let calDate=new Date(), calView='day';
 let sort={col:'datetime',asc:true}, archSort={col:'datetime',asc:false};
 let nextNum=1, autoSyncTimer=null;
 document.addEventListener('DOMContentLoaded',initPinScreen);
@@ -1500,13 +1531,38 @@ function renderArchive(){
 // ═══════════════════════════════════════════════════
 // CALENDAR
 // ═══════════════════════════════════════════════════
-function setCalView(v){calView=v;document.getElementById('cal-month-btn').classList.toggle('active',v==='month');document.getElementById('cal-week-btn').classList.toggle('active',v==='week');renderCalendar();}
-function prevPeriod(){if(calView==='month')calDate.setMonth(calDate.getMonth()-1);else calDate.setDate(calDate.getDate()-7);renderCalendar();}
-function nextPeriod(){if(calView==='month')calDate.setMonth(calDate.getMonth()+1);else calDate.setDate(calDate.getDate()+7);renderCalendar();}
+function setCalView(v){
+  calView=v;
+  ['day','month'].forEach(n=>{
+    const btn=document.getElementById('cal-'+n+'-btn');
+    if(btn)btn.classList.toggle('active',v===n);
+  });
+  renderCalendar();
+}
+function prevPeriod(){
+  if(calView==='month')calDate.setMonth(calDate.getMonth()-1);
+  else calDate.setDate(calDate.getDate()-1);
+  renderCalendar();
+}
+function nextPeriod(){
+  if(calView==='month')calDate.setMonth(calDate.getMonth()+1);
+  else calDate.setDate(calDate.getDate()+1);
+  renderCalendar();
+}
 function goToToday(){calDate=new Date();renderCalendar();}
 function renderCalendar(){
-  if(calView==='month'){document.getElementById('cal-month-view').style.display='';document.getElementById('cal-week-view').style.display='none';renderGridCal();renderAgenda();}
-  else{document.getElementById('cal-month-view').style.display='none';document.getElementById('cal-week-view').style.display='';renderWeekCal();}
+  const dayView=document.getElementById('cal-day-view');
+  const monthView=document.getElementById('cal-month-view');
+  if(calView==='month'){
+    if(dayView)dayView.style.display='none';
+    if(monthView)monthView.style.display='';
+    renderGridCal();renderAgenda();
+    document.getElementById('calendar-month-year').textContent=calDate.toLocaleDateString(currentLang==='ru'?'ru-RU':'en-US',{month:'long',year:'numeric'});
+  } else {
+    if(dayView)dayView.style.display='';
+    if(monthView)monthView.style.display='none';
+    renderDispatchView();
+  }
 }
 function renderGridCal(){
   const c=document.getElementById('calendar-days-container');
