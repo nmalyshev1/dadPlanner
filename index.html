@@ -122,11 +122,34 @@
 
     /* ── TABLE ──────────────────────────────────────── */
     .excel-container { overflow-x:auto; border:1px solid var(--border); border-radius:10px; }
-    .excel-table { width:100%; border-collapse:collapse; font-size:0.86rem; text-align:left; }
-    .excel-table th { background:var(--table-hdr); color:var(--gold); font-weight:700; text-transform:uppercase; font-size:0.7rem; letter-spacing:1px; padding:10px 13px; border-bottom:2px solid var(--border-gold); border-right:1px solid var(--border); cursor:pointer; white-space:nowrap; }
-    .excel-table td { padding:9px 13px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); vertical-align:middle; white-space:nowrap; }
+    .excel-table { width:100%; border-collapse:collapse; font-size:0.86rem; text-align:left; table-layout:fixed; }
+    .excel-table th { background:var(--table-hdr); color:var(--gold); font-weight:700; text-transform:uppercase; font-size:0.7rem; letter-spacing:1px; padding:10px 13px; border-bottom:2px solid var(--border-gold); border-right:1px solid var(--border); cursor:pointer; white-space:nowrap; overflow:hidden; }
+    .excel-table td { padding:9px 13px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); vertical-align:middle; overflow:hidden; }
     .excel-table tr:last-child td { border-bottom:none; }
     .excel-table tbody tr:hover { background:var(--table-hover); }
+    /* Column: # */ .excel-table th:nth-child(1), .excel-table td:nth-child(1) { width:52px; }
+    /* Column: Client */ .excel-table th:nth-child(2), .excel-table td:nth-child(2) { width:160px; }
+    /* Column: Trip */ .excel-table th:nth-child(3), .excel-table td:nth-child(3) { width:auto; min-width:260px; }
+    /* Column: Car · Driver */ .excel-table th:nth-child(4), .excel-table td:nth-child(4) { width:170px; }
+    /* Column: Price */ .excel-table th:nth-child(5), .excel-table td:nth-child(5) { width:105px; }
+    /* Column: Status */ .excel-table th:nth-child(6), .excel-table td:nth-child(6) { width:130px; }
+    /* Column: Actions */ .excel-table th:nth-child(7), .excel-table td:nth-child(7) { width:100px; }
+
+    /* ── ADDRESS AUTOCOMPLETE ───────────────────────── */
+    .autocomplete-wrap { position:relative; }
+    .autocomplete-wrap input { width:100%; }
+    .autocomplete-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--bg-card); border:1.5px solid var(--border-gold); border-radius:10px; box-shadow:var(--shadow-lg); z-index:9999; max-height:260px; overflow-y:auto; display:none; }
+    .autocomplete-dropdown.open { display:block; animation:fadeIn 0.15s ease; }
+    .autocomplete-item { padding:10px 14px; cursor:pointer; display:flex; align-items:flex-start; gap:10px; border-bottom:1px solid var(--border); transition:background 0.15s; }
+    .autocomplete-item:last-child { border-bottom:none; }
+    .autocomplete-item:hover, .autocomplete-item.highlighted { background:rgba(184,148,42,0.09); }
+    .autocomplete-item-icon { font-size:1rem; flex-shrink:0; margin-top:1px; }
+    .autocomplete-item-text { flex:1; min-width:0; }
+    .autocomplete-item-main { font-size:0.87rem; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .autocomplete-item-sub { font-size:0.73rem; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+    .autocomplete-loading { padding:14px; text-align:center; color:var(--text-muted); font-size:0.82rem; }
+    .autocomplete-loading::before { content:'⟳'; animation:spin 1s linear infinite; display:inline-block; margin-right:6px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
 
     /* ── BADGES ─────────────────────────────────────── */
     .status-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.7rem; font-weight:700; text-transform:uppercase; }
@@ -476,13 +499,13 @@
           <div class="excel-container">
             <table class="excel-table">
               <thead><tr>
-                <th onclick="sortTable('bookingNumber')" style="width:46px">#</th>
+                <th onclick="sortTable('bookingNumber')">#</th>
                 <th onclick="sortTable('name')">Client</th>
-                <th onclick="sortTable('datetime')">Trip</th>
+                <th onclick="sortTable('datetime')">Trip &amp; Destination</th>
                 <th class="hide-mobile">Car · Driver</th>
-                <th onclick="sortTable('price')" style="width:90px">Price</th>
-                <th style="width:128px">Status</th>
-                <th style="width:96px">Actions</th>
+                <th onclick="sortTable('price')">Price</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr></thead>
               <tbody id="excel-table-body"></tbody>
             </table>
@@ -571,8 +594,8 @@
               <div class="form-group"><label>Email</label><input type="email" id="m-email" oninput="checkReturningClient()"></div>
               <div class="form-group"><label data-i18n="f_phone">Phone (incl. country code)</label><input type="tel" id="m-phone" placeholder="+33 6 12 34 56 78" oninput="checkReturningClient()"></div>
               <div class="form-group"><label data-i18n="f_datetime">Date &amp; Time</label><input type="datetime-local" id="m-datetime" required></div>
-              <div class="form-group"><label data-i18n="f_pickup">Pickup</label><input type="text" id="m-pickup" required></div>
-              <div class="form-group"><label data-i18n="f_dropoff">Dropoff</label><input type="text" id="m-dropoff" required></div>
+              <div class="form-group"><label data-i18n="f_pickup">Pickup</label><div class="autocomplete-wrap"><input type="text" id="m-pickup" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-m-pickup"></div></div></div>
+              <div class="form-group"><label data-i18n="f_dropoff">Dropoff</label><div class="autocomplete-wrap"><input type="text" id="m-dropoff" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-m-dropoff"></div></div></div>
               <div class="form-group"><label data-i18n="f_vehicle">Vehicle</label><select id="m-car"></select></div>
               <div class="form-group"><label data-i18n="f_driver">Driver</label><select id="m-driver"></select></div>
               <div class="form-group"><label data-i18n="f_pax">Passengers</label><input type="number" id="m-passengers" min="1" max="15" value="1"></div>
@@ -811,8 +834,8 @@
           <div class="form-group"><label>Email</label><input type="email" id="edit-email"></div>
           <div class="form-group"><label data-i18n="f_phone">Phone</label><input type="tel" id="edit-phone"></div>
           <div class="form-group"><label data-i18n="f_datetime">Date &amp; Time</label><input type="datetime-local" id="edit-datetime" required></div>
-          <div class="form-group"><label data-i18n="f_pickup">Pickup</label><input type="text" id="edit-pickup" required></div>
-          <div class="form-group"><label data-i18n="f_dropoff">Dropoff</label><input type="text" id="edit-dropoff" required></div>
+          <div class="form-group"><label data-i18n="f_pickup">Pickup</label><div class="autocomplete-wrap"><input type="text" id="edit-pickup" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-edit-pickup"></div></div></div>
+          <div class="form-group"><label data-i18n="f_dropoff">Dropoff</label><div class="autocomplete-wrap"><input type="text" id="edit-dropoff" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-edit-dropoff"></div></div></div>
           <div class="form-group"><label data-i18n="f_vehicle">Vehicle</label><select id="edit-car"></select></div>
           <div class="form-group"><label data-i18n="f_driver">Driver</label><select id="edit-driver"></select></div>
           <div class="form-group"><label data-i18n="f_pax">Passengers</label><input type="number" id="edit-passengers" min="1" max="15"></div>
@@ -1436,9 +1459,10 @@ function buildRow(b,archived) {
         <div style="font-weight:700;font-size:0.88rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap">${esc(b.name)}${lb}${notBadge}</div>
         <div style="font-size:0.74rem;color:var(--text-muted);margin-top:2px">📞 ${esc(b.phone||'—')}</div>
       </td>
-      <td>
+      <td style="white-space:normal">
         <div style="font-weight:600;font-size:0.82rem;color:var(--gold);white-space:nowrap">${dateStr}</div>
-        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🛫 ${esc(b.pickup)} ➝ ${esc(b.dropoff)}</div>
+        <div style="font-size:0.79rem;color:var(--text-secondary);margin-top:3px;font-weight:500">🛫 <span style="color:var(--text-primary)">${esc(b.pickup||'—')}</span></div>
+        <div style="font-size:0.79rem;color:var(--text-secondary);margin-top:2px;font-weight:500">🏁 <span style="color:var(--text-primary)">${esc(b.dropoff||'—')}</span></div>
       </td>
       <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
       <td>
@@ -1459,9 +1483,10 @@ function buildRow(b,archived) {
         <div style="font-weight:700;font-size:0.88rem">${esc(b.name)}${notBadge}</div>
         <div style="font-size:0.74rem;color:var(--text-muted);margin-top:2px">📞 ${esc(b.phone||'—')}</div>
       </td>
-      <td>
+      <td style="white-space:normal">
         <div style="font-weight:600;font-size:0.82rem;color:var(--gold);white-space:nowrap">${dateStr}</div>
-        <div style="font-size:0.75rem;color:var(--text-secondary);margin-top:2px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">🛫 ${esc(b.pickup)} ➝ ${esc(b.dropoff)}</div>
+        <div style="font-size:0.79rem;color:var(--text-secondary);margin-top:3px;font-weight:500">🛫 <span style="color:var(--text-primary)">${esc(b.pickup||'—')}</span></div>
+        <div style="font-size:0.79rem;color:var(--text-secondary);margin-top:2px;font-weight:500">🏁 <span style="color:var(--text-primary)">${esc(b.dropoff||'—')}</span></div>
       </td>
       <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
       <td>
@@ -1901,6 +1926,116 @@ function purgeAllData(){
 }
 
 // ═══════════════════════════════════════════════════
+// ADDRESS AUTOCOMPLETE (OpenStreetMap Nominatim)
+// ═══════════════════════════════════════════════════
+const acState = {}; // { inputId: { timer, controller, highlighted } }
+
+function initAddressAutocomplete(inputId, dropdownId) {
+  const inp = document.getElementById(inputId);
+  const drop = document.getElementById(dropdownId);
+  if(!inp || !drop) return;
+  acState[inputId] = { timer: null, controller: null, highlighted: -1 };
+
+  inp.addEventListener('input', () => {
+    const q = inp.value.trim();
+    clearTimeout(acState[inputId].timer);
+    if(q.length < 3) { closeDrop(drop, inputId); return; }
+    acState[inputId].timer = setTimeout(() => fetchAddresses(q, inp, drop, inputId), 320);
+  });
+
+  inp.addEventListener('keydown', e => {
+    const items = drop.querySelectorAll('.autocomplete-item');
+    if(!items.length) return;
+    if(e.key === 'ArrowDown') {
+      e.preventDefault();
+      acState[inputId].highlighted = Math.min(acState[inputId].highlighted + 1, items.length - 1);
+      updateHighlight(items, acState[inputId].highlighted);
+    } else if(e.key === 'ArrowUp') {
+      e.preventDefault();
+      acState[inputId].highlighted = Math.max(acState[inputId].highlighted - 1, 0);
+      updateHighlight(items, acState[inputId].highlighted);
+    } else if(e.key === 'Enter' && acState[inputId].highlighted >= 0) {
+      e.preventDefault();
+      items[acState[inputId].highlighted].click();
+    } else if(e.key === 'Escape') {
+      closeDrop(drop, inputId);
+    }
+  });
+
+  inp.addEventListener('blur', () => {
+    setTimeout(() => closeDrop(drop, inputId), 180);
+  });
+}
+
+function updateHighlight(items, idx) {
+  items.forEach((it, i) => it.classList.toggle('highlighted', i === idx));
+  if(items[idx]) items[idx].scrollIntoView({block:'nearest'});
+}
+
+async function fetchAddresses(q, inp, drop, inputId) {
+  if(acState[inputId].controller) acState[inputId].controller.abort();
+  acState[inputId].controller = new AbortController();
+  drop.innerHTML = '<div class="autocomplete-loading">Searching...</div>';
+  drop.classList.add('open');
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`;
+    const res = await fetch(url, {
+      signal: acState[inputId].controller.signal,
+      headers: { 'Accept-Language': 'en', 'User-Agent': 'VTransferPanel/1.0' }
+    });
+    const data = await res.json();
+    acState[inputId].highlighted = -1;
+    if(!data.length) {
+      drop.innerHTML = '<div class="autocomplete-loading" style="animation:none">No results found</div>';
+      return;
+    }
+    drop.innerHTML = '';
+    data.forEach(place => {
+      const a = place.address || {};
+      const mainParts = [a.amenity||a.tourism||a.road||a.pedestrian, a.city||a.town||a.village||a.hamlet].filter(Boolean);
+      const main = mainParts.length ? mainParts.join(', ') : place.display_name.split(',').slice(0,2).join(',').trim();
+      const sub = place.display_name;
+      const icon = getPlaceIcon(place.type, place.class, a);
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.innerHTML = `<div class="autocomplete-item-icon">${icon}</div><div class="autocomplete-item-text"><div class="autocomplete-item-main">${escHTML(main)}</div><div class="autocomplete-item-sub">${escHTML(sub)}</div></div>`;
+      item.addEventListener('mousedown', e => e.preventDefault());
+      item.addEventListener('click', () => {
+        inp.value = place.display_name.split(',').slice(0,3).join(',').trim();
+        closeDrop(drop, inputId);
+        inp.focus();
+      });
+      drop.appendChild(item);
+    });
+  } catch(err) {
+    if(err.name !== 'AbortError') drop.innerHTML = '<div class="autocomplete-loading" style="animation:none">Search failed</div>';
+  }
+}
+
+function getPlaceIcon(type, cls, addr) {
+  if(cls==='aeroway'||type==='aerodrome') return '✈️';
+  if(cls==='railway'||type==='station') return '🚉';
+  if(cls==='amenity'&&(type==='hotel'||type==='motel')) return '🏨';
+  if(addr.road||cls==='highway') return '📍';
+  if(cls==='natural'||cls==='waterway') return '🌊';
+  if(cls==='tourism') return '🗺️';
+  return '📍';
+}
+
+function escHTML(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function closeDrop(drop, inputId) {
+  drop.classList.remove('open');
+  drop.innerHTML = '';
+  if(acState[inputId]) acState[inputId].highlighted = -1;
+}
+
+function initAllAutocompletes() {
+  [['m-pickup','ac-m-pickup'],['m-dropoff','ac-m-dropoff'],
+   ['edit-pickup','ac-edit-pickup'],['edit-dropoff','ac-edit-dropoff']].forEach(([inp,drop]) => initAddressAutocomplete(inp, drop));
+}
+
+// ═══════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════
 function fmtDate(dt){if(!dt)return'TBD';try{const d=new Date(dt);return d.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(e){return'TBD';}}
@@ -1914,6 +2049,7 @@ window.addEventListener('load',()=>{
   const today=new Date().toISOString().slice(0,10);
   const expDate=document.getElementById('exp-date');
   if(expDate)expDate.value=today;
+  initAllAutocompletes();
 });
 </script>
 </body>
