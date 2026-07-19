@@ -1410,7 +1410,10 @@ function pushExpenseToCloud(exp) {
     }).catch(()=>{});
 }
 function pushAllToCloud(skipConfirm = false) {
-  if(!bookings.length&&!expenses.length){showToast('Nothing to push.',false);return;}
+  if(!bookings.length&&!expenses.length){
+    showToast(currentLang==='ru'?'Нет сохранённых заказов в этом браузере':'No bookings stored in this browser yet',false);
+    return;
+  }
   if(!skipConfirm && !confirm(`Push ALL local data (${bookings.length} bookings, ${expenses.length} expenses) to cloud?`))return;
   setSyncIndicator('pending','Uploading...');
   const bIds=bookings.map(b=>b.id), eIds=expenses.map(e=>e.id);
