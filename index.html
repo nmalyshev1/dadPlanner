@@ -1268,21 +1268,44 @@ function setSyncIndicator(st,txt) {
 // ═══════════════════════════════════════════════════
 // SYNC
 // ═══════════════════════════════════════════════════
+function saveBookingToCloud(b) {
+  b.updated_at = new Date().toISOString();
+  const jsonStr = JSON.stringify(b);
+  const b64 = btoa(unescape(encodeURIComponent(jsonStr)));
+  const safeB64 = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const chunkSize = 200;
+  let chunks = [];
+  for (let i = 0; i < safeB64.length; i += chunkSize) {
+    chunks.push(safeB64.substring(i, i + chunkSize));
+  }
+  let promises = chunks.map((chunk, i) =>
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${b.id}_c${i}/${chunk}`, { method: 'POST', headers: { 'Content-Length': '0' } })
+  );
+  promises.push(fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${b.id}_len/${chunks.length}`, { method: 'POST', headers: { 'Content-Length': '0' } }));
+  return Promise.all(promises);
+}
+
 function syncNow(silent=false) {
   setSyncIndicator('pending','Syncing...');
   fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${listKey}`)
     .then(r=>r.json()).then(ls=>{
       let bIds=[];
-      if(ls){const cl=(ls+'').replace(/^"+|"+$/g,'').trim();if(cl)bIds=cl.split(',');}
+      if(typeof ls === 'string'){
+        const cl=ls.replace(/^"+|"+$/g,'').trim();
+        if(cl && cl !== 'EMPTY' && cl !== 'NONE') bIds=cl.split(',').filter(id => id && id !== '[object Object]');
+      }
       fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${expListKey}`)
         .then(r=>r.json()).then(els=>{
           let eIds=[];
-          if(els){const ec=(els+'').replace(/^"+|"+$/g,'').trim();if(ec)eIds=ec.split(',');}
+          if(typeof els === 'string'){
+            const ec=els.replace(/^"+|"+$/g,'').trim();
+            if(ec && ec !== 'EMPTY' && ec !== 'NONE') eIds=ec.split(',').filter(id => id && id !== '[object Object]');
+          }
           // Fetch settings
           const settingsFetch=fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_settings_cfg`)
             .then(r=>r.json()).then(sd=>{
-              if(!sd)return;
-              const sc=(sd+'').replace(/^"+|"+$/g,'').trim();
+              if(!sd || typeof sd !== 'string')return;
+              const sc=sd.replace(/^"+|"+$/g,'').trim();
               if(!sc)return;
               try{
                 const ps=JSON.parse(decodeURIComponent(sc));
@@ -1293,7 +1316,7 @@ function syncNow(silent=false) {
           const bookingFetches=bIds.length?Promise.all(bIds.map(id=>fetchBookingById(id))):Promise.resolve([]);
           const expFetches=eIds.length?Promise.all(eIds.map(id=>
             fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}`)
-              .then(r=>r.json()).then(ds=>{if(!ds)return null;const cj=(ds+'').replace(/^"+|"+$/g,'').trim();try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){return null;}}}).catch(()=>null)
+              .then(r=>r.json()).then(ds=>{if(!ds || typeof ds !== 'string')return null;const cj=ds.replace(/^"+|"+$/g,'').trim();try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){return null;}}}).catch(()=>null)
           )):Promise.resolve([]);
 
           Promise.all([bookingFetches,expFetches,settingsFetch]).then(([cb,ce])=>{
@@ -1324,14 +1347,15 @@ function syncNow(silent=false) {
 function fetchBookingById(id) {
   return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}`)
     .then(r=>r.json()).then(ds=>{
-      if(ds){const cj=(ds+'').replace(/^"+|"+$/g,'').trim();if(cj&&cj!=='null'&&cj!=='undefined'&&cj.length>2){try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){}}}}
+      if(ds && typeof ds === 'string'){const cj=ds.replace(/^"+|"+$/g,'').trim();if(cj&&cj!=='null'&&cj!=='undefined'&&cj.length>2&&!cj.includes('Message')){try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){}}}}
       return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}_len`)
         .then(r=>r.json()).then(lenDs=>{
-          const numChunks=parseInt((lenDs+'').replace(/^"+|"+$/g,'').trim())||0;
+          if(!lenDs || typeof lenDs !== 'string')return null;
+          const numChunks=parseInt(lenDs.replace(/^"+|"+$/g,'').trim())||0;
           if(!numChunks)return null;
           return Promise.all(Array.from({length:numChunks},(_,i)=>
             fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}_c${i}`)
-              .then(r=>r.json()).then(cd=>(cd+'').replace(/^"+|"+$/g,'').trim()).catch(()=>'')
+              .then(r=>r.json()).then(cd=>typeof cd === 'string'?cd.replace(/^"+|"+$/g,'').trim():'').catch(()=>'')
           )).then(chunks=>{
             const b64=chunks.join('').replace(/-/g,'+').replace(/_/g,'/');
             if(!b64)return null;
@@ -1342,22 +1366,35 @@ function fetchBookingById(id) {
     }).catch(()=>null);
 }
 function pushToCloud(b) {
-  b.updated_at=new Date().toISOString();
-  fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${b.id}/${encodeURIComponent(JSON.stringify(b))}`,{method:'POST',headers:{'Content-Length':'0'}})
-    .then(()=>{
-      fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${listKey}`).then(r=>r.json()).then(ls=>{
-        let list=[];if(ls){const c=(ls+'').replace(/^"+|"+$/g,'').trim();if(c)list=c.split(',');}
-        if(!list.includes(b.id)){list.push(b.id);if(list.length>500)list=list.slice(-500);
-          fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${listKey}/${encodeURIComponent(list.join(','))}`,{method:'POST',headers:{'Content-Length':'0'}});}
-      });
-    }).catch(()=>{});
+  saveBookingToCloud(b).then(() => {
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${listKey}`)
+      .then(r => r.json())
+      .then(ls => {
+        let list = [];
+        if (typeof ls === 'string') {
+          const c = ls.replace(/^"+|"+$/g, '').trim();
+          if (c && c !== 'EMPTY' && c !== 'NONE') {
+            list = c.split(',').filter(id => id && id !== '[object Object]');
+          }
+        }
+        if (!list.includes(b.id)) {
+          list.push(b.id);
+          if (list.length > 500) list = list.slice(-500);
+          fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${listKey}/${encodeURIComponent(list.join(','))}`, { method: 'POST', headers: { 'Content-Length': '0' } });
+        }
+      }).catch(() => {});
+  }).catch(() => {});
 }
 function pushExpenseToCloud(exp) {
   exp.updated_at=new Date().toISOString();
   fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${exp.id}/${encodeURIComponent(JSON.stringify(exp))}`,{method:'POST',headers:{'Content-Length':'0'}})
     .then(()=>{
       fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${expListKey}`).then(r=>r.json()).then(ls=>{
-        let list=[];if(ls){const c=(ls+'').replace(/^"+|"+$/g,'').trim();if(c)list=c.split(',');}
+        let list=[];
+        if (typeof ls === 'string') {
+          const c=ls.replace(/^"+|"+$/g,'').trim();
+          if(c && c !== 'EMPTY' && c !== 'NONE') list=c.split(',').filter(id => id && id !== '[object Object]');
+        }
         if(!list.includes(exp.id)){list.push(exp.id);fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${expListKey}/${encodeURIComponent(list.join(','))}`,{method:'POST',headers:{'Content-Length':'0'}});}
       });
     }).catch(()=>{});
@@ -1372,7 +1409,7 @@ function pushAllToCloud() {
     eIds.length?fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${expListKey}/${encodeURIComponent(eIds.join(','))}`,{method:'POST',headers:{'Content-Length':'0'}}):Promise.resolve()
   ]).then(()=>{
     const ups=[
-      ...bookings.map(b=>{b.updated_at=new Date().toISOString();return fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${b.id}/${encodeURIComponent(JSON.stringify(b))}`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{});}),
+      ...bookings.map(b=>saveBookingToCloud(b).catch(()=>{})),
       ...expenses.map(e=>{e.updated_at=new Date().toISOString();return fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${e.id}/${encodeURIComponent(JSON.stringify(e))}`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{});})
     ];
     Promise.all(ups).then(()=>{pushSettingsToCloud();setSyncIndicator('online','All pushed ✓');showToast(`✅ All data pushed to cloud!`);});
