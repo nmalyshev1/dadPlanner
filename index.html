@@ -417,10 +417,13 @@
       <div class="sync-status">
         <span class="sync-indicator" id="sync-dot"></span>
         <span id="sync-text">Connecting...</span>
-        <button onclick="syncNow()" title="Sync Now" style="background:none;border:none;cursor:pointer;padding:0 0 0 3px;color:var(--gold);display:inline-flex;align-items:center;opacity:0.8;transition:opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.8">
+        <button onclick="syncNow()" title="Sync Cloud" style="background:none;border:none;cursor:pointer;padding:0 0 0 3px;color:var(--gold);display:inline-flex;align-items:center;opacity:0.8;transition:opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.8">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
       </div>
+      <button class="header-btn" onclick="pushAllToCloud(true)" title="Push All Local Bookings to Cloud" style="border-color:var(--border-gold);color:var(--gold);">
+        ☁️ <span class="btn-label">Push All</span>
+      </button>
       <!-- Language toggle -->
       <select class="header-btn header-select" onchange="changeLang(this.value)" id="lang-select">
         <option value="en">English</option>
@@ -1328,12 +1331,19 @@ function syncNow(silent=false) {
               if(li>=0){const lt=new Date(merged[li].updated_at||merged[li].created_at).getTime(),ct=new Date(cb.updated_at||cb.created_at).getTime();if(ct>lt){merged[li]=cb;updated++;}else if(lt>ct)pushToCloud(merged[li]);}
               else{merged.push(cb);updated++;}
             });
+            // Auto-upload any local bookings not present in cloud list bIds
+            bookings.forEach(lb => {
+              if (lb && lb.id && !bIds.includes(lb.id)) pushToCloud(lb);
+            });
             bookings=merged; migrateBookings(bookings);
             if(maxN>=nextNum){nextNum=maxN+1;localStorage.setItem(COUNTER_KEY,nextNum);}
             localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));
             // Merge expenses
             const ve=ce.filter(e=>e!==null); let mergedE=[...expenses];
             ve.forEach(ce=>{const li=mergedE.findIndex(le=>le.id===ce.id);if(li>=0){const lt=new Date(mergedE[li].updated_at||mergedE[li].created_at).getTime(),ct=new Date(ce.updated_at||ce.created_at).getTime();if(ct>lt){mergedE[li]=ce;}else pushExpenseToCloud(mergedE[li]);}else mergedE.push(ce);});
+            expenses.forEach(le => {
+              if (le && le.id && !eIds.includes(le.id)) pushExpenseToCloud(le);
+            });
             expenses=mergedE; localStorage.setItem('vtransfer_expenses',JSON.stringify(expenses));
             autoCompleteTrips();
             renderAll();
@@ -1399,9 +1409,9 @@ function pushExpenseToCloud(exp) {
       });
     }).catch(()=>{});
 }
-function pushAllToCloud() {
+function pushAllToCloud(skipConfirm = false) {
   if(!bookings.length&&!expenses.length){showToast('Nothing to push.',false);return;}
-  if(!confirm(`Push ALL local data (${bookings.length} bookings, ${expenses.length} expenses) to cloud?`))return;
+  if(!skipConfirm && !confirm(`Push ALL local data (${bookings.length} bookings, ${expenses.length} expenses) to cloud?`))return;
   setSyncIndicator('pending','Uploading...');
   const bIds=bookings.map(b=>b.id), eIds=expenses.map(e=>e.id);
   Promise.all([
