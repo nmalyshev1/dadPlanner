@@ -1419,9 +1419,6 @@ function saveBookingToCloud(b) {
   const jsonStr = JSON.stringify(b);
   const b64 = btoa(unescape(encodeURIComponent(jsonStr)));
   const safeB64 = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  // CRITICAL: chunk size MUST be 120 or less.
-  // URL path = /api/KeyVal/UpdateValue/mzmvife9/vtransfer_b_[id]_c[n]/[chunk]
-  // prefix is ~70 chars. IIS hard-limits total path. 120 chunk keeps us safe.
   const chunkSize = 120;
   let chunks = [];
   for (let i = 0; i < safeB64.length; i += chunkSize) {
@@ -1580,17 +1577,57 @@ function pushToCloud(b) {
   }).catch(() => {});
 }
 
-function pushExpenseToCloud(exp) {
-  exp.updated_at=new Date().toISOString();
-  fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${exp.id}/${encodeURIComponent(JSON.stringify(exp))}`,{method:'POST',headers:{'Content-Length':'0'}})
-    .then(()=>{
-      fetchListFromCloud(expListKey).then(list => {
-        if (!list.includes(exp.id)) {
-          list.push(exp.id);
-          saveListToCloud(expListKey, list);
-        }
+// Save one expense to cloud using safe Base64 chunking (same as bookings)
+// IIS rejects encodeURIComponent(JSON) in URL paths — use b64 instead
+function saveExpenseToCloud(exp) {
+  exp.updated_at = new Date().toISOString();
+  if(!exp.id) exp.id = Date.now()+'_e_'+Math.random().toString(36).slice(2,7);
+  const jsonStr = JSON.stringify(exp);
+  const b64 = btoa(unescape(encodeURIComponent(jsonStr))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const chunkSize = 120;
+  let chunks = [];
+  for(let i=0; i<b64.length; i+=chunkSize) chunks.push(b64.substring(i,i+chunkSize));
+  let promises = chunks.map((chunk,i) =>
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${exp.id}_c${i}/${chunk}`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{})
+  );
+  promises.push(fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${exp.id}_len/${chunks.length}`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{}));
+  return Promise.all(promises);
+}
+
+// Fetch one expense from cloud by ID
+function fetchExpenseById(id) {
+  return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}_len`)
+    .then(r=>r.json()).then(lenDs=>{
+      if(!lenDs || typeof lenDs !== 'string') return null;
+      const numChunks = parseInt(lenDs.replace(/^"+|"+ $/g,'').trim()) || 0;
+      if(!numChunks) return null;
+      return Promise.all(Array.from({length:numChunks},(_,i)=>
+        fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}_c${i}`)
+          .then(r=>r.json()).then(cd=>typeof cd==='string'?cd.replace(/^"+|"+ $/g,'').trim():'').catch(()=>'')
+      )).then(chunks=>{
+        const b64=chunks.join('').replace(/-/g,'+').replace(/_/g,'/');
+        if(!b64) return null;
+        const pad=b64.length%4?'='.repeat(4-b64.length%4):'';
+        try{
+          const p=JSON.parse(decodeURIComponent(escape(atob(b64+pad))));
+          if(!p) return null;
+          if(!p.updated_at) p.updated_at = p.created_at || new Date().toISOString();
+          return p;
+        }catch(e){return null;}
       });
-    }).catch(()=>{});
+    }).catch(()=>null);
+}
+
+function pushExpenseToCloud(exp) {
+  if(!exp.id) exp.id = Date.now()+'_e_'+Math.random().toString(36).slice(2,7);
+  saveExpenseToCloud(exp).then(()=>{
+    fetchListFromCloud(expListKey).then(list => {
+      if(!list.includes(exp.id)){
+        list.push(exp.id);
+        saveListToCloud(expListKey, list);
+      }
+    });
+  }).catch(()=>{});
 }
 
 function pushAllToCloud(skipConfirm = false) {
@@ -1601,12 +1638,9 @@ function pushAllToCloud(skipConfirm = false) {
   if(!skipConfirm && !confirm(`Push ALL local data (${bookings.length} bookings, ${expenses.length} expenses) to cloud?`)) return;
   setSyncIndicator('pending','Uploading...');
   
-  // Save all bookings and expenses in parallel
+  // Save all bookings and expenses in parallel using safe Base64 chunking
   const bPromises = bookings.map(b => saveBookingToCloud(b).catch(err => console.warn('Booking push error:', err)));
-  const ePromises = expenses.map(e => {
-    e.updated_at = new Date().toISOString();
-    return fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${e.id}/${encodeURIComponent(JSON.stringify(e))}`, { method:'POST', headers:{'Content-Length':'0'} }).catch(err => console.warn('Expense push error:', err));
-  });
+  const ePromises = expenses.map(e => saveExpenseToCloud(e).catch(err => console.warn('Expense push error:', err)));
 
   // Update chunked ID lists in cloud
   const bIds = bookings.map(b => b.id).filter(Boolean);
