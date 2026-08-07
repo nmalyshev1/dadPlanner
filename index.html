@@ -1642,34 +1642,6 @@ function fullSyncFromCloud() {
     });
   }).catch(()=>{setSyncIndicator('offline','Sync failed');showToast('Full sync failed — check network',false);});
 }
-      let bIds=[];
-      if(typeof ls === 'string'){
-        const cl=ls.replace(/^"+|"+$/g,'').trim();
-        if(cl && cl !== 'EMPTY' && cl !== 'NONE') bIds=cl.split(',').filter(id=>id && id !== '[object Object]');
-      }
-      if(!bIds.length){setSyncIndicator('online','No cloud data');showToast('No bookings found in cloud.',false);return;}
-      // Only fetch IDs we don't have locally
-      const localIds=new Set(bookings.map(b=>b.id));
-      const missing=bIds.filter(id=>!localIds.has(id));
-      if(!missing.length){setSyncIndicator('online','Already up to date ✓');showToast('✓ Already fully synced — no new bookings');return;}
-      Promise.all(missing.map(id=>fetchBookingById(id))).then(results=>{
-        const valid=results.filter(b=>b!==null);
-        let added=0;
-        valid.forEach(cb=>{
-          if(!bookings.find(lb=>lb.id===cb.id)){
-            bookings.push(cb);
-            added++;
-          }
-        });
-        migrateBookings(bookings);
-        localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));
-        renderAll();
-        const now=new Date(),ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-        setSyncIndicator('online',`Full sync ${ts}`);
-        showToast(`✅ Full sync complete — ${added} new booking${added!==1?'s':''} downloaded`);
-      });
-    }).catch(()=>{setSyncIndicator('offline','Sync failed');showToast('Full sync failed — check network',false);});
-}
 function startAutoSync() { if(autoSyncTimer)clearInterval(autoSyncTimer); autoSyncTimer=setInterval(()=>syncNow(true),10000); }
 
 // ═══════════════════════════════════════════════════
