@@ -353,45 +353,43 @@
     .settings-add-row .form-group { flex:1; min-width:130px; margin:0; }
 
     /* ── DISPATCH BOARD ────────────────────────────── */
-    .dispatch-board-wrap { border:1.5px solid var(--border); border-radius:10px; background:var(--bg-card); overflow:hidden; }
-    /* Header row with hour ticks */
-    .dispatch-hdr-row { display:flex; background:var(--table-hdr); border-bottom:2px solid var(--border-gold); position:sticky; top:0; z-index:10; }
-    .dispatch-label-cell { flex-shrink:0; padding:7px 12px; font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); border-right:2px solid var(--border-gold); display:flex; align-items:center; }
-    .dispatch-hours-hdr { display:flex; flex:1; }
-    .dispatch-hour-tick { flex-shrink:0; text-align:center; font-size:0.62rem; color:var(--text-muted); padding:7px 0; border-right:1px solid var(--border); font-weight:600; }
-    /* Each vehicle occupies two paired rows: name row + timeline row */
-    .dispatch-pair { border-bottom:1px solid var(--border); }
-    .dispatch-pair:last-child { border-bottom:none; }
-    .dispatch-name-row { display:flex; background:rgba(184,148,42,0.04); border-bottom:1px solid rgba(184,148,42,0.1); min-height:22px; }
-    .dispatch-name-cell { flex-shrink:0; padding:3px 12px; font-size:0.75rem; font-weight:700; color:var(--text-primary); border-right:2px solid var(--border-gold); display:flex; align-items:center; gap:6px; }
-    .dispatch-name-plate { font-size:0.63rem; color:var(--text-muted); font-family:monospace; font-weight:400; }
-    .dispatch-name-spacer { flex:1; }
-    /* Timeline row */
-    .dispatch-timeline-row { display:flex; min-height:34px; }
-    .dispatch-row-label { flex-shrink:0; padding:4px 12px; border-right:2px solid var(--border-gold); background:var(--table-hdr); display:flex; align-items:center; font-size:0.68rem; color:var(--text-muted); }
-    .dispatch-timeline { flex:1; position:relative; overflow:hidden; }
-    .dispatch-grid-line { position:absolute; top:0; bottom:0; width:1px; background:var(--border); opacity:0.5; pointer-events:none; }
-    .dispatch-grid-line.major { background:var(--border-gold); opacity:0.3; }
-    .dispatch-now-line { position:absolute; top:0; bottom:0; width:2px; background:var(--status-cancelled); opacity:0.8; z-index:8; pointer-events:none; }
-    /* Booking blocks */
-    .dispatch-block { position:absolute; top:3px; bottom:3px; border-radius:3px; padding:2px 6px; cursor:pointer; overflow:hidden; z-index:5; display:flex; align-items:center; gap:4px; transition:filter 0.15s, z-index 0s, box-shadow 0.15s; border-left:3px solid rgba(0,0,0,0.25); }
-    .dispatch-block:hover { filter:brightness(1.12); box-shadow:0 3px 10px rgba(0,0,0,0.3); z-index:20; }
-    .dispatch-block.pending { background:rgba(212,134,10,0.88); color:#fff; }
-    .dispatch-block.confirmed { background:rgba(27,127,74,0.88); color:#fff; }
-    .dispatch-block.completed { background:rgba(26,110,168,0.85); color:#fff; }
-    .dispatch-block.cancelled { background:rgba(192,57,43,0.65); color:#fff; }
-    .dispatch-block-icon { font-size:0.72rem; flex-shrink:0; }
-    .dispatch-block-text { font-size:0.65rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .dispatch-empty-row { padding:11px 14px; font-size:0.78rem; color:var(--text-muted); font-style:italic; text-align:center; }
+    /* ── DISPATCH / DAY CALENDAR ─────────────────── */
+    .dispatch-board-wrap { border:1.5px solid var(--border); border-radius:10px; background:var(--bg-card); overflow-x:auto; }
+    .dispatch-table { border-collapse:collapse; table-layout:fixed; min-width:max-content; }
+    .dispatch-table th, .dispatch-table td { border:1px solid var(--border); padding:0; margin:0; }
+    /* Header row */
+    .dispatch-th-label { width:140px; min-width:140px; padding:6px 10px; font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); background:var(--table-hdr); border-right:2px solid var(--border-gold) !important; white-space:nowrap; }
+    .dispatch-th-hour { width:44px; min-width:44px; text-align:center; font-size:0.62rem; color:var(--text-muted); font-weight:600; background:var(--table-hdr); padding:5px 0; border-bottom:2px solid var(--border-gold) !important; }
+    /* Vehicle name row (first of pair) */
+    .dispatch-td-vname { background:rgba(184,148,42,0.05); border-right:2px solid var(--border-gold) !important; padding:3px 10px; font-size:0.74rem; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; }
+    .dispatch-td-vname small { display:block; font-size:0.6rem; color:var(--text-muted); font-weight:400; font-family:monospace; }
+    .dispatch-td-vname-spacer { background:rgba(184,148,42,0.05); }
+    /* Vehicle booking bar row (second of pair) */
+    .dispatch-td-rowlabel { background:var(--table-hdr); border-right:2px solid var(--border-gold) !important; padding:2px 8px; font-size:0.63rem; color:var(--text-muted); white-space:nowrap; }
+    /* Each hour column cell in booking row */
+    .dispatch-td-hour { position:relative; height:34px; min-width:44px; width:44px; padding:0; overflow:visible; background:var(--bg-card); }
+    .dispatch-td-hour.major { background:rgba(184,148,42,0.025); }
+    /* Now-line */
+    .dispatch-now-col { position:absolute; top:0; bottom:0; left:0; width:2px; background:var(--status-cancelled); opacity:0.8; pointer-events:none; z-index:8; }
+    /* Booking blocks — span multiple columns via colspan */
+    .dispatch-td-block { position:relative; padding:0; overflow:visible; vertical-align:middle; height:34px; }
+    /* The booking pill inside the cell */
+    .dispatch-pill { display:flex; flex-direction:column; justify-content:center; padding:2px 5px; border-radius:3px; cursor:pointer; height:28px; margin:3px 2px; border-left:3px solid rgba(0,0,0,0.25); transition:filter 0.15s, box-shadow 0.15s; white-space:nowrap; overflow:hidden; }
+    .dispatch-pill:hover { filter:brightness(1.12); box-shadow:0 3px 10px rgba(0,0,0,0.35); }
+    .dispatch-pill.pending { background:rgba(212,134,10,0.88); color:#fff; }
+    .dispatch-pill.confirmed { background:rgba(27,127,74,0.88); color:#fff; }
+    .dispatch-pill.completed { background:rgba(26,110,168,0.85); color:#fff; }
+    .dispatch-pill.cancelled { background:rgba(192,57,43,0.65); color:#fff; }
+    .dispatch-pill-time { font-size:0.6rem; font-weight:700; line-height:1.2; }
+    .dispatch-pill-name { font-size:0.63rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; line-height:1.2; }
+    .dispatch-empty-row { padding:11px 14px; font-size:0.78rem; color:var(--text-muted); font-style:italic; }
     /* Sidebar */
     .dispatch-sidebar { width:200px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
     .dispatch-sidebar-card { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; padding:12px 13px; }
     .dispatch-sidebar-title { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); margin-bottom:8px; }
     .dispatch-sidebar-subtitle { font-size:0.75rem; color:var(--text-muted); font-style:italic; }
-    /* Legend squares - checkbox style like the reference */
     .dispatch-legend-item { display:flex; align-items:center; gap:7px; font-size:0.75rem; color:var(--text-secondary); margin-bottom:5px; }
     .dispatch-legend-swatch { width:14px; height:14px; border-radius:2px; border:1px solid var(--border); flex-shrink:0; }
-    /* Assigned / Unassigned items */
     .dispatch-assigned-item { padding:6px 9px; border-radius:7px; border:1.5px solid rgba(27,127,74,0.25); background:rgba(27,127,74,0.05); cursor:pointer; margin-bottom:5px; transition:all 0.2s; }
     .dispatch-assigned-item:hover { border-color:rgba(27,127,74,0.5); background:rgba(27,127,74,0.1); }
     .dispatch-unassigned-item { padding:6px 9px; border-radius:7px; border:1.5px solid rgba(192,57,43,0.3); background:rgba(192,57,43,0.06); cursor:pointer; margin-bottom:5px; transition:all 0.2s; }
@@ -2009,132 +2007,177 @@ function renderGridCal(){
 // ═══════════════════════════════════════════════════
 function renderDispatchView(){
   const container=document.getElementById('dispatch-board-container');
-  const sidebar=document.getElementById('dispatch-sidebar');
-  const unassignedList=document.getElementById('dispatch-unassigned-list');
-  const assignedCard=document.getElementById('dispatch-assigned-card');
-  const assignedList=document.getElementById('dispatch-assigned-list');
   if(!container)return;
 
   const dayStr=`${calDate.getFullYear()}-${pad2(calDate.getMonth()+1)}-${pad2(calDate.getDate())}`;
   const dayBookings=bookings.filter(b=>b.datetime&&b.datetime.startsWith(dayStr));
   dayBookings.sort((a,b)=>(a.datetime||'').localeCompare(b.datetime||''));
 
-  // Separate unassigned and assigned
   const unassigned=dayBookings.filter(b=>!b.car&&!b.driver);
   const assigned=dayBookings.filter(b=>b.car||b.driver);
 
-  // Build timeline (0–23h)
-  const HOURS=24;
-  const CELL_W=48; // px per hour
-  const totalW=HOURS*CELL_W;
-  const LABEL_W=150;
-
-  // Group bookings by vehicle
+  // Group by vehicle
   const vehicleMap={};
   assigned.forEach(b=>{
-    const key=b.car||'Unassigned';
+    const key=b.car||'No vehicle';
     if(!vehicleMap[key])vehicleMap[key]=[];
     vehicleMap[key].push(b);
   });
-  // Always show configured vehicles + any extra from bookings
   const vehicleKeys=[...new Set([...settings.vehicles.map(v=>v.name),...Object.keys(vehicleMap)])];
 
-  // Header row
-  let html=`<div class="dispatch-hdr-row" style="min-width:${LABEL_W+totalW}px">`;
-  html+=`<div class="dispatch-label-cell" style="width:${LABEL_W}px;min-width:${LABEL_W}px;">Vehicle / Driver</div>`;
-  html+=`<div class="dispatch-hours-hdr" style="width:${totalW}px;">`;
-  for(let h=0;h<HOURS;h++){
-    html+=`<div class="dispatch-hour-tick" style="width:${CELL_W}px;">${pad2(h)}</div>`;
-  }
-  html+=`</div></div>`;
+  const HOURS=24;
+  const CELL_W=44; // px per hour column
 
   // Now line
   const now=new Date();
   const isToday=now.toISOString().startsWith(dayStr);
-  const nowPct=isToday?((now.getHours()*60+now.getMinutes())/(HOURS*60)*100):null;
+  const nowHour=now.getHours();
+  const nowMin=now.getMinutes();
+  const nowFrac=nowMin/60; // fraction within the current hour column
 
-  // Vehicle rows
-  vehicleKeys.forEach(vname=>{
-    const vBookings=vehicleMap[vname]||[];
-    const vDef=settings.vehicles.find(v=>v.name===vname);
-    const plate=vDef&&vDef.plate?vDef.plate:'';
-    html+=`<div class="dispatch-vehicle-row" style="min-width:${LABEL_W+totalW}px">`;
-    html+=`<div class="dispatch-row-label" style="width:${LABEL_W}px;min-width:${LABEL_W}px;">`;
-    html+=`<div class="dispatch-row-label-name">${esc(vname)}</div>`;
-    if(plate)html+=`<div class="dispatch-row-label-plate">${esc(plate)}</div>`;
-    html+=`</div>`;
-    html+=`<div class="dispatch-timeline" style="width:${totalW}px;position:relative;">`;
-    // Grid lines
-    for(let h=0;h<HOURS;h++){
-      const isMaj=h%6===0;
-      html+=`<div class="dispatch-grid-line${isMaj?' major':''}" style="left:${h*CELL_W}px"></div>`;
-    }
-    // Now line
-    if(nowPct!==null)html+=`<div class="dispatch-now-line" style="left:${nowPct}%"></div>`;
-    // Booking blocks
-    vBookings.forEach(b=>{
-      if(!b.datetime)return;
-      const bDate=new Date(b.datetime);
-      const startMin=bDate.getHours()*60+bDate.getMinutes();
-      const durMin=90; // assume 1.5h transfer
-      const leftPx=(startMin/60)*CELL_W;
-      const widthPx=Math.max((durMin/60)*CELL_W,CELL_W*0.8);
-      const icon=b.car&&(b.car.toLowerCase().includes('v-class')||b.car.toLowerCase().includes('trafic'))?'🚐':'🚗';
-      const ts=bDate.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-      html+=`<div class="dispatch-block ${(b.status||'pending').toLowerCase()}" style="left:${leftPx}px;width:${widthPx}px;" onclick="showCalPopup(event,'${b.id}')" title="${esc(b.name)} — ${ts}">`;
-      html+=`<div class="dispatch-block-time">${ts} ${icon}</div>`;
-      html+=`<div class="dispatch-block-name">${esc(b.name)}</div>`;
-      html+=`<div class="dispatch-block-route">${esc((b.pickup||'').split(',')[0])} ➝ ${esc((b.dropoff||'').split(',')[0])}</div>`;
-      if(b.driver)html+=`<div class="dispatch-block-driver">👤 ${esc(b.driver)}</div>`;
-      html+=`</div>`;
-    });
-    html+=`</div></div>`;
-  });
+  // Build table
+  let html=`<table class="dispatch-table"><thead><tr>`;
+  html+=`<th class="dispatch-th-label">VEHICLE / DRIVER</th>`;
+  for(let h=0;h<HOURS;h++){
+    html+=`<th class="dispatch-th-hour">${pad2(h)}</th>`;
+  }
+  html+=`</tr></thead><tbody>`;
 
   if(!vehicleKeys.length){
-    html+=`<div class="dispatch-empty-row">No vehicles configured.</div>`;
+    html+=`<tr><td class="dispatch-empty-row" colspan="${HOURS+1}">No vehicles configured. Add vehicles in Settings.</td></tr>`;
   }
 
+  vehicleKeys.forEach(vname=>{
+    const vDef=settings.vehicles.find(v=>v.name===vname);
+    const plate=vDef&&vDef.plate?vDef.plate:'';
+    const vBookings=vehicleMap[vname]||[];
+
+    // ── ROW 1: Vehicle name row (full width, no booking content) ──
+    html+=`<tr>`;
+    html+=`<td class="dispatch-td-vname">${esc(vname)}${plate?`<small>${esc(plate)}</small>`:''}</td>`;
+    for(let h=0;h<HOURS;h++){
+      html+=`<td class="dispatch-td-vname-spacer"></td>`;
+    }
+    html+=`</tr>`;
+
+    // ── ROW 2: Booking bar row ──
+    // We need to lay bookings out without overlap.
+    // Strategy: walk hour by hour, emit colspan cells for booking blocks.
+    // Build a map: hour -> booking that starts at or spans that hour
+    // For simplicity: sort bookings by start time, place them left to right.
+    // Build a coverage array of 24 slots (each slot = 1 hour column).
+    // Each booking starts at its start hour and spans ceil(duration/60) columns.
+    const coverage = new Array(HOURS).fill(null); // null = empty
+    const bMeta = []; // {booking, startH, spanCols}
+    vBookings.forEach(b=>{
+      if(!b.datetime)return;
+      const bd=new Date(b.datetime);
+      const startH=bd.getHours();
+      const startMin=bd.getMinutes();
+      // Duration: use b.duration field if set, else 90 min default
+      const durMin=parseInt(b.duration||90)||90;
+      const endMin=startH*60+startMin+durMin;
+      const endH=Math.min(HOURS,Math.ceil(endMin/60));
+      const spanCols=Math.max(1,endH-startH);
+      // Mark columns
+      for(let c=startH;c<Math.min(startH+spanCols,HOURS);c++){
+        coverage[c]=b.id;
+      }
+      bMeta.push({b,startH,spanCols:Math.min(spanCols,HOURS-startH),startMin});
+    });
+
+    html+=`<tr>`;
+    html+=`<td class="dispatch-td-rowlabel">${esc(vname.split(' ').slice(-1)[0])}</td>`; // short label
+
+    let h=0;
+    while(h<HOURS){
+      // Check if a booking starts here
+      const bm=bMeta.find(x=>x.startH===h);
+      if(bm){
+        const {b,spanCols,startMin}=bm;
+        const icon=b.car&&(b.car.toLowerCase().includes('v-class')||b.car.toLowerCase().includes('trafic')||b.car.toLowerCase().includes('vito'))?'🚐':'🚗';
+        const ts=new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+        // Left offset within first column (based on minutes)
+        const leftPct=Math.round(startMin/60*100);
+        html+=`<td class="dispatch-td-block" colspan="${spanCols}" onclick="showCalPopup(event,'${b.id}')">`;
+        html+=`<div class="dispatch-pill ${(b.status||'pending').toLowerCase()}" style="margin-left:${leftPct}%;margin-right:2px;" title="${esc(b.name)} ${ts}">`;
+        html+=`<div class="dispatch-pill-time">${ts} ${icon}</div>`;
+        html+=`<div class="dispatch-pill-name">${esc(b.name)}</div>`;
+        html+=`</div></td>`;
+        h+=spanCols;
+      } else if(coverage[h]!==null){
+        // This column is spanned by a booking that started earlier — skip
+        // (already consumed by colspan)
+        h++;
+      } else {
+        // Empty hour cell
+        const isMaj=h%6===0;
+        let nowStyle='';
+        if(isToday&&h===nowHour){
+          nowStyle=`position:relative;`;
+        }
+        html+=`<td class="dispatch-td-hour${isMaj?' major':''}" style="${nowStyle}">`;
+        if(isToday&&h===nowHour){
+          const leftPx=Math.round(nowFrac*CELL_W);
+          html+=`<div class="dispatch-now-col" style="left:${leftPx}px"></div>`;
+        }
+        html+=`</td>`;
+        h++;
+      }
+    }
+    html+=`</tr>`;
+  });
+
+  html+=`</tbody></table>`;
   container.innerHTML=html;
 
-  // Unassigned sidebar
-  if(unassigned.length){
-    let uhtml='';
-    unassigned.forEach(b=>{
-      const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
-      uhtml+=`<div class="dispatch-unassigned-item" onclick="showCalPopup(event,'${b.id}')">`;
-      uhtml+=`<div class="dispatch-unassigned-name">${esc(b.name)}</div>`;
-      uhtml+=`<div class="dispatch-unassigned-info">${ts} · €${b.price}</div>`;
-      uhtml+=`</div>`;
-    });
-    unassignedList.innerHTML=uhtml;
-  } else {
-    unassignedList.innerHTML='<div style="font-size:0.78rem;color:var(--text-muted)">All assigned ✓</div>';
+  // ── Sidebar ──
+  const unassignedList=document.getElementById('dispatch-unassigned-list');
+  const assignedCard=document.getElementById('dispatch-assigned-card');
+  const assignedList=document.getElementById('dispatch-assigned-list');
+
+  if(unassignedList){
+    if(unassigned.length){
+      let uhtml='';
+      unassigned.forEach(b=>{
+        const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
+        uhtml+=`<div class="dispatch-unassigned-item" onclick="showCalPopup(event,'${b.id}')">`;
+        uhtml+=`<div style="font-size:0.76rem;font-weight:700;color:var(--text-primary)">${esc(b.name)}</div>`;
+        uhtml+=`<div style="font-size:0.69rem;color:var(--text-muted)">${ts} · €${b.price||0}</div>`;
+        uhtml+=`</div>`;
+      });
+      unassignedList.innerHTML=uhtml;
+    } else {
+      unassignedList.innerHTML='<div style="font-size:0.78rem;color:var(--text-muted)">All assigned ✓</div>';
+    }
   }
 
-  // Assigned sidebar
-  if(assigned.length){
-    assignedCard.style.display='block';
-    let ahtml='';
-    assigned.slice(0,5).forEach(b=>{
-      const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
-      ahtml+=`<div class="dispatch-unassigned-item" style="border-color:rgba(27,127,74,0.3);background:rgba(27,127,74,0.05);" onclick="showCalPopup(event,'${b.id}')">`;
-      ahtml+=`<div class="dispatch-unassigned-name">${esc(b.name)}</div>`;
-      ahtml+=`<div class="dispatch-unassigned-info">${ts} · ${esc(b.car||'')}</div>`;
-      ahtml+=`</div>`;
-    });
-    if(assigned.length>5)ahtml+=`<div style="font-size:0.74rem;color:var(--text-muted);padding:4px 9px;">+${assigned.length-5} more</div>`;
-    assignedList.innerHTML=ahtml;
-  } else {
-    assignedCard.style.display='none';
+  if(assignedCard&&assignedList){
+    if(assigned.length){
+      assignedCard.style.display='block';
+      let ahtml='';
+      assigned.slice(0,6).forEach(b=>{
+        const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
+        ahtml+=`<div class="dispatch-assigned-item" onclick="showCalPopup(event,'${b.id}')">`;
+        ahtml+=`<div style="font-size:0.76rem;font-weight:700;color:var(--text-primary)">${ts} ${esc(b.name)}</div>`;
+        ahtml+=`<div style="font-size:0.69rem;color:var(--text-muted)">${esc(b.car||'—')}</div>`;
+        ahtml+=`</div>`;
+      });
+      if(assigned.length>6)ahtml+=`<div style="font-size:0.74rem;color:var(--text-muted);padding:4px 9px;">+${assigned.length-6} more</div>`;
+      assignedList.innerHTML=ahtml;
+    } else {
+      assignedCard.style.display='none';
+    }
   }
 
   // Auto-scroll to current hour
-  if(isToday){
-    const scrollArea=document.getElementById('dispatch-scroll-area');
-    if(scrollArea){const scrollTo=Math.max(0,(now.getHours()-2)*CELL_W+LABEL_W);setTimeout(()=>scrollArea.scrollLeft=scrollTo,100);}
+  const scrollArea=document.getElementById('dispatch-scroll-area');
+  if(scrollArea&&isToday){
+    const scrollTo=Math.max(0,(nowHour-2)*CELL_W+140);
+    setTimeout(()=>scrollArea.scrollLeft=scrollTo,100);
   }
 }
+
 
 // ═══════════════════════════════════════════════════
 // CALENDAR BOOKING POPUP
