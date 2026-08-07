@@ -1599,11 +1599,11 @@ function fetchExpenseById(id) {
   return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}_len`)
     .then(r=>r.json()).then(lenDs=>{
       if(!lenDs || typeof lenDs !== 'string') return null;
-      const numChunks = parseInt(lenDs.replace(/^"+|"+ $/g,'').trim()) || 0;
+      const numChunks = parseInt(lenDs.replace(/^"+|"+ *$/g,'').trim()) || 0;
       if(!numChunks) return null;
       return Promise.all(Array.from({length:numChunks},(_,i)=>
         fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}_c${i}`)
-          .then(r=>r.json()).then(cd=>typeof cd==='string'?cd.replace(/^"+|"+ $/g,'').trim():'').catch(()=>'')
+          .then(r=>r.json()).then(cd=>typeof cd==='string'?cd.replace(/^"+|"+ *$/g,'').trim():'').catch(()=>'')
       )).then(chunks=>{
         const b64=chunks.join('').replace(/-/g,'+').replace(/_/g,'/');
         if(!b64) return null;
@@ -1664,29 +1664,40 @@ function pushAllToCloud(skipConfirm = false) {
 
 function fullSyncFromCloud() {
   setSyncIndicator('pending','Full sync...');
-  showToast('⬇️ Downloading all bookings from cloud...');
-  fetchListFromCloud(listKey).then(bIds => {
-    if(!bIds.length){setSyncIndicator('online','No cloud data');showToast('No bookings found in cloud.',false);return;}
-    const localIds = new Set(bookings.map(b=>b.id));
-    const missing = bIds.filter(id=>!localIds.has(id));
-    if(!missing.length){setSyncIndicator('online','Already up to date ✓');showToast('✓ Already fully synced — no new bookings');return;}
-    Promise.all(missing.map(id=>fetchBookingById(id))).then(results=>{
-      const valid = results.filter(b=>b!==null);
-      let added = 0;
-      valid.forEach(cb=>{
-        if(!bookings.find(lb=>lb.id===cb.id)){
-          bookings.push(cb);
-          added++;
-        }
+  showToast('⬇️ Downloading all data from cloud...');
+  // Fetch BOTH booking and expense ID lists in parallel
+  Promise.all([
+    fetchListFromCloud(listKey),
+    fetchListFromCloud(expListKey)
+  ]).then(([bIds, eIds]) => {
+    const missingB = bIds.filter(id => id && !bookings.find(b => b.id === id));
+    const missingE = eIds.filter(id => id && !expenses.find(e => e.id === id));
+    if(!missingB.length && !missingE.length){
+      setSyncIndicator('online','Already up to date ✓');
+      showToast('✓ Already fully synced — no new data');
+      return;
+    }
+    Promise.all([
+      missingB.length ? Promise.all(missingB.map(id => fetchBookingById(id))) : Promise.resolve([]),
+      missingE.length ? Promise.all(missingE.map(id => fetchExpenseById(id))) : Promise.resolve([])
+    ]).then(([bResults, eResults]) => {
+      let addedB = 0, addedE = 0;
+      bResults.filter(b => b !== null).forEach(cb => {
+        if(!bookings.find(lb => lb.id === cb.id)){ bookings.push(cb); addedB++; }
+      });
+      eResults.filter(e => e !== null).forEach(ce => {
+        if(!expenses.find(le => le.id === ce.id)){ expenses.push(ce); addedE++; }
       });
       migrateBookings(bookings);
-      localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));
+      localStorage.setItem('vtransfer_bookings', JSON.stringify(bookings));
+      localStorage.setItem('vtransfer_expenses', JSON.stringify(expenses));
       renderAll();
-      const now=new Date(),ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-      setSyncIndicator('online',`Full sync ${ts}`);
-      showToast(`✅ Full sync complete — ${added} new booking${added!==1?'s':''} downloaded`);
+      updateAnalytics();
+      const now = new Date(), ts = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+      setSyncIndicator('online', `Full sync ${ts}`);
+      showToast(`✅ Full sync — ${addedB} booking${addedB!==1?'s':''} + ${addedE} expense${addedE!==1?'s':''} downloaded`);
     });
-  }).catch(()=>{setSyncIndicator('offline','Sync failed');showToast('Full sync failed — check network',false);});
+  }).catch(() => { setSyncIndicator('offline','Sync failed'); showToast('Full sync failed — check network', false); });
 }
 function startAutoSync() { if(autoSyncTimer)clearInterval(autoSyncTimer); autoSyncTimer=setInterval(()=>syncNow(true),10000); }
 
