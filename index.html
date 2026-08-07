@@ -47,12 +47,12 @@
     .pin-dots { display:flex; justify-content:center; gap:18px; margin-bottom:32px; }
     .pin-dot { width:16px; height:16px; border-radius:50%; border:2px solid rgba(196,162,101,0.5); background:transparent; transition:all 0.2s cubic-bezier(0.175,0.885,0.32,1.275); }
     .pin-dot.filled { background:var(--gold-gradient); border-color:#C4A265; transform:scale(1.15); box-shadow:0 0 12px rgba(196,162,101,0.5); }
-    .pin-keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:260px; margin:0 auto 24px; }
-    .pin-key { background:rgba(11,19,43,0.6); border:1px solid rgba(196,162,101,0.2); border-radius:12px; color:#FAFAF8; font-family:inherit; font-size:1.4rem; font-weight:600; padding:18px 0; cursor:pointer; transition:all 0.15s ease; user-select:none; -webkit-tap-highlight-color:transparent; }
-    .pin-key:hover { background:rgba(196,162,101,0.12); border-color:rgba(196,162,101,0.5); transform:translateY(-1px); }
-    .pin-key:active { transform:scale(0.94); }
-    .pin-key.empty { visibility:hidden; }
-    .pin-error { font-size:0.85rem; color:#E74C3C; min-height:22px; }
+    .pin-keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:260px; margin:0 auto 24px; position:relative; z-index:10; }
+    .pin-key { background:rgba(11,19,43,0.6); border:1px solid rgba(196,162,101,0.25); border-radius:12px; color:#FAFAF8; font-family:inherit; font-size:1.4rem; font-weight:600; padding:18px 0; cursor:pointer; transition:all 0.15s ease; user-select:none; -webkit-tap-highlight-color:transparent; touch-action:manipulation; position:relative; z-index:10; pointer-events:auto; outline:none; }
+    .pin-key:hover, .pin-key:focus { background:rgba(196,162,101,0.18); border-color:rgba(196,162,101,0.6); transform:translateY(-1px); }
+    .pin-key:active { transform:scale(0.94); background:rgba(196,162,101,0.3); }
+    .pin-key.empty { visibility:hidden; pointer-events:none; }
+    .pin-error { font-size:0.85rem; color:#E74C3C; min-height:22px; margin-top:4px; font-weight:600; }
     .pin-shake { animation:shake 0.4s ease; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
     .pin-screen-hidden { display:none !important; }
@@ -454,10 +454,18 @@
       <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
     </div>
     <div class="pin-keypad">
-      <button class="pin-key" onclick="pinPress('1')">1</button><button class="pin-key" onclick="pinPress('2')">2</button><button class="pin-key" onclick="pinPress('3')">3</button>
-      <button class="pin-key" onclick="pinPress('4')">4</button><button class="pin-key" onclick="pinPress('5')">5</button><button class="pin-key" onclick="pinPress('6')">6</button>
-      <button class="pin-key" onclick="pinPress('7')">7</button><button class="pin-key" onclick="pinPress('8')">8</button><button class="pin-key" onclick="pinPress('9')">9</button>
-      <button class="pin-key empty"></button><button class="pin-key" onclick="pinPress('0')">0</button><button class="pin-key" onclick="pinBackspace()">⌫</button>
+      <button type="button" class="pin-key" onclick="pinPress('1')" onpointerdown="pinPress('1')">1</button>
+      <button type="button" class="pin-key" onclick="pinPress('2')" onpointerdown="pinPress('2')">2</button>
+      <button type="button" class="pin-key" onclick="pinPress('3')" onpointerdown="pinPress('3')">3</button>
+      <button type="button" class="pin-key" onclick="pinPress('4')" onpointerdown="pinPress('4')">4</button>
+      <button type="button" class="pin-key" onclick="pinPress('5')" onpointerdown="pinPress('5')">5</button>
+      <button type="button" class="pin-key" onclick="pinPress('6')" onpointerdown="pinPress('6')">6</button>
+      <button type="button" class="pin-key" onclick="pinPress('7')" onpointerdown="pinPress('7')">7</button>
+      <button type="button" class="pin-key" onclick="pinPress('8')" onpointerdown="pinPress('8')">8</button>
+      <button type="button" class="pin-key" onclick="pinPress('9')" onpointerdown="pinPress('9')">9</button>
+      <button type="button" class="pin-key empty"></button>
+      <button type="button" class="pin-key" onclick="pinPress('0')" onpointerdown="pinPress('0')">0</button>
+      <button type="button" class="pin-key" onclick="pinBackspace()" onpointerdown="pinBackspace()">⌫</button>
     </div>
     <div class="pin-error" id="pin-error"></div>
   </div>
@@ -1140,10 +1148,24 @@ function toggleTheme() {
 // ═══════════════════════════════════════════════════
 const CORRECT_PIN = '1101';
 const SESSION_KEY = 'vtransfer_pin_session';
-let currentPin = '';
+let currentPin = '', lastPinPressTime = 0;
 function initPinScreen() { if(sessionStorage.getItem(SESSION_KEY)==='unlocked') unlockApp(false); }
-function pinPress(d) { if(currentPin.length>=4)return; currentPin+=d; updateDots(); if(currentPin.length===4)setTimeout(checkPin,120); }
-function pinBackspace() { currentPin=currentPin.slice(0,-1); updateDots(); document.getElementById('pin-error').textContent=''; }
+function pinPress(d, e) {
+  if (e && e.type === 'pointerdown') { e.preventDefault(); }
+  const now = Date.now();
+  if (now - lastPinPressTime < 100) return;
+  lastPinPressTime = now;
+  if(currentPin.length>=4) return;
+  currentPin += String(d);
+  updateDots();
+  if(currentPin.length===4) setTimeout(checkPin, 120);
+}
+function pinBackspace(e) {
+  if (e && e.type === 'pointerdown') { e.preventDefault(); }
+  currentPin = currentPin.slice(0, -1);
+  updateDots();
+  document.getElementById('pin-error').textContent = '';
+}
 function updateDots() { for(let i=0;i<4;i++) document.getElementById('dot-'+i).classList.toggle('filled',i<currentPin.length); }
 function checkPin() {
   if(currentPin===CORRECT_PIN){ sessionStorage.setItem(SESSION_KEY,'unlocked'); unlockApp(true); }
@@ -1154,9 +1176,11 @@ function checkPin() {
   }
 }
 document.addEventListener('keydown',e=>{
-  if(!document.getElementById('pin-screen').classList.contains('pin-screen-hidden')){
+  const pinScreen = document.getElementById('pin-screen');
+  if(pinScreen && !pinScreen.classList.contains('pin-screen-hidden')){
     if(e.key>='0'&&e.key<='9') pinPress(e.key);
-    if(e.key==='Backspace') pinBackspace();
+    else if(e.code && e.code.startsWith('Numpad') && e.code.length===7) pinPress(e.code.slice(-1));
+    else if(e.key==='Backspace'||e.key==='Delete') pinBackspace();
   }
 });
 
