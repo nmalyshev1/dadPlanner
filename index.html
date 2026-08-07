@@ -222,9 +222,10 @@
 
     /* ── STAT CARDS ─────────────────────────────────── */
     .analytics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:14px; margin-bottom:24px; }
-    .stat-card { background:var(--bg-card); border:1.5px solid var(--border); border-radius:12px; padding:18px; display:flex; flex-direction:column; gap:4px; box-shadow:var(--shadow-sm); }
+    .stat-card { background:var(--bg-card); border:1.5px solid var(--border); border-radius:12px; padding:18px; display:flex; flex-direction:column; gap:4px; box-shadow:var(--shadow-sm); transition:all 0.2s ease; }
     .stat-val { font-size:1.65rem; font-weight:700; color:var(--gold); }
     .stat-label { font-size:0.73rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); font-weight:600; }
+    .stat-hint { font-size:0.62rem; color:var(--text-muted); margin-top:2px; opacity:0.7; }
     .stat-card.paid-card { border-color:rgba(27,127,74,0.3); } .stat-card.paid-card .stat-val { color:var(--status-confirmed); }
     .stat-card.unpaid-card { border-color:rgba(192,57,43,0.3); } .stat-card.unpaid-card .stat-val { color:var(--status-cancelled); }
     .stat-card.profit-card { border-color:rgba(184,148,42,0.4); background:linear-gradient(135deg,rgba(184,148,42,0.06),rgba(184,148,42,0.02)); }
@@ -246,17 +247,21 @@
     .toast.show { transform:translateY(0); opacity:1; }
 
     /* ── MISC ───────────────────────────────────────── */
-    .action-btn-row { display:flex; gap:4px; align-items:center; }
+    .action-btn-row { display:flex; gap:4px; align-items:center; flex-wrap:wrap; }
     .action-icon { background:none; border:none; color:var(--text-muted); cursor:pointer; opacity:0.7; transition:all 0.2s; padding:5px; border-radius:6px; display:inline-flex; align-items:center; }
     .action-icon:hover { opacity:1; background:var(--table-hover); }
     .action-icon.edit-btn:hover { color:var(--gold); }
     .action-icon.delete-btn:hover { color:var(--status-cancelled); }
+    /* Labeled action pills */
+    .action-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 9px; border-radius:20px; border:1.5px solid var(--border); background:var(--bg-card); color:var(--text-secondary); font-family:inherit; font-size:0.72rem; font-weight:600; cursor:pointer; transition:all 0.2s ease; white-space:nowrap; }
+    .action-pill:hover { border-color:var(--gold); color:var(--gold); background:rgba(184,148,42,0.06); transform:translateY(-1px); }
+    .action-pill.delete-pill:hover { border-color:var(--status-cancelled); color:var(--status-cancelled); background:rgba(192,57,43,0.06); }
     .no-data { text-align:center; padding:38px; color:var(--text-muted); font-style:italic; }
     .booking-num { font-family:monospace; font-weight:700; color:var(--gold); font-size:0.82rem; }
     .linked-badge { display:inline-flex; align-items:center; gap:3px; font-size:0.63rem; color:var(--gold); background:rgba(184,148,42,0.1); border:1px solid var(--border-gold); border-radius:10px; padding:1px 6px; margin-left:4px; cursor:pointer; transition:all 0.2s; }
     .linked-badge:hover { background:rgba(184,148,42,0.2); }
     .linked-transfers-section { margin-top:18px; padding-top:14px; border-top:1.5px solid var(--border); }
-    .linked-transfers-title { font-size:0.76rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+    .linked-transfers-title { font-size:0.76rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; gap:6px; }
     .linked-transfer-item { display:flex; align-items:center; gap:9px; padding:7px 11px; background:var(--input-bg); border:1.5px solid var(--border); border-radius:8px; margin-bottom:5px; cursor:pointer; transition:all 0.2s; font-size:0.8rem; }
     .linked-transfer-item:hover { border-color:var(--gold); transform:translateX(3px); }
     .linked-transfer-num { font-weight:700; color:var(--gold); min-width:62px; }
@@ -267,6 +272,35 @@
     .linked-transfer-status.completed{background:rgba(26,110,168,0.12);color:var(--status-completed);}
     .linked-transfer-status.cancelled{background:rgba(192,57,43,0.12);color:var(--status-cancelled);}
     .notified-dot { width:7px; height:7px; border-radius:50%; background:var(--status-confirmed); display:inline-block; margin-left:3px; flex-shrink:0; }
+    /* Car type badges */
+    .car-type-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.67rem; font-weight:700; text-transform:uppercase; white-space:nowrap; }
+    .car-type-badge.own { background:rgba(27,127,74,0.12); color:var(--status-confirmed); border:1px solid rgba(27,127,74,0.25); }
+    .car-type-badge.rented { background:rgba(26,110,168,0.12); color:var(--status-completed); border:1px solid rgba(26,110,168,0.25); }
+    .car-type-badge.commission { background:rgba(192,57,43,0.12); color:var(--status-cancelled); border:1px solid rgba(192,57,43,0.25); }
+    .comm-paid-badge { display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.67rem; font-weight:700; white-space:nowrap; }
+    .comm-paid-badge.yes { background:rgba(27,127,74,0.12); color:var(--status-confirmed); border:1px solid rgba(27,127,74,0.25); }
+    .comm-paid-badge.no { background:rgba(192,57,43,0.12); color:var(--status-cancelled); border:1px solid rgba(192,57,43,0.25); }
+    .comm-paid-badge.na { background:rgba(90,86,80,0.1); color:var(--text-muted); border:1px solid var(--border); }
+    /* Calendar popup */
+    .cal-popup { position:fixed; z-index:9000; background:var(--bg-card); border:1.5px solid var(--border-gold); border-radius:14px; box-shadow:var(--shadow-lg); padding:16px 18px; min-width:290px; max-width:340px; animation:modalSlide 0.22s ease; backdrop-filter:blur(14px); }
+    .cal-popup-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    .cal-popup-num { font-family:'Playfair Display',serif; font-size:1rem; color:var(--gold); font-weight:600; }
+    .cal-popup-close { background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer; padding:2px 5px; line-height:1; transition:color 0.2s; }
+    .cal-popup-close:hover { color:var(--text-primary); }
+    .cal-popup-row { display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; font-size:0.83rem; }
+    .cal-popup-label { font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); font-weight:700; min-width:68px; padding-top:1px; }
+    .cal-popup-val { color:var(--text-primary); font-weight:500; flex:1; }
+    .cal-popup-actions { display:flex; gap:8px; margin-top:14px; }
+    /* Stat card clickable */
+    .stat-card { cursor:pointer; }
+    .stat-card:hover { border-color:var(--border-gold); box-shadow:var(--shadow-md); transform:translateY(-2px); transition:all 0.2s ease; }
+    /* Stat detail modal */
+    #stat-detail-modal .modal { max-width:680px; }
+    .stat-detail-table { width:100%; border-collapse:collapse; font-size:0.84rem; }
+    .stat-detail-table th { background:var(--table-hdr); color:var(--gold); font-weight:700; font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; padding:8px 12px; border-bottom:2px solid var(--border-gold); text-align:left; }
+    .stat-detail-table td { padding:8px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+    .stat-detail-table tr:last-child td { border-bottom:none; }
+    .stat-detail-table tbody tr:hover { background:var(--table-hover); }
 
     /* Return / Round-trip banners */
     .return-journey-box { background:rgba(26,110,168,0.06); border:1.5px dashed rgba(26,110,168,0.35); border-radius:10px; padding:13px 16px; margin-bottom:16px; display:flex; align-items:center; gap:13px; }
@@ -421,6 +455,9 @@
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
       </div>
+      <button class="header-btn" onclick="fullSyncFromCloud()" title="Download all bookings from cloud" style="border-color:rgba(26,110,168,0.5);color:var(--status-completed);">
+        ⬇️ <span class="btn-label">Full Sync</span>
+      </button>
       <button class="header-btn" onclick="pushAllToCloud(true)" title="Push All Local Bookings to Cloud" style="border-color:var(--border-gold);color:var(--gold);">
         ☁️ <span class="btn-label">Push All</span>
       </button>
@@ -477,7 +514,6 @@
         <div class="panel">
           <div class="panel-title">
             <span data-i18n="nav_bookings">Active Bookings</span>
-            <span style="font-size:0.8rem;font-family:'Outfit',sans-serif;font-weight:400;color:var(--text-muted);" data-i18n="dbl_edit">Double-click to edit</span>
           </div>
           <div class="grid-filters">
             <input type="text" id="search-bar" class="search-input" oninput="renderTable()">
@@ -666,6 +702,8 @@
                 <th class="hide-mobile">Car · Driver</th>
                 <th onclick="sortArchive('price')" style="width:72px">€</th>
                 <th style="width:100px">Payment</th>
+                <th class="hide-mobile" style="width:100px">Car Type</th>
+                <th class="hide-mobile" style="width:90px">Comm. Paid</th>
                 <th style="width:80px">Actions</th>
               </tr></thead>
               <tbody id="archive-table-body"></tbody>
@@ -737,16 +775,16 @@
         <div class="panel">
           <div class="panel-title" data-i18n="nav_analytics">Analytics</div>
           <div class="analytics-grid">
-            <div class="stat-card profit-card"><span class="stat-val" id="stat-net-profit">€0</span><span class="stat-label" data-i18n="an_net">Net Profit</span></div>
-            <div class="stat-card"><span class="stat-val" id="stat-confirmed-rev">€0</span><span class="stat-label" data-i18n="an_conf_rev">Confirmed Revenue</span></div>
-            <div class="stat-card paid-card"><span class="stat-val" id="stat-paid-rev">€0</span><span class="stat-label" data-i18n="an_paid">✅ Paid to You</span></div>
-            <div class="stat-card unpaid-card"><span class="stat-val" id="stat-unpaid-rev">€0</span><span class="stat-label" data-i18n="an_awaiting">💳 Awaiting Payment</span></div>
-            <div class="stat-card expense-card"><span class="stat-val" id="stat-total-expenses">€0</span><span class="stat-label" data-i18n="an_expenses">📉 Total Expenses</span></div>
-            <div class="stat-card expense-card"><span class="stat-val" id="stat-commission-exp">€0</span><span class="stat-label" data-i18n="an_commission">💸 Commissions</span></div>
-            <div class="stat-card expense-card"><span class="stat-val" id="stat-rental-exp">€0</span><span class="stat-label" data-i18n="an_rental">🏠 Rental</span></div>
-            <div class="stat-card expense-card"><span class="stat-val" id="stat-partner-exp">€0</span><span class="stat-label" data-i18n="an_partner">🤝 Partners</span></div>
-            <div class="stat-card"><span class="stat-val" id="stat-total">0</span><span class="stat-label" data-i18n="an_total">Total Bookings</span></div>
-            <div class="stat-card"><span class="stat-val" id="stat-completed">0</span><span class="stat-label" data-i18n="an_completed">Completed Transfers</span></div>
+            <div class="stat-card profit-card" onclick="showStatDetail('net-profit')" title="Click to see details"><span class="stat-val" id="stat-net-profit">€0</span><span class="stat-label" data-i18n="an_net">Net Profit</span><span class="stat-hint">Click to see breakdown</span></div>
+            <div class="stat-card" onclick="showStatDetail('confirmed-rev')" title="Click to see list"><span class="stat-val" id="stat-confirmed-rev">€0</span><span class="stat-label" data-i18n="an_conf_rev">Confirmed Revenue</span><span class="stat-hint">Click to see bookings</span></div>
+            <div class="stat-card paid-card" onclick="showStatDetail('paid')" title="Click to see list"><span class="stat-val" id="stat-paid-rev">€0</span><span class="stat-label" data-i18n="an_paid">✅ Paid to You</span><span class="stat-hint">Click to see bookings</span></div>
+            <div class="stat-card unpaid-card" onclick="showStatDetail('unpaid')" title="Click to see list"><span class="stat-val" id="stat-unpaid-rev">€0</span><span class="stat-label" data-i18n="an_awaiting">💳 Awaiting Payment</span><span class="stat-hint">Click to see bookings</span></div>
+            <div class="stat-card expense-card" onclick="showStatDetail('expenses')" title="Click to see list"><span class="stat-val" id="stat-total-expenses">€0</span><span class="stat-label" data-i18n="an_expenses">📉 Total Expenses</span><span class="stat-hint">Click to see expenses</span></div>
+            <div class="stat-card expense-card" onclick="showStatDetail('commission')" title="Click to see list"><span class="stat-val" id="stat-commission-exp">€0</span><span class="stat-label" data-i18n="an_commission">💸 Commissions</span><span class="stat-hint">Click to see expenses</span></div>
+            <div class="stat-card expense-card" onclick="showStatDetail('rental')" title="Click to see list"><span class="stat-val" id="stat-rental-exp">€0</span><span class="stat-label" data-i18n="an_rental">🏠 Rental</span><span class="stat-hint">Click to see expenses</span></div>
+            <div class="stat-card expense-card" onclick="showStatDetail('partner')" title="Click to see list"><span class="stat-val" id="stat-partner-exp">€0</span><span class="stat-label" data-i18n="an_partner">🤝 Partners</span><span class="stat-hint">Click to see expenses</span></div>
+            <div class="stat-card" onclick="showStatDetail('all-bookings')" title="Click to see list"><span class="stat-val" id="stat-total">0</span><span class="stat-label" data-i18n="an_total">Total Bookings</span><span class="stat-hint">Click to see all</span></div>
+            <div class="stat-card" onclick="showStatDetail('completed')" title="Click to see list"><span class="stat-val" id="stat-completed">0</span><span class="stat-label" data-i18n="an_completed">Completed Transfers</span><span class="stat-hint">Click to see all</span></div>
           </div>
           <div class="panel-title" style="margin-top:6px;" data-i18n="backup_title">Backup &amp; Data</div>
           <div style="display:flex;flex-wrap:wrap;gap:11px;margin-top:14px;">
@@ -858,6 +896,20 @@
           <div class="form-group"><label data-i18n="f_flight">Flight Info</label><input type="text" id="edit-flightInfo"></div>
           <div class="form-group"><label data-i18n="f_child">Child Seats</label><input type="number" id="edit-childSeats" min="0"></div>
           <div class="form-group"><label data-i18n="f_hold">Hold Bags</label><input type="number" id="edit-holdBags" min="0"></div>
+          <div class="form-group"><label>Car Type</label>
+            <select id="edit-carType">
+              <option value="Own">🚗 Own Car</option>
+              <option value="Rented">🏠 Rented</option>
+              <option value="Commission">💸 Commission</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Commission Paid</label>
+            <select id="edit-commissionPaid">
+              <option value="N/A">— N/A</option>
+              <option value="Yes">✅ Yes</option>
+              <option value="No">❌ No</option>
+            </select>
+          </div>
           <div class="form-group full-width"><label data-i18n="f_notes">Notes</label><textarea id="edit-requirements" rows="2"></textarea></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap;">
@@ -873,14 +925,31 @@
       </form>
       <div class="linked-transfers-section" id="linked-section" style="display:none;">
         <div class="linked-transfers-title">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-          <span data-i18n="linked_title">Linked Transfers (same client)</span>
+          <span style="display:flex;align-items:center;gap:6px;">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            <span data-i18n="linked_title">Linked Transfers (same client)</span>
+          </span>
+          <button class="btn btn-secondary btn-sm" onclick="addTripForClient(document.getElementById('edit-id').value)" style="font-size:0.74rem;padding:4px 10px;">➕ Add Another Trip</button>
         </div>
         <div id="linked-list"></div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- STAT DETAIL MODAL -->
+<div class="modal-overlay" id="stat-detail-modal" onclick="if(event.target===this)closeStatDetail()">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <div class="modal-title" id="stat-detail-title">Details</div>
+      <button class="modal-close" onclick="closeStatDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="stat-detail-body"></div>
+  </div>
+</div>
+
+<!-- CALENDAR POPUP -->
+<div id="cal-popup" class="cal-popup" style="display:none;"></div>
 
 <div class="toast" id="toast-el"><span></span></div>
 <div id="global-notify-menu" class="notify-menu"></div>
@@ -1428,6 +1497,39 @@ function pushAllToCloud(skipConfirm = false) {
     Promise.all(ups).then(()=>{pushSettingsToCloud();setSyncIndicator('online','All pushed ✓');showToast(`✅ All data pushed to cloud!`);});
   }).catch(()=>setSyncIndicator('offline','Push failed'));
 }
+function fullSyncFromCloud() {
+  setSyncIndicator('pending','Full sync...');
+  showToast('⬇️ Downloading all bookings from cloud...');
+  fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${listKey}`)
+    .then(r=>r.json()).then(ls=>{
+      let bIds=[];
+      if(typeof ls === 'string'){
+        const cl=ls.replace(/^"+|"+$/g,'').trim();
+        if(cl && cl !== 'EMPTY' && cl !== 'NONE') bIds=cl.split(',').filter(id=>id && id !== '[object Object]');
+      }
+      if(!bIds.length){setSyncIndicator('online','No cloud data');showToast('No bookings found in cloud.',false);return;}
+      // Only fetch IDs we don't have locally
+      const localIds=new Set(bookings.map(b=>b.id));
+      const missing=bIds.filter(id=>!localIds.has(id));
+      if(!missing.length){setSyncIndicator('online','Already up to date ✓');showToast('✓ Already fully synced — no new bookings');return;}
+      Promise.all(missing.map(id=>fetchBookingById(id))).then(results=>{
+        const valid=results.filter(b=>b!==null);
+        let added=0;
+        valid.forEach(cb=>{
+          if(!bookings.find(lb=>lb.id===cb.id)){
+            bookings.push(cb);
+            added++;
+          }
+        });
+        migrateBookings(bookings);
+        localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));
+        renderAll();
+        const now=new Date(),ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+        setSyncIndicator('online',`Full sync ${ts}`);
+        showToast(`✅ Full sync complete — ${added} new booking${added!==1?'s':''} downloaded`);
+      });
+    }).catch(()=>{setSyncIndicator('offline','Sync failed');showToast('Full sync failed — check network',false);});
+}
 function startAutoSync() { if(autoSyncTimer)clearInterval(autoSyncTimer); autoSyncTimer=setInterval(()=>syncNow(true),10000); }
 
 // ═══════════════════════════════════════════════════
@@ -1528,6 +1630,8 @@ function buildRow(b,archived) {
       </select></td>
       <td><div class="action-btn-row">${actionBtns(b.id)}</div></td>`;
   } else {
+    const ctBadge = carTypeBadge(b.carType||'Own');
+    const cpBadge = commPaidBadge(b.commissionPaid||'N/A');
     tr.innerHTML=`
       <td class="booking-num" style="white-space:nowrap">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td>
       <td>
@@ -1544,16 +1648,27 @@ function buildRow(b,archived) {
         <div style="font-weight:800;font-size:0.95rem">€${displayPrice}</div>
         <button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')" style="margin-top:3px;font-size:0.62rem;padding:2px 7px">${payIcon} ${pay}</button>
       </td>
+      <td class="hide-mobile">${ctBadge}</td>
+      <td class="hide-mobile">${cpBadge}</td>
       <td><div class="action-btn-row">${actionBtns(b.id)}</div></td>`;
   }
   tr.addEventListener('dblclick',e=>{if(!['SELECT','BUTTON'].includes(e.target.tagName)&&!e.target.closest('.action-btn-row'))openModal(b.id);});
   return tr;
 }
+function carTypeBadge(ct){
+  const map={Own:'🚗 Own',Rented:'🏠 Rented',Commission:'💸 Commission'};
+  const cls=ct?ct.toLowerCase():'own';
+  return `<span class="car-type-badge ${cls}">${map[ct]||ct||'—'}</span>`;
+}
+function commPaidBadge(cp){
+  if(!cp||cp==='N/A')return '<span class="comm-paid-badge na">— N/A</span>';
+  return cp==='Yes'?'<span class="comm-paid-badge yes">✅ Paid</span>':'<span class="comm-paid-badge no">❌ Unpaid</span>';
+}
 function actionBtns(id){
-  return `<button class="action-icon edit-btn" onclick="openModal('${id}')" title="Edit"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-  <button class="action-icon" onclick="showNotifyMenu(event,'${id}')" title="Notify"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.95 10.5a19.79 19.79 0 01-3-8.57A2 2 0 012.9 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg></button>
-  <button class="action-icon" onclick="copyReport('${id}')" title="Copy"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
-  <button class="action-icon delete-btn" onclick="deleteBooking('${id}')" title="Delete"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
+  return `<button class="action-pill" onclick="openModal('${id}')" title="Edit">✏️ Edit</button>
+  <button class="action-pill" onclick="copyReport('${id}')" title="Copy report">📋 Copy</button>
+  <button class="action-pill" onclick="showNotifyMenu(event,'${id}')" title="Notify client">📞 Notify</button>
+  <button class="action-pill delete-pill" onclick="deleteBooking('${id}')" title="Delete">🗑️ Delete</button>`;
 }
 function changeStatus(id,ns){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].status=ns;saveLocalData();pushToCloud(bookings[i]);showToast(`Status → ${ns}`);}}
 function changePayment(id){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].paymentStatus=bookings[i].paymentStatus==='Paid'?'Unpaid':'Paid';saveLocalData();pushToCloud(bookings[i]);showToast(`Payment → ${bookings[i].paymentStatus}`);}}
@@ -1641,6 +1756,7 @@ function renderCalendar(){
     if(dayView)dayView.style.display='';
     if(monthView)monthView.style.display='none';
     renderDispatchView();
+    document.getElementById('calendar-month-year').textContent=calDate.toLocaleDateString(currentLang==='ru'?'ru-RU':'en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   }
 }
 function renderGridCal(){
@@ -1670,6 +1786,194 @@ function renderGridCal(){
   const tc=fi+dm,pad=(7-(tc%7))%7;
   for(let i=1;i<=pad;i++){const d=document.createElement('div');d.className='calendar-day other-month';d.innerHTML=`<span class="calendar-day-num">${i}</span>`;c.appendChild(d);}
 }
+
+// ═══════════════════════════════════════════════════
+// DISPATCH VIEW (Day Calendar)
+// ═══════════════════════════════════════════════════
+function renderDispatchView(){
+  const container=document.getElementById('dispatch-board-container');
+  const sidebar=document.getElementById('dispatch-sidebar');
+  const unassignedList=document.getElementById('dispatch-unassigned-list');
+  const assignedCard=document.getElementById('dispatch-assigned-card');
+  const assignedList=document.getElementById('dispatch-assigned-list');
+  if(!container)return;
+
+  const dayStr=`${calDate.getFullYear()}-${pad2(calDate.getMonth()+1)}-${pad2(calDate.getDate())}`;
+  const dayBookings=bookings.filter(b=>b.datetime&&b.datetime.startsWith(dayStr));
+  dayBookings.sort((a,b)=>(a.datetime||'').localeCompare(b.datetime||''));
+
+  // Separate unassigned and assigned
+  const unassigned=dayBookings.filter(b=>!b.car&&!b.driver);
+  const assigned=dayBookings.filter(b=>b.car||b.driver);
+
+  // Build timeline (0–23h)
+  const HOURS=24;
+  const CELL_W=48; // px per hour
+  const totalW=HOURS*CELL_W;
+  const LABEL_W=150;
+
+  // Group bookings by vehicle
+  const vehicleMap={};
+  assigned.forEach(b=>{
+    const key=b.car||'Unassigned';
+    if(!vehicleMap[key])vehicleMap[key]=[];
+    vehicleMap[key].push(b);
+  });
+  // Always show configured vehicles + any extra from bookings
+  const vehicleKeys=[...new Set([...settings.vehicles.map(v=>v.name),...Object.keys(vehicleMap)])];
+
+  // Header row
+  let html=`<div class="dispatch-hdr-row" style="min-width:${LABEL_W+totalW}px">`;
+  html+=`<div class="dispatch-label-cell" style="width:${LABEL_W}px;min-width:${LABEL_W}px;">Vehicle / Driver</div>`;
+  html+=`<div class="dispatch-hours-hdr" style="width:${totalW}px;">`;
+  for(let h=0;h<HOURS;h++){
+    html+=`<div class="dispatch-hour-tick" style="width:${CELL_W}px;">${pad2(h)}</div>`;
+  }
+  html+=`</div></div>`;
+
+  // Now line
+  const now=new Date();
+  const isToday=now.toISOString().startsWith(dayStr);
+  const nowPct=isToday?((now.getHours()*60+now.getMinutes())/(HOURS*60)*100):null;
+
+  // Vehicle rows
+  vehicleKeys.forEach(vname=>{
+    const vBookings=vehicleMap[vname]||[];
+    const vDef=settings.vehicles.find(v=>v.name===vname);
+    const plate=vDef&&vDef.plate?vDef.plate:'';
+    html+=`<div class="dispatch-vehicle-row" style="min-width:${LABEL_W+totalW}px">`;
+    html+=`<div class="dispatch-row-label" style="width:${LABEL_W}px;min-width:${LABEL_W}px;">`;
+    html+=`<div class="dispatch-row-label-name">${esc(vname)}</div>`;
+    if(plate)html+=`<div class="dispatch-row-label-plate">${esc(plate)}</div>`;
+    html+=`</div>`;
+    html+=`<div class="dispatch-timeline" style="width:${totalW}px;position:relative;">`;
+    // Grid lines
+    for(let h=0;h<HOURS;h++){
+      const isMaj=h%6===0;
+      html+=`<div class="dispatch-grid-line${isMaj?' major':''}" style="left:${h*CELL_W}px"></div>`;
+    }
+    // Now line
+    if(nowPct!==null)html+=`<div class="dispatch-now-line" style="left:${nowPct}%"></div>`;
+    // Booking blocks
+    vBookings.forEach(b=>{
+      if(!b.datetime)return;
+      const bDate=new Date(b.datetime);
+      const startMin=bDate.getHours()*60+bDate.getMinutes();
+      const durMin=90; // assume 1.5h transfer
+      const leftPx=(startMin/60)*CELL_W;
+      const widthPx=Math.max((durMin/60)*CELL_W,CELL_W*0.8);
+      const icon=b.car&&(b.car.toLowerCase().includes('v-class')||b.car.toLowerCase().includes('trafic'))?'🚐':'🚗';
+      const ts=bDate.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      html+=`<div class="dispatch-block ${(b.status||'pending').toLowerCase()}" style="left:${leftPx}px;width:${widthPx}px;" onclick="showCalPopup(event,'${b.id}')" title="${esc(b.name)} — ${ts}">`;
+      html+=`<div class="dispatch-block-time">${ts} ${icon}</div>`;
+      html+=`<div class="dispatch-block-name">${esc(b.name)}</div>`;
+      html+=`<div class="dispatch-block-route">${esc((b.pickup||'').split(',')[0])} ➝ ${esc((b.dropoff||'').split(',')[0])}</div>`;
+      if(b.driver)html+=`<div class="dispatch-block-driver">👤 ${esc(b.driver)}</div>`;
+      html+=`</div>`;
+    });
+    html+=`</div></div>`;
+  });
+
+  if(!vehicleKeys.length){
+    html+=`<div class="dispatch-empty-row">No vehicles configured.</div>`;
+  }
+
+  container.innerHTML=html;
+
+  // Unassigned sidebar
+  if(unassigned.length){
+    let uhtml='';
+    unassigned.forEach(b=>{
+      const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
+      uhtml+=`<div class="dispatch-unassigned-item" onclick="showCalPopup(event,'${b.id}')">`;
+      uhtml+=`<div class="dispatch-unassigned-name">${esc(b.name)}</div>`;
+      uhtml+=`<div class="dispatch-unassigned-info">${ts} · €${b.price}</div>`;
+      uhtml+=`</div>`;
+    });
+    unassignedList.innerHTML=uhtml;
+  } else {
+    unassignedList.innerHTML='<div style="font-size:0.78rem;color:var(--text-muted)">All assigned ✓</div>';
+  }
+
+  // Assigned sidebar
+  if(assigned.length){
+    assignedCard.style.display='block';
+    let ahtml='';
+    assigned.slice(0,5).forEach(b=>{
+      const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
+      ahtml+=`<div class="dispatch-unassigned-item" style="border-color:rgba(27,127,74,0.3);background:rgba(27,127,74,0.05);" onclick="showCalPopup(event,'${b.id}')">`;
+      ahtml+=`<div class="dispatch-unassigned-name">${esc(b.name)}</div>`;
+      ahtml+=`<div class="dispatch-unassigned-info">${ts} · ${esc(b.car||'')}</div>`;
+      ahtml+=`</div>`;
+    });
+    if(assigned.length>5)ahtml+=`<div style="font-size:0.74rem;color:var(--text-muted);padding:4px 9px;">+${assigned.length-5} more</div>`;
+    assignedList.innerHTML=ahtml;
+  } else {
+    assignedCard.style.display='none';
+  }
+
+  // Auto-scroll to current hour
+  if(isToday){
+    const scrollArea=document.getElementById('dispatch-scroll-area');
+    if(scrollArea){const scrollTo=Math.max(0,(now.getHours()-2)*CELL_W+LABEL_W);setTimeout(()=>scrollArea.scrollLeft=scrollTo,100);}
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// CALENDAR BOOKING POPUP
+// ═══════════════════════════════════════════════════
+function showCalPopup(e, bookingId){
+  e.stopPropagation();
+  const b=bookings.find(x=>x.id===bookingId);
+  if(!b)return;
+  const popup=document.getElementById('cal-popup');
+  const pay=b.paymentStatus||'Unpaid';
+  const fmtDt=dt=>{if(!dt)return'TBD';try{const d=new Date(dt);return d.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(err){return dt;}};
+  const statusColors={Pending:'var(--status-pending)',Confirmed:'var(--status-confirmed)',Completed:'var(--status-completed)',Cancelled:'var(--status-cancelled)'};
+  const sc=statusColors[b.status]||'var(--text-muted)';
+  popup.innerHTML=`
+    <div class="cal-popup-header">
+      <span class="cal-popup-num">#${(b.bookingNumber||0).toString().padStart(5,'0')}</span>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span class="status-badge ${(b.status||'pending').toLowerCase()}">${b.status||'Pending'}</span>
+        <button class="cal-popup-close" onclick="hideCalPopup()">✕</button>
+      </div>
+    </div>
+    <div class="cal-popup-row"><span class="cal-popup-label">👤 Client</span><span class="cal-popup-val" style="font-weight:700">${esc(b.name||'—')}</span></div>
+    ${b.phone?`<div class="cal-popup-row"><span class="cal-popup-label">📞 Phone</span><span class="cal-popup-val">${esc(b.phone)}</span></div>`:''}
+    ${b.email?`<div class="cal-popup-row"><span class="cal-popup-label">✉️ Email</span><span class="cal-popup-val" style="font-size:0.79rem">${esc(b.email)}</span></div>`:''}
+    <div class="cal-popup-row"><span class="cal-popup-label">📅 Time</span><span class="cal-popup-val" style="color:var(--gold);font-weight:700">${fmtDt(b.datetime)}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">🛫 Pickup</span><span class="cal-popup-val">${esc(b.pickup||'—')}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">🏁 Dropoff</span><span class="cal-popup-val">${esc(b.dropoff||'—')}</span></div>
+    ${b.car?`<div class="cal-popup-row"><span class="cal-popup-label">🚗 Vehicle</span><span class="cal-popup-val">${esc(b.car)}${b.driver?' · 👤 '+esc(b.driver):''}</span></div>`:''}
+    ${b.flightInfo?`<div class="cal-popup-row"><span class="cal-popup-label">✈️ Flight</span><span class="cal-popup-val">${esc(b.flightInfo)}</span></div>`:''}
+    <div class="cal-popup-row"><span class="cal-popup-label">👥 Pax</span><span class="cal-popup-val">${b.passengers||1} pax · 💼 ${b.luggage||0} · 📦 ${b.holdBags||0} · 👶 ${b.childSeats||0}</span></div>
+    <div class="cal-popup-row"><span class="cal-popup-label">💰 Amount</span><span class="cal-popup-val" style="font-weight:800;font-size:0.95rem">€${b.price||0} <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400">(${pay})</span></span></div>
+    ${b.requirements&&b.requirements!=='None'?`<div class="cal-popup-row"><span class="cal-popup-label">💬 Notes</span><span class="cal-popup-val" style="font-size:0.79rem;color:var(--text-secondary)">${esc(b.requirements)}</span></div>`:''}
+    <div class="cal-popup-actions">
+      <button class="btn btn-sm" onclick="hideCalPopup();openModal('${b.id}')">✏️ Edit</button>
+      <button class="btn btn-secondary btn-sm" onclick="notifyClientWA('${b.id}')">📱 WhatsApp</button>
+    </div>`;
+
+  // Position popup near click
+  popup.style.display='block';
+  const vw=window.innerWidth, vh=window.innerHeight;
+  let x=e.clientX+10, y=e.clientY+10;
+  popup.style.left=x+'px'; popup.style.top=y+'px';
+  requestAnimationFrame(()=>{
+    const pr=popup.getBoundingClientRect();
+    if(pr.right>vw-10)popup.style.left=(vw-pr.width-14)+'px';
+    if(pr.bottom>vh-10)popup.style.top=(y-pr.height-20)+'px';
+  });
+}
+function hideCalPopup(){
+  const p=document.getElementById('cal-popup');
+  if(p)p.style.display='none';
+}
+document.addEventListener('click',e=>{
+  const p=document.getElementById('cal-popup');
+  if(p&&p.style.display!=='none'&&!p.contains(e.target))hideCalPopup();
+});
 function renderWeekCal(){
   const container=document.getElementById('week-grid-container');
   const today=new Date(),dow=(calDate.getDay()+6)%7;
@@ -1822,6 +2126,8 @@ function openModal(id){
   document.getElementById('edit-paymentStatus').value=b.paymentStatus||'Unpaid';
   populateVehicleSelect(document.getElementById('edit-car'),b.car);
   populateDriverSelect(document.getElementById('edit-driver'),b.driver||'');
+  document.getElementById('edit-carType').value=b.carType||'Own';
+  document.getElementById('edit-commissionPaid').value=b.commissionPaid||'N/A';
   // Linked
   const ph=(b.phone||'').trim(),em=(b.email||'').trim().toLowerCase();
   let lhtml='';
@@ -1845,9 +2151,24 @@ function handleEditSubmit(e){
     bookings[i].price=parseInt(document.getElementById('edit-price').value)||0;
     bookings[i].status=document.getElementById('edit-status').value;
     bookings[i].paymentStatus=document.getElementById('edit-paymentStatus').value;
+    bookings[i].carType=document.getElementById('edit-carType').value||'Own';
+    bookings[i].commissionPaid=document.getElementById('edit-commissionPaid').value||'N/A';
     bookings[i].updated_at=new Date().toISOString();
     saveLocalData();pushToCloud(bookings[i]);closeModal();showToast(currentLang==='ru'?'Изменения сохранены!':'Changes saved!');
   }
+}
+function addTripForClient(bookingId){
+  const b=bookings.find(x=>x.id===bookingId);
+  if(!b)return;
+  closeModal();
+  switchTab('add-tab',document.getElementById('nav-add'));setMobileNav('mnav-add');
+  setTimeout(()=>{
+    if(b.name)document.getElementById('m-name').value=b.name;
+    if(b.email)document.getElementById('m-email').value=b.email;
+    if(b.phone)document.getElementById('m-phone').value=b.phone;
+    document.getElementById('add-tab').scrollIntoView({behavior:'smooth'});
+    showToast('✅ Client pre-filled — add the new trip details');
+  },200);
 }
 function deleteBooking(id){
   if(!confirm(currentLang==='ru'?'Удалить этот заказ?':'Delete this booking?'))return;
@@ -1939,6 +2260,91 @@ function updateAnalytics(){
   document.getElementById('stat-net-profit').textContent=fmt(netProfit);
   document.getElementById('stat-net-profit').style.color=netProfit>=0?'var(--status-confirmed)':'var(--status-cancelled)';
 }
+function showStatDetail(type){
+  const modal=document.getElementById('stat-detail-modal');
+  const title=document.getElementById('stat-detail-title');
+  const body=document.getElementById('stat-detail-body');
+  let html='';
+  const fmtAmt=n=>'€'+(parseFloat(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2});
+  const fmtDt=dt=>{if(!dt)return'—';try{return new Date(dt).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+new Date(dt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(e){return dt;}};
+  if(type==='confirmed-rev'){
+    title.textContent='Confirmed Revenue — Bookings';
+    const list=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed');
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Amount</th><th>Status</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="6" class="no-data">No bookings</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--gold)">${fmtAmt(b.price)}</td><td><span class="status-badge ${(b.status||'').toLowerCase()}">${b.status}</span></td></tr>`);
+    const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
+    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--gold)">${fmtAmt(total)}</td><td></td></tr></tfoot></table>`;
+  } else if(type==='paid'){
+    title.textContent='Paid Bookings';
+    const list=bookings.filter(b=>(b.paymentStatus||'Unpaid')==='Paid');
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Amount</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="5" class="no-data">No paid bookings</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--status-confirmed)">${fmtAmt(b.price)}</td></tr>`);
+    const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
+    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total Paid</td><td style="font-weight:800;color:var(--status-confirmed)">${fmtAmt(total)}</td></tr></tfoot></table>`;
+  } else if(type==='unpaid'){
+    title.textContent='Awaiting Payment';
+    const list=bookings.filter(b=>(b.status==='Confirmed'||b.status==='Completed')&&(b.paymentStatus||'Unpaid')==='Unpaid');
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Phone</th><th>Date</th><th>Amount</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="5" class="no-data">No unpaid bookings 🎉</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="font-size:0.8rem;color:var(--text-muted)">${esc(b.phone||'—')}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(b.price)}</td></tr>`);
+    const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
+    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total Outstanding</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(total)}</td></tr></tfoot></table>`;
+  } else if(type==='expenses'){
+    title.textContent='All Expenses';
+    html=buildExpenseDetailTable(expenses);
+  } else if(type==='commission'){
+    title.textContent='Commission Expenses';
+    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='commission'));
+  } else if(type==='rental'){
+    title.textContent='Rental Expenses';
+    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='rental'));
+  } else if(type==='partner'){
+    title.textContent='Partner Expenses';
+    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='partner'));
+  } else if(type==='all-bookings'){
+    title.textContent='All Bookings';
+    const list=[...bookings].sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Status</th><th>€</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="6" class="no-data">No bookings</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td><span class="status-badge ${(b.status||'').toLowerCase()}">${b.status}</span></td><td style="font-weight:700">${fmtAmt(b.price)}</td></tr>`);
+    html+=`</tbody></table>`;
+  } else if(type==='completed'){
+    title.textContent='Completed Transfers';
+    const list=bookings.filter(b=>b.status==='Completed').sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>€</th><th>Payment</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="6" class="no-data">No completed transfers</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--gold)">${fmtAmt(b.price)}</td><td><span class="payment-badge ${(b.paymentStatus||'Unpaid').toLowerCase()}" style="cursor:default">${b.paymentStatus||'Unpaid'}</span></td></tr>`);
+    const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
+    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--gold)">${fmtAmt(total)}</td><td></td></tr></tfoot></table>`;
+  } else if(type==='net-profit'){
+    title.textContent='Net Profit Breakdown';
+    const confRev=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
+    const totalExp=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+    html=`<div style="display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap;">
+      <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:var(--status-confirmed)">${fmtAmt(confRev)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Revenue</div></div>
+      <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:var(--status-cancelled)">${fmtAmt(totalExp)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Expenses</div></div>
+      <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:${confRev-totalExp>=0?'var(--status-confirmed)':'var(--status-cancelled)'}">${fmtAmt(confRev-totalExp)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Net Profit</div></div>
+    </div>`;
+    html+=buildExpenseDetailTable(expenses,'Expense Breakdown');
+  }
+  body.innerHTML=html;
+  modal.classList.add('open');
+}
+function buildExpenseDetailTable(list,caption=''){
+  const fmtAmt=n=>'€'+(parseFloat(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2});
+  let html=`<table class="stat-detail-table"><thead><tr><th>Date</th><th>Category</th><th>Partner</th><th>Amount</th><th>Description</th></tr></thead><tbody>`;
+  if(!list.length)html+='<tr><td colspan="5" class="no-data">No expenses</td></tr>';
+  list.sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(e=>{
+    const catLabel=e.category?e.category.charAt(0).toUpperCase()+e.category.slice(1):'Other';
+    html+=`<tr><td style="font-weight:600">${e.date||'—'}</td><td><span class="expense-cat-badge ${e.category}">${catLabel}</span></td><td style="color:var(--text-muted);font-size:0.81rem">${esc(e.partnerName||'—')}</td><td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(e.amount)}</td><td style="color:var(--text-secondary);font-size:0.81rem">${esc(e.description||'—')}</td></tr>`;
+  });
+  const total=list.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  html+=`</tbody><tfoot><tr><td colspan="3" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(total)}</td><td></td></tr></tfoot></table>`;
+  return html;
+}
+function closeStatDetail(){document.getElementById('stat-detail-modal').classList.remove('open');}
 
 // ═══════════════════════════════════════════════════
 // EXPORTS
