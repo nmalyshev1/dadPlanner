@@ -1398,72 +1398,118 @@ function saveBookingToCloud(b) {
   return Promise.all(promises);
 }
 
+// ═══════════════════════════════════════════════════
+// CHUNKED LIST SYNC HELPERS (bypasses IIS URL length limits)
+// ═══════════════════════════════════════════════════
+function saveListToCloud(keyName, listArray) {
+  const cleanList = [...new Set((listArray||[]).filter(id => id && id !== '[object Object]'))];
+  const str = cleanList.join(',');
+  // 1. Send single key for short lists (backward compatibility)
+  if (str.length < 1200) {
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${keyName}/${encodeURIComponent(str)}`, { method: 'POST', headers: { 'Content-Length': '0' } }).catch(() => {});
+  }
+  // 2. Base64 chunked key (unlimited length, safe short URLs)
+  try {
+    const b64 = btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const chunkSize = 180;
+    let chunks = [];
+    for (let i = 0; i < b64.length; i += chunkSize) chunks.push(b64.substring(i, i + chunkSize));
+    let promises = chunks.map((c, i) =>
+      fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${keyName}_c${i}/${c}`, { method: 'POST', headers: { 'Content-Length': '0' } }).catch(() => {})
+    );
+    promises.push(fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${keyName}_len/${chunks.length}`, { method: 'POST', headers: { 'Content-Length': '0' } }).catch(() => {}));
+    return Promise.all(promises);
+  } catch(e) { return Promise.resolve(); }
+}
+
+function fetchListFromCloud(keyName) {
+  return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${keyName}_len`)
+    .then(r => r.json()).then(lenDs => {
+      if (lenDs && typeof lenDs === 'string') {
+        const numChunks = parseInt(lenDs.replace(/^"+|"+$/g, '').trim()) || 0;
+        if (numChunks > 0) {
+          return Promise.all(Array.from({ length: numChunks }, (_, i) =>
+            fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${keyName}_c${i}`)
+              .then(r => r.json()).then(cd => typeof cd === 'string' ? cd.replace(/^"+|"+$/g, '').trim() : '').catch(() => '')
+          )).then(chunks => {
+            const b64 = chunks.join('').replace(/-/g, '+').replace(/_/g, '/');
+            if (!b64) return [];
+            const pad = b64.length % 4 ? '='.repeat(4 - b64.length % 4) : '';
+            try {
+              const raw = decodeURIComponent(escape(atob(b64 + pad)));
+              return raw.split(',').filter(id => id && id !== '[object Object]');
+            } catch(e) { return []; }
+          });
+        }
+      }
+      return fetchFallbackList(keyName);
+    }).catch(() => fetchFallbackList(keyName));
+}
+
+function fetchFallbackList(keyName) {
+  return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${keyName}`)
+    .then(r => r.json()).then(ls => {
+      if (typeof ls === 'string') {
+        const cl = ls.replace(/^"+|"+$/g, '').trim();
+        if (cl && cl !== 'EMPTY' && cl !== 'NONE') return cl.split(',').filter(id => id && id !== '[object Object]');
+      }
+      return [];
+    }).catch(() => []);
+}
+
 function syncNow(silent=false) {
   setSyncIndicator('pending','Syncing...');
-  fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${listKey}`)
-    .then(r=>r.json()).then(ls=>{
-      let bIds=[];
-      if(typeof ls === 'string'){
-        const cl=ls.replace(/^"+|"+$/g,'').trim();
-        if(cl && cl !== 'EMPTY' && cl !== 'NONE') bIds=cl.split(',').filter(id => id && id !== '[object Object]');
-      }
-      fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${expListKey}`)
-        .then(r=>r.json()).then(els=>{
-          let eIds=[];
-          if(typeof els === 'string'){
-            const ec=els.replace(/^"+|"+$/g,'').trim();
-            if(ec && ec !== 'EMPTY' && ec !== 'NONE') eIds=ec.split(',').filter(id => id && id !== '[object Object]');
-          }
-          // Fetch settings
-          const settingsFetch=fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_settings_cfg`)
-            .then(r=>r.json()).then(sd=>{
-              if(!sd || typeof sd !== 'string')return;
-              const sc=sd.replace(/^"+|"+$/g,'').trim();
-              if(!sc)return;
-              try{
-                const ps=JSON.parse(decodeURIComponent(sc));
-                if(ps&&ps.vehicles){settings=ps;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}
-              }catch(e){try{const ps=JSON.parse(sc);if(ps&&ps.vehicles){settings=ps;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}}catch(e2){}}
-            }).catch(()=>{});
+  Promise.all([fetchListFromCloud(listKey), fetchListFromCloud(expListKey)]).then(([bIds, eIds]) => {
+    // Fetch settings
+    const settingsFetch = fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_settings_cfg`)
+      .then(r=>r.json()).then(sd=>{
+        if(!sd || typeof sd !== 'string')return;
+        const sc=sd.replace(/^"+|"+$/g,'').trim();
+        if(!sc)return;
+        try{
+          const ps=JSON.parse(decodeURIComponent(sc));
+          if(ps&&ps.vehicles){settings=ps;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}
+        }catch(e){try{const ps=JSON.parse(sc);if(ps&&ps.vehicles){settings=ps;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}}catch(e2){}}
+      }).catch(()=>{});
 
-          const bookingFetches=bIds.length?Promise.all(bIds.map(id=>fetchBookingById(id))):Promise.resolve([]);
-          const expFetches=eIds.length?Promise.all(eIds.map(id=>
-            fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}`)
-              .then(r=>r.json()).then(ds=>{if(!ds || typeof ds !== 'string')return null;const cj=ds.replace(/^"+|"+$/g,'').trim();try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){return null;}}}).catch(()=>null)
-          )):Promise.resolve([]);
+    const bookingFetches = bIds.length ? Promise.all(bIds.map(id => fetchBookingById(id))) : Promise.resolve([]);
+    const expFetches = eIds.length ? Promise.all(eIds.map(id =>
+      fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}`)
+        .then(r=>r.json()).then(ds=>{if(!ds || typeof ds !== 'string')return null;const cj=ds.replace(/^"+|"+$/g,'').trim();try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){return null;}}}).catch(()=>null)
+    )) : Promise.resolve([]);
 
-          Promise.all([bookingFetches,expFetches,settingsFetch]).then(([cb,ce])=>{
-            // Merge bookings
-            const vb=cb.filter(b=>b!==null); let merged=[...bookings],updated=0,maxN=nextNum-1;
-            vb.forEach(cb=>{
-              if(cb.bookingNumber>maxN)maxN=cb.bookingNumber;
-              const li=merged.findIndex(lb=>lb.id===cb.id);
-              if(li>=0){const lt=new Date(merged[li].updated_at||merged[li].created_at).getTime(),ct=new Date(cb.updated_at||cb.created_at).getTime();if(ct>lt){merged[li]=cb;updated++;}else if(lt>ct)pushToCloud(merged[li]);}
-              else{merged.push(cb);updated++;}
-            });
-            // Auto-upload any local bookings not present in cloud list bIds
-            bookings.forEach(lb => {
-              if (lb && lb.id && !bIds.includes(lb.id)) pushToCloud(lb);
-            });
-            bookings=merged; migrateBookings(bookings);
-            if(maxN>=nextNum){nextNum=maxN+1;localStorage.setItem(COUNTER_KEY,nextNum);}
-            localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));
-            // Merge expenses
-            const ve=ce.filter(e=>e!==null); let mergedE=[...expenses];
-            ve.forEach(ce=>{const li=mergedE.findIndex(le=>le.id===ce.id);if(li>=0){const lt=new Date(mergedE[li].updated_at||mergedE[li].created_at).getTime(),ct=new Date(ce.updated_at||ce.created_at).getTime();if(ct>lt){mergedE[li]=ce;}else pushExpenseToCloud(mergedE[li]);}else mergedE.push(ce);});
-            expenses.forEach(le => {
-              if (le && le.id && !eIds.includes(le.id)) pushExpenseToCloud(le);
-            });
-            expenses=mergedE; localStorage.setItem('vtransfer_expenses',JSON.stringify(expenses));
-            autoCompleteTrips();
-            renderAll();
-            const now=new Date(),ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-            setSyncIndicator('online',`Synced ${ts}`);
-            if(!silent&&updated>0)showToast(`☁️ Synced (${updated} update${updated>1?'s':''})`);
-          });
-        }).catch(()=>setSyncIndicator('offline','No network'));
-    }).catch(()=>setSyncIndicator('offline','No network'));
+    Promise.all([bookingFetches, expFetches, settingsFetch]).then(([cb, ce]) => {
+      // Merge bookings
+      const vb = cb.filter(b=>b!==null); let merged=[...bookings], updated=0, maxN=nextNum-1;
+      vb.forEach(cb => {
+        if(cb.bookingNumber>maxN) maxN=cb.bookingNumber;
+        const li = merged.findIndex(lb=>lb.id===cb.id);
+        if(li>=0){const lt=new Date(merged[li].updated_at||merged[li].created_at).getTime(),ct=new Date(cb.updated_at||cb.created_at).getTime();if(ct>lt){merged[li]=cb;updated++;}else if(lt>ct)pushToCloud(merged[li]);}
+        else{merged.push(cb);updated++;}
+      });
+      // Auto-upload any local bookings not present in cloud list bIds
+      bookings.forEach(lb => {
+        if (lb && lb.id && !bIds.includes(lb.id)) pushToCloud(lb);
+      });
+      bookings = merged; migrateBookings(bookings);
+      if(maxN>=nextNum){nextNum=maxN+1;localStorage.setItem(COUNTER_KEY,nextNum);}
+      localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));
+      // Merge expenses
+      const ve = ce.filter(e=>e!==null); let mergedE=[...expenses];
+      ve.forEach(ce=>{const li=mergedE.findIndex(le=>le.id===ce.id);if(li>=0){const lt=new Date(mergedE[li].updated_at||mergedE[li].created_at).getTime(),ct=new Date(ce.updated_at||ce.created_at).getTime();if(ct>lt){mergedE[li]=ce;}else pushExpenseToCloud(mergedE[li]);}else mergedE.push(ce);});
+      expenses.forEach(le => {
+        if (le && le.id && !eIds.includes(le.id)) pushExpenseToCloud(le);
+      });
+      expenses = mergedE; localStorage.setItem('vtransfer_expenses',JSON.stringify(expenses));
+      autoCompleteTrips();
+      renderAll();
+      const now=new Date(),ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      setSyncIndicator('online',`Synced ${ts}`);
+      if(!silent&&updated>0)showToast(`☁️ Synced (${updated} update${updated>1?'s':''})`);
+    });
+  }).catch(()=>setSyncIndicator('offline','No network'));
 }
+
 function fetchBookingById(id) {
   return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}`)
     .then(r=>r.json()).then(ds=>{
@@ -1485,40 +1531,32 @@ function fetchBookingById(id) {
         }).catch(()=>null);
     }).catch(()=>null);
 }
+
 function pushToCloud(b) {
   saveBookingToCloud(b).then(() => {
-    fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${listKey}`)
-      .then(r => r.json())
-      .then(ls => {
-        let list = [];
-        if (typeof ls === 'string') {
-          const c = ls.replace(/^"+|"+$/g, '').trim();
-          if (c && c !== 'EMPTY' && c !== 'NONE') {
-            list = c.split(',').filter(id => id && id !== '[object Object]');
-          }
-        }
-        if (!list.includes(b.id)) {
-          list.push(b.id);
-          if (list.length > 500) list = list.slice(-500);
-          fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${listKey}/${encodeURIComponent(list.join(','))}`, { method: 'POST', headers: { 'Content-Length': '0' } });
-        }
-      }).catch(() => {});
+    fetchListFromCloud(listKey).then(list => {
+      if (!list.includes(b.id)) {
+        list.push(b.id);
+        if (list.length > 500) list = list.slice(-500);
+        saveListToCloud(listKey, list);
+      }
+    });
   }).catch(() => {});
 }
+
 function pushExpenseToCloud(exp) {
   exp.updated_at=new Date().toISOString();
   fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${exp.id}/${encodeURIComponent(JSON.stringify(exp))}`,{method:'POST',headers:{'Content-Length':'0'}})
     .then(()=>{
-      fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${expListKey}`).then(r=>r.json()).then(ls=>{
-        let list=[];
-        if (typeof ls === 'string') {
-          const c=ls.replace(/^"+|"+$/g,'').trim();
-          if(c && c !== 'EMPTY' && c !== 'NONE') list=c.split(',').filter(id => id && id !== '[object Object]');
+      fetchListFromCloud(expListKey).then(list => {
+        if (!list.includes(exp.id)) {
+          list.push(exp.id);
+          saveListToCloud(expListKey, list);
         }
-        if(!list.includes(exp.id)){list.push(exp.id);fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${expListKey}/${encodeURIComponent(list.join(','))}`,{method:'POST',headers:{'Content-Length':'0'}});}
       });
     }).catch(()=>{});
 }
+
 function pushAllToCloud(skipConfirm = false) {
   if(!bookings.length && !expenses.length){
     showToast(currentLang==='ru'?'Нет сохранённых заказов в этом браузере':'No bookings stored in this browser yet',false);
@@ -1527,18 +1565,18 @@ function pushAllToCloud(skipConfirm = false) {
   if(!skipConfirm && !confirm(`Push ALL local data (${bookings.length} bookings, ${expenses.length} expenses) to cloud?`)) return;
   setSyncIndicator('pending','Uploading...');
   
-  // Save all bookings and expenses in parallel with individual error catching
+  // Save all bookings and expenses in parallel
   const bPromises = bookings.map(b => saveBookingToCloud(b).catch(err => console.warn('Booking push error:', err)));
   const ePromises = expenses.map(e => {
     e.updated_at = new Date().toISOString();
     return fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${e.id}/${encodeURIComponent(JSON.stringify(e))}`, { method:'POST', headers:{'Content-Length':'0'} }).catch(err => console.warn('Expense push error:', err));
   });
 
-  // Update ID lists in cloud
+  // Update chunked ID lists in cloud
   const bIds = bookings.map(b => b.id).filter(Boolean);
   const eIds = expenses.map(e => e.id).filter(Boolean);
-  const listPromise = fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${listKey}/${encodeURIComponent(bIds.join(','))}`, { method:'POST', headers:{'Content-Length':'0'} }).catch(() => {});
-  const expListPromise = eIds.length ? fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${expListKey}/${encodeURIComponent(eIds.join(','))}`, { method:'POST', headers:{'Content-Length':'0'} }).catch(() => {}) : Promise.resolve();
+  const listPromise = saveListToCloud(listKey, bIds);
+  const expListPromise = eIds.length ? saveListToCloud(expListKey, eIds) : Promise.resolve();
 
   Promise.all([...bPromises, ...ePromises, listPromise, expListPromise])
     .then(() => {
@@ -1550,14 +1588,36 @@ function pushAllToCloud(skipConfirm = false) {
     .catch(err => {
       console.error('Push error:', err);
       setSyncIndicator('online', 'Pushed (partial)');
-      showToast(`⚠️ Pushed local data to cloud (some items may need retry)`);
+      showToast(`⚠️ Pushed local data to cloud`);
     });
 }
+
 function fullSyncFromCloud() {
   setSyncIndicator('pending','Full sync...');
   showToast('⬇️ Downloading all bookings from cloud...');
-  fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${listKey}`)
-    .then(r=>r.json()).then(ls=>{
+  fetchListFromCloud(listKey).then(bIds => {
+    if(!bIds.length){setSyncIndicator('online','No cloud data');showToast('No bookings found in cloud.',false);return;}
+    const localIds = new Set(bookings.map(b=>b.id));
+    const missing = bIds.filter(id=>!localIds.has(id));
+    if(!missing.length){setSyncIndicator('online','Already up to date ✓');showToast('✓ Already fully synced — no new bookings');return;}
+    Promise.all(missing.map(id=>fetchBookingById(id))).then(results=>{
+      const valid = results.filter(b=>b!==null);
+      let added = 0;
+      valid.forEach(cb=>{
+        if(!bookings.find(lb=>lb.id===cb.id)){
+          bookings.push(cb);
+          added++;
+        }
+      });
+      migrateBookings(bookings);
+      localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));
+      renderAll();
+      const now=new Date(),ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      setSyncIndicator('online',`Full sync ${ts}`);
+      showToast(`✅ Full sync complete — ${added} new booking${added!==1?'s':''} downloaded`);
+    });
+  }).catch(()=>{setSyncIndicator('offline','Sync failed');showToast('Full sync failed — check network',false);});
+}
       let bIds=[];
       if(typeof ls === 'string'){
         const cl=ls.replace(/^"+|"+$/g,'').trim();
@@ -2283,7 +2343,15 @@ function addTripForClient(bookingId){
 function deleteBooking(id){
   if(!confirm(currentLang==='ru'?'Удалить этот заказ?':'Delete this booking?'))return;
   const i=bookings.findIndex(b=>b.id===id);
-  if(i>=0){bookings.splice(i,1);saveLocalData();fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${id}/`,{method:'POST',headers:{'Content-Length':'0'}}).then(()=>fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/${listKey}`).then(r=>r.json()).then(ls=>{let list=[];if(ls){const c=(ls+'').replace(/^"+|"+$/g,'').trim();if(c)list=c.split(',');}list=list.filter(x=>x!==id);fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${listKey}/${encodeURIComponent(list.join(','))}`,{method:'POST',headers:{'Content-Length':'0'}});}));showToast(currentLang==='ru'?'Заказ удалён':'Booking deleted');}
+  if(i>=0){
+    bookings.splice(i,1); saveLocalData();
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${id}/`,{method:'POST',headers:{'Content-Length':'0'}});
+    fetchListFromCloud(listKey).then(list => {
+      const updatedList = list.filter(x=>x!==id);
+      saveListToCloud(listKey, updatedList);
+    });
+    showToast(currentLang==='ru'?'Заказ удалён':'Booking deleted');
+  }
 }
 function copyReport(id){
   const b=bookings.find(x=>x.id===id);if(!b)return;
