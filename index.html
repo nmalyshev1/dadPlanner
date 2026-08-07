@@ -1359,10 +1359,17 @@ function onExpCatChange() {
 // ═══════════════════════════════════════════════════
 function migrateBookings(arr) {
   const map={'Ожидает':'Pending','Подтвержден':'Confirmed','Завершен':'Completed','Отменен':'Cancelled'};
+  let changed=false;
   arr.forEach(b=>{
-    if(map[b.status])b.status=map[b.status];
-    if(!b.paymentStatus)b.paymentStatus='Unpaid';
+    if(map[b.status]){b.status=map[b.status];changed=true;}
+    if(!b.paymentStatus){b.paymentStatus='Unpaid';changed=true;}
+    // CRITICAL: assign ID if missing — without this booking never syncs to cloud
+    if(!b.id){
+      b.id=Date.now()+'_'+Math.random().toString(36).slice(2,9)+'_mig';
+      changed=true;
+    }
   });
+  return changed;
 }
 function autoCompleteTrips() {
   const now=new Date(); let count=0;
@@ -1386,7 +1393,8 @@ function loadLocalData() {
   else{let mx=0;bookings.forEach(b=>{if(b.bookingNumber>mx)mx=b.bookingNumber;});nextNum=mx>0?mx+1:1;localStorage.setItem(COUNTER_KEY,nextNum);}
   let migrated=false;
   bookings.forEach(b=>{if(!b.bookingNumber){b.bookingNumber=nextNum++;migrated=true;}});
-  migrateBookings(bookings);
+  // migrateBookings now also assigns missing IDs — save result to persist them
+  if(migrateBookings(bookings))migrated=true;
   if(migrated){localStorage.setItem(COUNTER_KEY,nextNum);localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));}
 }
 function saveLocalData() { localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings)); renderAll(); }
@@ -1407,18 +1415,22 @@ function setSyncIndicator(st,txt) {
 // ═══════════════════════════════════════════════════
 function saveBookingToCloud(b) {
   b.updated_at = new Date().toISOString();
+  if(!b.id) b.id=Date.now()+'_'+Math.random().toString(36).slice(2,9);
   const jsonStr = JSON.stringify(b);
   const b64 = btoa(unescape(encodeURIComponent(jsonStr)));
   const safeB64 = b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-  const chunkSize = 200;
+  // CRITICAL: chunk size MUST be 120 or less.
+  // URL path = /api/KeyVal/UpdateValue/mzmvife9/vtransfer_b_[id]_c[n]/[chunk]
+  // prefix is ~70 chars. IIS hard-limits total path. 120 chunk keeps us safe.
+  const chunkSize = 120;
   let chunks = [];
   for (let i = 0; i < safeB64.length; i += chunkSize) {
     chunks.push(safeB64.substring(i, i + chunkSize));
   }
   let promises = chunks.map((chunk, i) =>
-    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${b.id}_c${i}/${chunk}`, { method: 'POST', headers: { 'Content-Length': '0' } })
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${b.id}_c${i}/${chunk}`, { method: 'POST', headers: { 'Content-Length': '0' } }).catch(()=>{})
   );
-  promises.push(fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${b.id}_len/${chunks.length}`, { method: 'POST', headers: { 'Content-Length': '0' } }));
+  promises.push(fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${b.id}_len/${chunks.length}`, { method: 'POST', headers: { 'Content-Length': '0' } }).catch(()=>{}));
   return Promise.all(promises);
 }
 
