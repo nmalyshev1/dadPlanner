@@ -302,7 +302,23 @@
     .stat-detail-table tr:last-child td { border-bottom:none; }
     .stat-detail-table tbody tr:hover { background:var(--table-hover); }
 
-    /* Return / Round-trip banners */
+    /* ── STOPS (multi-stop trips) ───────────────────── */
+    .stops-section { grid-column:1/-1; background:rgba(184,148,42,0.04); border:1.5px dashed var(--border-gold); border-radius:10px; padding:12px 14px; margin-bottom:2px; }
+    .stops-section-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .stop-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; animation:slideDown 0.2s ease; }
+    .stop-row input { flex:1; }
+    .stop-num { font-size:0.7rem; font-weight:800; color:var(--gold); min-width:20px; text-align:center; background:rgba(184,148,42,0.12); border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .stop-remove { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; line-height:1; padding:4px; border-radius:5px; transition:all 0.15s; flex-shrink:0; }
+    .stop-remove:hover { color:var(--status-cancelled); background:rgba(192,57,43,0.08); }
+    .add-stop-btn { display:inline-flex; align-items:center; gap:5px; background:none; border:1.5px dashed var(--border-gold); color:var(--gold); font-family:inherit; font-size:0.78rem; font-weight:600; padding:5px 12px; border-radius:8px; cursor:pointer; transition:all 0.2s; }
+    .add-stop-btn:hover { background:rgba(184,148,42,0.1); border-style:solid; }
+    /* Route with stops in table */
+    .route-stops { display:flex; flex-direction:column; gap:2px; }
+    .route-leg { display:flex; align-items:flex-start; gap:5px; font-size:0.79rem; }
+    .route-leg-icon { font-size:0.72rem; flex-shrink:0; margin-top:1px; opacity:0.8; }
+    .route-stop-dot { width:6px; height:6px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:5px; opacity:0.7; }
+    .stop-badge { display:inline-flex; align-items:center; gap:3px; font-size:0.62rem; background:rgba(184,148,42,0.1); border:1px solid var(--border-gold); border-radius:10px; padding:1px 6px; color:var(--gold); font-weight:700; margin-left:3px; }
+
     .return-journey-box { background:rgba(26,110,168,0.06); border:1.5px dashed rgba(26,110,168,0.35); border-radius:10px; padding:13px 16px; margin-bottom:16px; display:flex; align-items:center; gap:13px; }
     .return-journey-box svg { color:var(--status-completed); flex-shrink:0; }
     .return-journey-text { flex:1; font-size:0.86rem; color:var(--text-secondary); }
@@ -337,40 +353,49 @@
     .settings-add-row .form-group { flex:1; min-width:130px; margin:0; }
 
     /* ── DISPATCH BOARD ────────────────────────────── */
-    .dispatch-board-wrap { overflow-x:auto; border:1.5px solid var(--border); border-radius:12px; background:var(--bg-card); }
+    .dispatch-board-wrap { border:1.5px solid var(--border); border-radius:10px; background:var(--bg-card); overflow:hidden; }
+    /* Header row with hour ticks */
     .dispatch-hdr-row { display:flex; background:var(--table-hdr); border-bottom:2px solid var(--border-gold); position:sticky; top:0; z-index:10; }
-    .dispatch-label-cell { flex-shrink:0; padding:9px 14px; font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); border-right:2px solid var(--border-gold); display:flex; align-items:center; }
+    .dispatch-label-cell { flex-shrink:0; padding:7px 12px; font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); border-right:2px solid var(--border-gold); display:flex; align-items:center; }
     .dispatch-hours-hdr { display:flex; flex:1; }
-    .dispatch-hour-tick { flex-shrink:0; text-align:center; font-size:0.62rem; color:var(--text-muted); padding:9px 0; border-right:1px solid var(--border); font-weight:700; }
-    .dispatch-vehicle-row { display:flex; border-bottom:1px solid var(--border); position:relative; }
-    .dispatch-vehicle-row:last-child { border-bottom:none; }
-    .dispatch-row-label { flex-shrink:0; padding:9px 12px; border-right:2px solid var(--border-gold); background:var(--table-hdr); display:flex; flex-direction:column; justify-content:center; gap:2px; }
-    .dispatch-row-label-name { font-size:0.8rem; font-weight:700; color:var(--text-primary); }
-    .dispatch-row-label-plate { font-size:0.68rem; color:var(--text-muted); font-family:monospace; }
-    .dispatch-timeline { flex:1; position:relative; min-height:60px; }
-    .dispatch-grid-line { position:absolute; top:0; bottom:0; width:1px; background:var(--border); opacity:0.6; pointer-events:none; }
-    .dispatch-grid-line.major { background:var(--border-gold); opacity:0.4; }
-    .dispatch-now-line { position:absolute; top:0; bottom:0; width:2px; background:var(--status-cancelled); opacity:0.7; z-index:8; pointer-events:none; }
-    .dispatch-block { position:absolute; top:7px; bottom:7px; border-radius:6px; padding:3px 8px; cursor:pointer; overflow:hidden; z-index:5; display:flex; flex-direction:column; justify-content:center; border-left:3px solid; transition:transform 0.15s, box-shadow 0.15s, z-index 0s; }
-    .dispatch-block:hover { transform:scaleY(1.08); box-shadow:0 6px 16px rgba(0,0,0,0.25); z-index:20; }
-    .dispatch-block.pending { background:rgba(212,134,10,0.82); border-color:var(--status-pending); color:#fff; }
-    .dispatch-block.confirmed { background:rgba(27,127,74,0.85); border-color:var(--status-confirmed); color:#fff; }
-    .dispatch-block.completed { background:rgba(26,110,168,0.8); border-color:var(--status-completed); color:#fff; }
-    .dispatch-block.cancelled { background:rgba(192,57,43,0.6); border-color:var(--status-cancelled); color:#fff; }
-    .dispatch-block-time { font-size:0.68rem; font-weight:800; line-height:1; }
-    .dispatch-block-name { font-size:0.67rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .dispatch-block-route { font-size:0.6rem; opacity:0.88; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .dispatch-block-driver { font-size:0.58rem; opacity:0.78; margin-top:1px; }
-    .dispatch-empty-row { padding:16px 14px; font-size:0.8rem; color:var(--text-muted); font-style:italic; }
-    .dispatch-sidebar { width:195px; flex-shrink:0; display:flex; flex-direction:column; gap:12px; }
-    .dispatch-sidebar-card { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; padding:13px; }
-    .dispatch-sidebar-title { font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); margin-bottom:9px; }
-    .dispatch-unassigned-item { padding:7px 9px; border-radius:7px; border:1.5px solid rgba(192,57,43,0.3); background:rgba(192,57,43,0.06); cursor:pointer; margin-bottom:5px; transition:all 0.2s; }
-    .dispatch-unassigned-item:hover { border-color:rgba(192,57,43,0.6); background:rgba(192,57,43,0.1); }
-    .dispatch-unassigned-name { font-size:0.78rem; font-weight:700; }
-    .dispatch-unassigned-info { font-size:0.68rem; color:var(--text-muted); }
+    .dispatch-hour-tick { flex-shrink:0; text-align:center; font-size:0.62rem; color:var(--text-muted); padding:7px 0; border-right:1px solid var(--border); font-weight:600; }
+    /* Each vehicle occupies two paired rows: name row + timeline row */
+    .dispatch-pair { border-bottom:1px solid var(--border); }
+    .dispatch-pair:last-child { border-bottom:none; }
+    .dispatch-name-row { display:flex; background:rgba(184,148,42,0.04); border-bottom:1px solid rgba(184,148,42,0.1); min-height:22px; }
+    .dispatch-name-cell { flex-shrink:0; padding:3px 12px; font-size:0.75rem; font-weight:700; color:var(--text-primary); border-right:2px solid var(--border-gold); display:flex; align-items:center; gap:6px; }
+    .dispatch-name-plate { font-size:0.63rem; color:var(--text-muted); font-family:monospace; font-weight:400; }
+    .dispatch-name-spacer { flex:1; }
+    /* Timeline row */
+    .dispatch-timeline-row { display:flex; min-height:34px; }
+    .dispatch-row-label { flex-shrink:0; padding:4px 12px; border-right:2px solid var(--border-gold); background:var(--table-hdr); display:flex; align-items:center; font-size:0.68rem; color:var(--text-muted); }
+    .dispatch-timeline { flex:1; position:relative; overflow:hidden; }
+    .dispatch-grid-line { position:absolute; top:0; bottom:0; width:1px; background:var(--border); opacity:0.5; pointer-events:none; }
+    .dispatch-grid-line.major { background:var(--border-gold); opacity:0.3; }
+    .dispatch-now-line { position:absolute; top:0; bottom:0; width:2px; background:var(--status-cancelled); opacity:0.8; z-index:8; pointer-events:none; }
+    /* Booking blocks */
+    .dispatch-block { position:absolute; top:3px; bottom:3px; border-radius:3px; padding:2px 6px; cursor:pointer; overflow:hidden; z-index:5; display:flex; align-items:center; gap:4px; transition:filter 0.15s, z-index 0s, box-shadow 0.15s; border-left:3px solid rgba(0,0,0,0.25); }
+    .dispatch-block:hover { filter:brightness(1.12); box-shadow:0 3px 10px rgba(0,0,0,0.3); z-index:20; }
+    .dispatch-block.pending { background:rgba(212,134,10,0.88); color:#fff; }
+    .dispatch-block.confirmed { background:rgba(27,127,74,0.88); color:#fff; }
+    .dispatch-block.completed { background:rgba(26,110,168,0.85); color:#fff; }
+    .dispatch-block.cancelled { background:rgba(192,57,43,0.65); color:#fff; }
+    .dispatch-block-icon { font-size:0.72rem; flex-shrink:0; }
+    .dispatch-block-text { font-size:0.65rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .dispatch-empty-row { padding:11px 14px; font-size:0.78rem; color:var(--text-muted); font-style:italic; text-align:center; }
+    /* Sidebar */
+    .dispatch-sidebar { width:200px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+    .dispatch-sidebar-card { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; padding:12px 13px; }
+    .dispatch-sidebar-title { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); margin-bottom:8px; }
+    .dispatch-sidebar-subtitle { font-size:0.75rem; color:var(--text-muted); font-style:italic; }
+    /* Legend squares - checkbox style like the reference */
     .dispatch-legend-item { display:flex; align-items:center; gap:7px; font-size:0.75rem; color:var(--text-secondary); margin-bottom:5px; }
-    .dispatch-legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+    .dispatch-legend-swatch { width:14px; height:14px; border-radius:2px; border:1px solid var(--border); flex-shrink:0; }
+    /* Assigned / Unassigned items */
+    .dispatch-assigned-item { padding:6px 9px; border-radius:7px; border:1.5px solid rgba(27,127,74,0.25); background:rgba(27,127,74,0.05); cursor:pointer; margin-bottom:5px; transition:all 0.2s; }
+    .dispatch-assigned-item:hover { border-color:rgba(27,127,74,0.5); background:rgba(27,127,74,0.1); }
+    .dispatch-unassigned-item { padding:6px 9px; border-radius:7px; border:1.5px solid rgba(192,57,43,0.3); background:rgba(192,57,43,0.06); cursor:pointer; margin-bottom:5px; transition:all 0.2s; }
+    .dispatch-unassigned-item:hover { border-color:rgba(192,57,43,0.6); background:rgba(192,57,43,0.1); }
 
     /* ── MOBILE BOTTOM NAV ──────────────────────────── */
     .mobile-bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; background:var(--bg-header); backdrop-filter:blur(20px); border-top:1px solid var(--border); z-index:200; padding:6px 0 env(safe-area-inset-bottom,6px); }
@@ -634,6 +659,14 @@
               <div class="form-group"><label data-i18n="f_phone">Phone (incl. country code)</label><input type="tel" id="m-phone" placeholder="+33 6 12 34 56 78" oninput="checkReturningClient()"></div>
               <div class="form-group"><label data-i18n="f_datetime">Date &amp; Time</label><input type="datetime-local" id="m-datetime" required></div>
               <div class="form-group"><label data-i18n="f_pickup">Pickup</label><div class="autocomplete-wrap"><input type="text" id="m-pickup" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-m-pickup"></div></div></div>
+              <!-- MULTI-STOP -->
+              <div class="form-group full-width stops-section" id="m-stops-section">
+                <div class="stops-section-label">
+                  <span>📍 Intermediate Stops <span id="m-stop-count" style="font-weight:400;opacity:0.7"></span></span>
+                  <button type="button" class="add-stop-btn" onclick="addStop('m-stops-list')">+ Add Stop</button>
+                </div>
+                <div id="m-stops-list"></div>
+              </div>
               <div class="form-group"><label data-i18n="f_dropoff">Dropoff</label><div class="autocomplete-wrap"><input type="text" id="m-dropoff" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-m-dropoff"></div></div></div>
               <div class="form-group"><label data-i18n="f_vehicle">Vehicle</label><select id="m-car"></select></div>
               <div class="form-group"><label data-i18n="f_driver">Driver</label><select id="m-driver"></select></div>
@@ -876,6 +909,14 @@
           <div class="form-group"><label data-i18n="f_phone">Phone</label><input type="tel" id="edit-phone"></div>
           <div class="form-group"><label data-i18n="f_datetime">Date &amp; Time</label><input type="datetime-local" id="edit-datetime" required></div>
           <div class="form-group"><label data-i18n="f_pickup">Pickup</label><div class="autocomplete-wrap"><input type="text" id="edit-pickup" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-edit-pickup"></div></div></div>
+          <!-- MULTI-STOP edit -->
+          <div class="form-group full-width stops-section">
+            <div class="stops-section-label">
+              <span>📍 Intermediate Stops</span>
+              <button type="button" class="add-stop-btn" onclick="addStop('edit-stops-list')">+ Add Stop</button>
+            </div>
+            <div id="edit-stops-list"></div>
+          </div>
           <div class="form-group"><label data-i18n="f_dropoff">Dropoff</label><div class="autocomplete-wrap"><input type="text" id="edit-dropoff" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-edit-dropoff"></div></div></div>
           <div class="form-group"><label data-i18n="f_vehicle">Vehicle</label><select id="edit-car"></select></div>
           <div class="form-group"><label data-i18n="f_driver">Driver</label><select id="edit-driver"></select></div>
@@ -1479,23 +1520,38 @@ function pushExpenseToCloud(exp) {
     }).catch(()=>{});
 }
 function pushAllToCloud(skipConfirm = false) {
-  if(!bookings.length&&!expenses.length){
+  if(!bookings.length && !expenses.length){
     showToast(currentLang==='ru'?'Нет сохранённых заказов в этом браузере':'No bookings stored in this browser yet',false);
     return;
   }
-  if(!skipConfirm && !confirm(`Push ALL local data (${bookings.length} bookings, ${expenses.length} expenses) to cloud?`))return;
+  if(!skipConfirm && !confirm(`Push ALL local data (${bookings.length} bookings, ${expenses.length} expenses) to cloud?`)) return;
   setSyncIndicator('pending','Uploading...');
-  const bIds=bookings.map(b=>b.id), eIds=expenses.map(e=>e.id);
-  Promise.all([
-    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${listKey}/${encodeURIComponent(bIds.join(','))}`,{method:'POST',headers:{'Content-Length':'0'}}),
-    eIds.length?fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${expListKey}/${encodeURIComponent(eIds.join(','))}`,{method:'POST',headers:{'Content-Length':'0'}}):Promise.resolve()
-  ]).then(()=>{
-    const ups=[
-      ...bookings.map(b=>saveBookingToCloud(b).catch(()=>{})),
-      ...expenses.map(e=>{e.updated_at=new Date().toISOString();return fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${e.id}/${encodeURIComponent(JSON.stringify(e))}`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{});})
-    ];
-    Promise.all(ups).then(()=>{pushSettingsToCloud();setSyncIndicator('online','All pushed ✓');showToast(`✅ All data pushed to cloud!`);});
-  }).catch(()=>setSyncIndicator('offline','Push failed'));
+  
+  // Save all bookings and expenses in parallel with individual error catching
+  const bPromises = bookings.map(b => saveBookingToCloud(b).catch(err => console.warn('Booking push error:', err)));
+  const ePromises = expenses.map(e => {
+    e.updated_at = new Date().toISOString();
+    return fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${e.id}/${encodeURIComponent(JSON.stringify(e))}`, { method:'POST', headers:{'Content-Length':'0'} }).catch(err => console.warn('Expense push error:', err));
+  });
+
+  // Update ID lists in cloud
+  const bIds = bookings.map(b => b.id).filter(Boolean);
+  const eIds = expenses.map(e => e.id).filter(Boolean);
+  const listPromise = fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${listKey}/${encodeURIComponent(bIds.join(','))}`, { method:'POST', headers:{'Content-Length':'0'} }).catch(() => {});
+  const expListPromise = eIds.length ? fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/${expListKey}/${encodeURIComponent(eIds.join(','))}`, { method:'POST', headers:{'Content-Length':'0'} }).catch(() => {}) : Promise.resolve();
+
+  Promise.all([...bPromises, ...ePromises, listPromise, expListPromise])
+    .then(() => {
+      pushSettingsToCloud();
+      const now = new Date(), ts = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+      setSyncIndicator('online', `Pushed ${ts}`);
+      showToast(`✅ Pushed ${bookings.length} bookings & ${expenses.length} expenses to cloud!`);
+    })
+    .catch(err => {
+      console.error('Push error:', err);
+      setSyncIndicator('online', 'Pushed (partial)');
+      showToast(`⚠️ Pushed local data to cloud (some items may need retry)`);
+    });
 }
 function fullSyncFromCloud() {
   setSyncIndicator('pending','Full sync...');
@@ -1614,8 +1670,11 @@ function buildRow(b,archived) {
       </td>
       <td style="white-space:normal">
         <div style="font-weight:600;font-size:0.82rem;color:var(--gold);white-space:nowrap">${dateStr}</div>
-        <div style="font-size:0.79rem;color:var(--text-secondary);margin-top:3px;font-weight:500">🛫 <span style="color:var(--text-primary)">${esc(b.pickup||'TBD')}</span></div>
-        <div style="font-size:0.79rem;color:var(--text-secondary);margin-top:2px;font-weight:500">🏁 <span style="color:var(--text-primary)">${esc(b.dropoff||'TBD')}</span></div>
+        <div class="route-stops">
+          <div class="route-leg"><span class="route-leg-icon">🛫</span><span style="color:var(--text-primary);font-weight:500">${esc(b.pickup||'TBD')}</span></div>
+          ${(b.stops&&b.stops.length)?b.stops.map(s=>`<div class="route-leg"><span class="route-stop-dot"></span><span style="color:var(--text-muted);font-size:0.76rem">${esc(s)}</span></div>`).join('')+`<div style="font-size:0.65rem;color:var(--gold);font-weight:700;margin-left:5px">${b.stops.length} stop${b.stops.length>1?'s':''}</div>`:''}
+          <div class="route-leg"><span class="route-leg-icon">🏁</span><span style="color:var(--text-primary);font-weight:500">${esc(b.dropoff||'TBD')}</span></div>
+        </div>
       </td>
       <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
       <td>
@@ -1640,8 +1699,11 @@ function buildRow(b,archived) {
       </td>
       <td style="white-space:normal">
         <div style="font-weight:600;font-size:0.82rem;color:var(--gold);white-space:nowrap">${dateStr}</div>
-        <div style="font-size:0.79rem;color:var(--text-secondary);margin-top:3px;font-weight:500">🛫 <span style="color:var(--text-primary)">${esc(b.pickup||'TBD')}</span></div>
-        <div style="font-size:0.79rem;color:var(--text-secondary);margin-top:2px;font-weight:500">🏁 <span style="color:var(--text-primary)">${esc(b.dropoff||'TBD')}</span></div>
+        <div class="route-stops">
+          <div class="route-leg"><span class="route-leg-icon">🛫</span><span style="color:var(--text-primary);font-weight:500">${esc(b.pickup||'TBD')}</span></div>
+          ${(b.stops&&b.stops.length)?b.stops.map(s=>`<div class="route-leg"><span class="route-stop-dot"></span><span style="color:var(--text-muted);font-size:0.76rem">${esc(s)}</span></div>`).join('')+`<div style="font-size:0.65rem;color:var(--gold);font-weight:700;margin-left:5px">${b.stops.length} stop${b.stops.length>1?'s':''}</div>`:''}
+          <div class="route-leg"><span class="route-leg-icon">🏁</span><span style="color:var(--text-primary);font-weight:500">${esc(b.dropoff||'TBD')}</span></div>
+        </div>
       </td>
       <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
       <td>
@@ -1669,6 +1731,48 @@ function actionBtns(id){
   <button class="action-pill" onclick="copyReport('${id}')" title="Copy report">📋 Copy</button>
   <button class="action-pill" onclick="showNotifyMenu(event,'${id}')" title="Notify client">📞 Notify</button>
   <button class="action-pill delete-pill" onclick="deleteBooking('${id}')" title="Delete">🗑️ Delete</button>`;
+}
+// ═══════════════════════════════════════════════════
+// MULTI-STOP MANAGEMENT
+// ═══════════════════════════════════════════════════
+function addStop(listId, value=''){
+  const list=document.getElementById(listId);
+  if(!list)return;
+  const idx=list.children.length+1;
+  const row=document.createElement('div');
+  row.className='stop-row';
+  row.innerHTML=`<div class="stop-num">${idx}</div><input type="text" placeholder="Stop ${idx} — e.g. Hotel Metropole" value="${esc(value)}" style="flex:1"><button type="button" class="stop-remove" onclick="removeStop(this,'${listId}')" title="Remove stop">×</button>`;
+  list.appendChild(row);
+  row.querySelector('input').focus();
+  updateStopNumbers(listId);
+}
+function removeStop(btn, listId){
+  btn.closest('.stop-row').remove();
+  updateStopNumbers(listId);
+}
+function updateStopNumbers(listId){
+  const list=document.getElementById(listId);
+  if(!list)return;
+  list.querySelectorAll('.stop-row').forEach((row,i)=>{
+    const num=row.querySelector('.stop-num');
+    if(num)num.textContent=i+1;
+    const inp=row.querySelector('input');
+    if(inp)inp.placeholder=`Stop ${i+1} — e.g. Hotel, Casino, Museum`;
+  });
+  // Update count badge if in add form
+  const cnt=document.getElementById('m-stop-count');
+  if(cnt&&listId==='m-stops-list'){const n=list.children.length;cnt.textContent=n?`(${n})`:''}
+}
+function collectStops(listId){
+  const list=document.getElementById(listId);
+  if(!list)return[];
+  return Array.from(list.querySelectorAll('.stop-row input')).map(i=>i.value.trim()).filter(Boolean);
+}
+function renderStopsInList(listId, stops){
+  const list=document.getElementById(listId);
+  if(!list)return;
+  list.innerHTML='';
+  (stops||[]).forEach(s=>addStop(listId,s));
 }
 function changeStatus(id,ns){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].status=ns;saveLocalData();pushToCloud(bookings[i]);showToast(`Status → ${ns}`);}}
 function changePayment(id){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].paymentStatus=bookings[i].paymentStatus==='Paid'?'Unpaid':'Paid';saveLocalData();pushToCloud(bookings[i]);showToast(`Payment → ${bookings[i].paymentStatus}`);}}
@@ -2051,6 +2155,7 @@ function buildBookingFromForm(){
     phone:document.getElementById('m-phone').value,
     datetime:document.getElementById('m-datetime').value,
     pickup:document.getElementById('m-pickup').value,
+    stops:collectStops('m-stops-list'),
     dropoff:document.getElementById('m-dropoff').value,
     car:document.getElementById('m-car').value,
     driver:document.getElementById('m-driver').value||'',
@@ -2089,6 +2194,8 @@ function resetAddForm(){
   document.getElementById('return-journey-banner').style.display='none';
   document.getElementById('round-trip-fields').style.display='none';
   document.getElementById('round-trip-check').checked=false;
+  document.getElementById('m-stops-list').innerHTML='';
+  const cnt=document.getElementById('m-stop-count');if(cnt)cnt.textContent='';
   retClient=null;
   populateAllVehicleSelects();populateAllDriverSelects();
 }
@@ -2128,6 +2235,8 @@ function openModal(id){
   populateDriverSelect(document.getElementById('edit-driver'),b.driver||'');
   document.getElementById('edit-carType').value=b.carType||'Own';
   document.getElementById('edit-commissionPaid').value=b.commissionPaid||'N/A';
+  // Populate stops
+  renderStopsInList('edit-stops-list', b.stops||[]);
   // Linked
   const ph=(b.phone||'').trim(),em=(b.email||'').trim().toLowerCase();
   let lhtml='';
@@ -2153,6 +2262,7 @@ function handleEditSubmit(e){
     bookings[i].paymentStatus=document.getElementById('edit-paymentStatus').value;
     bookings[i].carType=document.getElementById('edit-carType').value||'Own';
     bookings[i].commissionPaid=document.getElementById('edit-commissionPaid').value||'N/A';
+    bookings[i].stops=collectStops('edit-stops-list');
     bookings[i].updated_at=new Date().toISOString();
     saveLocalData();pushToCloud(bookings[i]);closeModal();showToast(currentLang==='ru'?'Изменения сохранены!':'Changes saved!');
   }
@@ -2178,9 +2288,12 @@ function deleteBooking(id){
 function copyReport(id){
   const b=bookings.find(x=>x.id===id);if(!b)return;
   const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'TBD';
+  const stopsLine=(b.stops&&b.stops.length)?b.stops.map((s,i)=>`📍 *Stop ${i+1}:* ${s}`).join('\n')+'\n':'';
   const txt=`📋 *Booking #${(b.bookingNumber||0).toString().padStart(5,'0')}*\n\n`+
     `👤 *Name:* ${b.name}\n📞 *Phone:* ${b.phone||'N/A'}\n✉️ *Email:* ${b.email||'N/A'}\n`+
-    `📅 *Date/Time:* ${ds}\n📍 *From:* ${b.pickup}\n📍 *To:* ${b.dropoff}\n`+
+    `📅 *Date/Time:* ${ds}\n📍 *From:* ${b.pickup}\n`+
+    stopsLine+
+    `📍 *To:* ${b.dropoff}\n`+
     (b.flightInfo?`✈️ *Flight:* ${b.flightInfo}\n`:'')+
     `🚗 *Car:* ${b.car||''}${b.driver?' · 👤 '+b.driver:''}\n`+
     `👥 *Pax:* ${b.passengers||1} / 💼 ${b.luggage||0} / 📦 ${b.holdBags||0} / 👶 ${b.childSeats||0}\n`+
