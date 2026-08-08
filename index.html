@@ -122,18 +122,30 @@
 
     /* ── TABLE ──────────────────────────────────────── */
     .excel-container { overflow-x:auto; border:1px solid var(--border); border-radius:10px; }
-    .excel-table { width:100%; border-collapse:collapse; font-size:0.86rem; text-align:left; table-layout:fixed; }
-    .excel-table th { background:var(--table-hdr); color:var(--gold); font-weight:700; text-transform:uppercase; font-size:0.7rem; letter-spacing:1px; padding:10px 13px; border-bottom:2px solid var(--border-gold); border-right:1px solid var(--border); cursor:pointer; white-space:nowrap; overflow:hidden; }
+    .excel-table { width:100%; border-collapse:collapse; font-size:0.86rem; text-align:left; }
+    .excel-table th { background:var(--table-hdr); color:var(--gold); font-weight:700; text-transform:uppercase; font-size:0.7rem; letter-spacing:1px; padding:10px 12px; border-bottom:2px solid var(--border-gold); border-right:1px solid var(--border); cursor:pointer; white-space:nowrap; overflow:hidden; vertical-align:middle; }
     .excel-table td { padding:9px 13px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); vertical-align:middle; overflow:hidden; }
     .excel-table tr:last-child td { border-bottom:none; }
     .excel-table tbody tr:hover { background:var(--table-hover); }
-    /* Column: # */ .excel-table th:nth-child(1), .excel-table td:nth-child(1) { width:52px; }
-    /* Column: Client */ .excel-table th:nth-child(2), .excel-table td:nth-child(2) { width:160px; }
-    /* Column: Trip */ .excel-table th:nth-child(3), .excel-table td:nth-child(3) { width:auto; min-width:260px; }
-    /* Column: Car · Driver */ .excel-table th:nth-child(4), .excel-table td:nth-child(4) { width:170px; }
-    /* Column: Price */ .excel-table th:nth-child(5), .excel-table td:nth-child(5) { width:105px; }
-    /* Column: Status */ .excel-table th:nth-child(6), .excel-table td:nth-child(6) { width:130px; }
-    /* Column: Actions */ .excel-table th:nth-child(7), .excel-table td:nth-child(7) { width:100px; }
+    .excel-table th.text-center, .excel-table td.text-center { text-align:center !important; }
+    .excel-table th.text-right, .excel-table td.text-right { text-align:right !important; }
+    /* Column widths for main active table */
+    #excel-table th:nth-child(1), #excel-table td:nth-child(1) { width:54px; text-align:center; }
+    #excel-table th:nth-child(2), #excel-table td:nth-child(2) { width:160px; }
+    #excel-table th:nth-child(3), #excel-table td:nth-child(3) { width:auto; min-width:240px; }
+    #excel-table th:nth-child(4), #excel-table td:nth-child(4) { width:165px; }
+    #excel-table th:nth-child(5), #excel-table td:nth-child(5) { width:115px; text-align:center; }
+    #excel-table th:nth-child(6), #excel-table td:nth-child(6) { width:130px; text-align:center; }
+    #excel-table th:nth-child(7), #excel-table td:nth-child(7) { width:115px; text-align:center; }
+    /* Column widths for archive table */
+    #archive-table th:nth-child(1), #archive-table td:nth-child(1) { width:54px; text-align:center; }
+    #archive-table th:nth-child(2), #archive-table td:nth-child(2) { width:160px; }
+    #archive-table th:nth-child(3), #archive-table td:nth-child(3) { width:auto; min-width:240px; }
+    #archive-table th:nth-child(4), #archive-table td:nth-child(4) { width:165px; }
+    #archive-table th:nth-child(5), #archive-table td:nth-child(5) { width:115px; text-align:center; }
+    #archive-table th:nth-child(6), #archive-table td:nth-child(6) { width:115px; text-align:center; }
+    #archive-table th:nth-child(7), #archive-table td:nth-child(7) { width:115px; text-align:center; }
+    #archive-table th:nth-child(8), #archive-table td:nth-child(8) { width:115px; text-align:center; }
 
     /* ── ADDRESS AUTOCOMPLETE ───────────────────────── */
     .autocomplete-wrap { position:relative; }
@@ -247,7 +259,7 @@
     .toast.show { transform:translateY(0); opacity:1; }
 
     /* ── MISC ───────────────────────────────────────── */
-    .action-btn-row { display:flex; gap:4px; align-items:center; flex-wrap:wrap; }
+    .action-btn-row { display:flex; gap:4px; align-items:center; justify-content:center; flex-wrap:wrap; }
     .action-icon { background:none; border:none; color:var(--text-muted); cursor:pointer; opacity:0.7; transition:all 0.2s; padding:5px; border-radius:6px; display:inline-flex; align-items:center; }
     .action-icon:hover { opacity:1; background:var(--table-hover); }
     .action-icon.edit-btn:hover { color:var(--gold); }
@@ -609,15 +621,15 @@
             <button class="btn btn-secondary" style="padding:8px 12px;" onclick="clearFilters()" data-i18n-btn="btn_clear">Clear</button>
           </div>
           <div class="excel-container">
-            <table class="excel-table">
+            <table class="excel-table" id="excel-table">
               <thead><tr>
-                <th onclick="sortTable('bookingNumber')">#</th>
+                <th onclick="sortTable('bookingNumber')" class="text-center">#</th>
                 <th onclick="sortTable('name')">Client</th>
                 <th onclick="sortTable('datetime')">Trip &amp; Destination</th>
                 <th class="hide-mobile">Car · Driver</th>
-                <th onclick="sortTable('price')">Price</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th onclick="sortTable('price')" class="text-center">Price / Payment</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Actions</th>
               </tr></thead>
               <tbody id="excel-table-body"></tbody>
             </table>
@@ -779,17 +791,16 @@
             <button class="btn btn-secondary" style="padding:8px 12px;" onclick="clearArchiveFilters()" data-i18n-btn="btn_clear">Clear</button>
           </div>
           <div class="excel-container">
-            <table class="excel-table">
+            <table class="excel-table" id="archive-table">
               <thead><tr>
-                <th onclick="sortArchive('bookingNumber')" style="width:48px">#</th>
+                <th onclick="sortArchive('bookingNumber')" class="text-center">#</th>
                 <th onclick="sortArchive('name')">Client</th>
-                <th onclick="sortArchive('datetime')">Trip</th>
+                <th onclick="sortArchive('datetime')">Trip &amp; Destination</th>
                 <th class="hide-mobile">Car · Driver</th>
-                <th onclick="sortArchive('price')" style="width:72px">€</th>
-                <th style="width:100px">Payment</th>
-                <th class="hide-mobile" style="width:100px">Car Type</th>
-                <th class="hide-mobile" style="width:90px">Comm. Paid</th>
-                <th style="width:80px">Actions</th>
+                <th onclick="sortArchive('price')" class="text-center">Price / Payment</th>
+                <th class="hide-mobile text-center">Car Type</th>
+                <th class="hide-mobile text-center">Comm. Paid</th>
+                <th class="text-center">Actions</th>
               </tr></thead>
               <tbody id="archive-table-body"></tbody>
             </table>
@@ -1852,7 +1863,7 @@ function buildRow(b,archived) {
 
   if(!archived){
     tr.innerHTML=`
-      <td class="booking-num" style="white-space:nowrap">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td>
+      <td class="booking-num text-center" style="white-space:nowrap">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td>
       <td>
         <div style="font-weight:700;font-size:0.88rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap">${esc(b.name)}${lb}${notBadge}</div>
         <div style="font-size:0.74rem;color:var(--text-muted);margin-top:2px">📞 ${esc(b.phone||'—')}</div>
@@ -1866,23 +1877,23 @@ function buildRow(b,archived) {
         </div>
       </td>
       <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
-      <td>
+      <td class="text-center">
         <div style="font-weight:800;font-size:0.95rem">€${displayPrice}</div>
         ${b.payoutAmount&&b.payoutAmount>0?`<div style="font-size:0.7rem;color:var(--status-cancelled);font-weight:600">−€${b.payoutAmount} ${b.payoutType||''}</div>`:''}
         <button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')" style="margin-top:3px;font-size:0.62rem;padding:2px 7px">${payIcon} ${pay}</button>
       </td>
-      <td><select class="status-badge ${(b.status||'Pending').toLowerCase()}" onchange="changeStatus('${b.id}',this.value)" style="padding:3px 6px;font-size:0.68rem;border:none;font-weight:700;background:transparent;cursor:pointer;width:100%">
+      <td class="text-center"><select class="status-badge ${(b.status||'Pending').toLowerCase()}" onchange="changeStatus('${b.id}',this.value)" style="padding:3px 6px;font-size:0.68rem;border:none;font-weight:700;background:transparent;cursor:pointer;width:100%">
         <option value="Pending" ${b.status==='Pending'?'selected':''}>⏳ ${t('s_pending')}</option>
         <option value="Confirmed" ${b.status==='Confirmed'?'selected':''}>✓ ${t('s_confirmed')}</option>
         <option value="Completed" ${b.status==='Completed'?'selected':''}>✈ ${t('s_completed')}</option>
         <option value="Cancelled" ${b.status==='Cancelled'?'selected':''}>✕ ${t('s_cancelled')}</option>
       </select></td>
-      <td><div class="action-btn-row">${actionBtns(b.id)}</div></td>`;
+      <td class="text-center"><div class="action-btn-row">${actionBtns(b.id)}</div></td>`;
   } else {
     const ctBadge = carTypeBadge(b.carType||'Own');
     const cpBadge = commPaidBadge(b.commissionPaid||'N/A');
     tr.innerHTML=`
-      <td class="booking-num" style="white-space:nowrap">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td>
+      <td class="booking-num text-center" style="white-space:nowrap">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td>
       <td>
         <div style="font-weight:700;font-size:0.88rem">${esc(b.name)}${notBadge}</div>
         <div style="font-size:0.74rem;color:var(--text-muted);margin-top:2px">📞 ${esc(b.phone||'—')}</div>
@@ -1896,14 +1907,14 @@ function buildRow(b,archived) {
         </div>
       </td>
       <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
-      <td>
+      <td class="text-center">
         <div style="font-weight:800;font-size:0.95rem">€${displayPrice}</div>
         ${b.payoutAmount&&b.payoutAmount>0?`<div style="font-size:0.7rem;color:var(--status-cancelled);font-weight:600">−€${b.payoutAmount} ${b.payoutType||''}</div>`:''}
         <button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')" style="margin-top:3px;font-size:0.62rem;padding:2px 7px">${payIcon} ${pay}</button>
       </td>
-      <td class="hide-mobile">${ctBadge}</td>
-      <td class="hide-mobile">${cpBadge}</td>
-      <td><div class="action-btn-row">${actionBtns(b.id)}</div></td>`;
+      <td class="hide-mobile text-center">${ctBadge}</td>
+      <td class="hide-mobile text-center">${cpBadge}</td>
+      <td class="text-center"><div class="action-btn-row">${actionBtns(b.id)}</div></td>`;
   }
   tr.addEventListener('dblclick',e=>{if(!['SELECT','BUTTON'].includes(e.target.tagName)&&!e.target.closest('.action-btn-row'))openModal(b.id);});
   return tr;
