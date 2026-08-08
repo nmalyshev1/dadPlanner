@@ -409,31 +409,83 @@
       .header-right { gap:5px; }
       .sync-status { padding:4px 8px; font-size:0.7rem; }
       #sync-text { display:none; }
-      main { grid-template-columns:1fr; padding:13px 11px 74px; gap:0; }
+      main { grid-template-columns:1fr; padding:10px 10px 80px; gap:0; }
       .sidebar { display:none; }
       .mobile-bottom-nav { display:block; }
-      .toast { bottom:66px; right:9px; left:9px; max-width:100%; }
-      .grid-filters { flex-direction:column; align-items:stretch; gap:7px; }
-      .grid-filters > * { width:100%; }
+      .toast { bottom:74px; right:9px; left:9px; max-width:100%; }
+      /* Filters stack vertically with full-width inputs */
+      .grid-filters { flex-direction:column; align-items:stretch; gap:8px; }
+      .grid-filters > * { width:100% !important; box-sizing:border-box; }
       .search-input { min-width:100%; }
-      .excel-table th, .excel-table td { padding:7px 9px; font-size:0.76rem; }
+      /* Mobile: hide the traditional table, show card layout */
+      .excel-container { overflow-x:visible !important; }
+      .excel-table { display:none; }
+      .mobile-cards { display:flex !important; flex-direction:column; gap:10px; padding:4px 0; }
       .hide-mobile { display:none; }
+      /* Calendar */
       .calendar-grid-wrap { display:none !important; }
       .agenda-view { display:block; }
-      .form-grid, .form-grid.edit-mode { grid-template-columns:1fr; gap:11px; }
-      .modal { width:100%; max-height:95vh; border-radius:16px 16px 0 0; align-self:flex-end; }
+      /* Forms: single column, bigger inputs */
+      .form-grid, .form-grid.edit-mode { grid-template-columns:1fr; gap:12px; }
+      .form-group input, .form-group select, .form-group textarea {
+        font-size:16px !important; /* prevents iOS zoom */
+        min-height:44px; padding:10px 12px;
+      }
+      .form-group select { min-height:44px; }
+      /* Modal full-screen sheet on mobile */
+      .modal { width:100%; max-height:92dvh; border-radius:18px 18px 0 0; align-self:flex-end; }
       .modal-overlay { align-items:flex-end; padding:0; }
-      .modal-body { padding:13px; }
-      .modal-header { padding:12px 13px; }
+      .modal-body { padding:14px 13px 24px; }
+      .modal-header { padding:14px 13px 10px; }
+      /* Analytics */
       .analytics-grid { grid-template-columns:1fr 1fr; gap:9px; }
       .stat-val { font-size:1.35rem; }
+      /* Buttons — fat finger friendly */
       .header-btn span.btn-label { display:none; }
+      .btn, .btn-sm { min-height:40px; }
+      .action-pill { min-height:36px; font-size:0.73rem; padding:7px 10px; }
+      /* Mobile bottom nav bigger */
+      .mobile-bottom-nav { padding:8px 0 env(safe-area-inset-bottom, 10px); }
+      .mobile-nav-btn { padding:8px 4px; }
+      .mobile-nav-btn svg { width:24px; height:24px; }
+      .mobile-nav-btn { font-size:0.6rem; }
+      /* Panel padding */
+      .panel { padding:14px 12px; }
+      .panel-title { font-size:0.9rem; margin-bottom:12px; }
+      /* Dispatch sidebar hidden on mobile */
+      .dispatch-sidebar { display:none !important; }
+      /* Calendar popup */
+      .cal-popup { left:10px !important; right:10px !important; max-width:none !important; width:auto !important; }
     }
     @media (max-width:480px) {
       .pin-card { padding:28px 16px; max-width:92%; border-radius:16px; }
       .pin-keypad { gap:8px; max-width:210px; }
       .pin-key { padding:11px 0; font-size:1.2rem; }
     }
+    /* Mobile card styles — always defined, hidden on desktop */
+    .mobile-cards { display:none; }
+    .m-card {
+      background:var(--bg-card);
+      border:1.5px solid var(--border);
+      border-radius:14px;
+      padding:13px 14px;
+      cursor:pointer;
+      transition:border-color 0.18s, box-shadow 0.18s;
+      -webkit-tap-highlight-color:transparent;
+      position:relative;
+    }
+    .m-card:active { border-color:var(--gold); box-shadow:0 2px 12px rgba(184,148,42,0.18); }
+    .m-card-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:8px; }
+    .m-card-name { font-weight:700; font-size:0.92rem; color:var(--text-primary); flex:1; }
+    .m-card-num { font-size:0.7rem; color:var(--text-muted); font-family:monospace; }
+    .m-card-route { font-size:0.8rem; color:var(--text-secondary); margin-bottom:7px; display:flex; flex-direction:column; gap:3px; }
+    .m-card-route-line { display:flex; align-items:flex-start; gap:6px; }
+    .m-card-footer { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .m-card-price { font-size:1rem; font-weight:800; color:var(--text-primary); }
+    .m-card-actions { display:flex; gap:6px; flex-wrap:wrap; }
+    .m-card-date { font-size:0.76rem; color:var(--gold); font-weight:600; margin-bottom:5px; }
+    .m-card-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:4px; }
+    .m-card-pill { font-size:0.68rem; padding:2px 8px; border-radius:20px; background:var(--table-hdr); color:var(--text-muted); }
   </style>
 </head>
 <body>
@@ -581,6 +633,8 @@
             </table>
             <div id="table-no-data" class="no-data" style="display:none;" data-i18n="no_bookings">No bookings match the filters.</div>
           </div>
+          <!-- Mobile card view -->
+          <div id="mobile-cards-container" class="mobile-cards"></div>
         </div>
       </div>
 
@@ -682,6 +736,8 @@
               <div class="form-group"><label data-i18n="f_child">Child Seats</label><input type="number" id="m-childSeats" min="0" max="5" value="0"></div>
               <div class="form-group"><label data-i18n="f_hold">Hold Bags</label><input type="number" id="m-holdBags" min="0" max="20" value="0"></div>
               <div class="form-group"><label data-i18n="f_price">Price (€)</label><input type="number" id="m-price" min="0" value="0"></div>
+              <div class="form-group"><label>💸 Payout (€) <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400">commission/rental/partner</span></label><input type="number" id="m-payoutAmount" min="0" value="0"></div>
+              <div class="form-group"><label>Payout Type</label><select id="m-payoutType"><option value="None">— None</option><option value="Commission">💸 Commission</option><option value="Rental">🏠 Rental</option><option value="Partner">🤝 Partner</option></select></div>
               <div class="form-group"><label data-i18n="f_status">Status</label>
                 <select id="m-status">
                   <option value="Pending" data-i18n-opt="s_pending">Pending</option>
@@ -775,6 +831,7 @@
                 <datalist id="partners-datalist"></datalist>
               </div>
               <div class="form-group"><label data-i18n="exp_amount">Amount (€)</label><input type="number" id="exp-amount" min="0" step="0.01" value="0" required></div>
+              <div class="form-group"><label>Link to Booking <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400">(optional)</span></label><select id="exp-booking-link"><option value="">— General expense</option></select></div>
               <div class="form-group"><label data-i18n="exp_desc">Description</label><input type="text" id="exp-description"></div>
             </div>
             <button type="submit" class="btn">💾 <span data-i18n="exp_save">Save Expense</span></button>
@@ -867,6 +924,16 @@
             <div class="form-group"><label>&nbsp;</label><button class="btn btn-sm" onclick="addPartner()">+ <span data-i18n="set_add_partner">Add Partner</span></button></div>
           </div>
         </div>
+        <!-- Logist Contact -->
+        <div class="panel">
+          <div class="panel-title panel-title-gold">📋 Logist / Dispatcher</div>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;">WhatsApp number for dispatching notifications.</p>
+          <div class="settings-add-row">
+            <div class="form-group"><label>Logist Phone (incl. country code)</label><input id="logist-phone-input" placeholder="+33612345678" type="tel"></div>
+            <div class="form-group"><label>&nbsp;</label><button class="btn btn-sm" onclick="saveLogistPhone()">💾 Save</button></div>
+          </div>
+          <div id="logist-phone-display" style="font-size:0.85rem;color:var(--gold);margin-top:8px;"></div>
+        </div>
       </div>
 
     </div><!-- /content-area -->
@@ -929,6 +996,8 @@
           <div class="form-group"><label data-i18n="f_pax">Passengers</label><input type="number" id="edit-passengers" min="1" max="15"></div>
           <div class="form-group"><label data-i18n="f_carryon">Carry-on Bags</label><input type="number" id="edit-luggage" min="0"></div>
           <div class="form-group"><label data-i18n="f_price">Price (€)</label><input type="number" id="edit-price" min="0"></div>
+          <div class="form-group"><label>💸 Payout (€)</label><input type="number" id="edit-payoutAmount" min="0" value="0"></div>
+          <div class="form-group"><label>Payout Type</label><select id="edit-payoutType"><option value="None">— None</option><option value="Commission">💸 Commission</option><option value="Rental">🏠 Rental</option><option value="Partner">🤝 Partner</option></select></div>
           <div class="form-group"><label data-i18n="f_status">Status</label>
             <select id="edit-status">
               <option value="Pending">Pending</option><option value="Confirmed">Confirmed</option>
@@ -960,9 +1029,10 @@
           <div class="form-group full-width"><label data-i18n="f_notes">Notes</label><textarea id="edit-requirements" rows="2"></textarea></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap;">
-          <div style="display:flex;gap:7px;">
-            <button type="button" class="btn btn-wa btn-sm" onclick="notifyClientWA(document.getElementById('edit-id').value)">📱 WhatsApp</button>
-            <button type="button" class="btn btn-sms btn-sm" onclick="notifyClientSMS(document.getElementById('edit-id').value)">💬 SMS</button>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;">
+            <button type="button" class="btn btn-wa btn-sm" onclick="notifyWA('client',document.getElementById('edit-id').value)">📱 Client</button>
+            <button type="button" class="btn btn-sm" style="background:var(--status-confirmed);color:#fff;" onclick="notifyWA('driver',document.getElementById('edit-id').value)">🚗 Driver</button>
+            <button type="button" class="btn btn-sm" style="background:var(--status-completed);color:#fff;" onclick="notifyWA('logist',document.getElementById('edit-id').value)">📋 Logist</button>
           </div>
           <div style="display:flex;gap:9px;">
             <button type="button" class="btn btn-secondary" onclick="closeModal()" data-i18n-btn="btn_cancel">Cancel</button>
@@ -1218,6 +1288,8 @@ function unlockApp(animate) {
   renderAll();
   syncNow(true);
   startAutoSync();
+  updateLogistPhoneDisplay();
+  populateExpBookingLink();
 }
 function renderAll() { renderTable(); renderArchive(); renderCalendar(); updateAnalytics(); renderExpenses(); renderSettings(); populateAllVehicleSelects(); populateAllDriverSelects(); updateFilterDropdowns(); updatePartnersDatalist(); }
 
@@ -1285,6 +1357,7 @@ function renderSettings() {
     d.innerHTML=`<span class="settings-item-name">${esc(v.name)}</span>${v.plate?`<span class="settings-item-plate">${esc(v.plate)}</span>`:''}<button class="action-icon delete-btn" onclick="deleteVehicle('${v.id}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
     vl.appendChild(d);
   });
+  updateLogistPhoneDisplay();
   // Drivers
   const dl=document.getElementById('settings-drivers-list'); dl.innerHTML='';
   if(!settings.drivers.length){dl.innerHTML=`<div class="no-data" style="padding:12px;">${currentLang==='ru'?'Нет водителей':'No drivers added'}</div>`;}
@@ -1728,6 +1801,7 @@ function clearFilters() {
 function sortTable(col){if(sort.col===col)sort.asc=!sort.asc;else{sort.col=col;sort.asc=true;}renderTable();}
 function renderTable() {
   const tbody=document.getElementById('excel-table-body'), noData=document.getElementById('table-no-data');
+  const mCards=document.getElementById('mobile-cards-container');
   const srch=(document.getElementById('search-bar').value||'').toLowerCase();
   const fSt=document.getElementById('filter-status').value, fPay=document.getElementById('filter-payment').value;
   const fCar=document.getElementById('filter-car').value, fDate=document.getElementById('filter-date').value;
@@ -1745,8 +1819,9 @@ function renderTable() {
   });
   filtered.sort((a,b)=>{let va=a[sort.col]||'',vb=b[sort.col]||'';if(sort.col==='price'||sort.col==='bookingNumber'){va=parseFloat(va)||0;vb=parseFloat(vb)||0;}return sort.asc?(va<vb?-1:va>vb?1:0):(va<vb?1:va>vb?-1:0);});
   tbody.innerHTML='';
+  if(mCards)mCards.innerHTML='';
   if(!filtered.length){noData.style.display='block';return;}noData.style.display='none';
-  filtered.forEach(b=>tbody.appendChild(buildRow(b,false)));
+  filtered.forEach(b=>{tbody.appendChild(buildRow(b,false));if(mCards)mCards.appendChild(buildMobileCard(b));});
 }
 function fmtDateCompact(dt){
   if(!dt)return'TBD';
@@ -1790,6 +1865,7 @@ function buildRow(b,archived) {
       <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
       <td>
         <div style="font-weight:800;font-size:0.95rem">€${displayPrice}</div>
+        ${b.payoutAmount&&b.payoutAmount>0?`<div style="font-size:0.7rem;color:var(--status-cancelled);font-weight:600">−€${b.payoutAmount} ${b.payoutType||''}</div>`:''}
         <button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')" style="margin-top:3px;font-size:0.62rem;padding:2px 7px">${payIcon} ${pay}</button>
       </td>
       <td><select class="status-badge ${(b.status||'Pending').toLowerCase()}" onchange="changeStatus('${b.id}',this.value)" style="padding:3px 6px;font-size:0.68rem;border:none;font-weight:700;background:transparent;cursor:pointer;width:100%">
@@ -1819,6 +1895,7 @@ function buildRow(b,archived) {
       <td class="hide-mobile">${carDriver||'<span style="color:var(--text-muted);font-size:0.76rem">—</span>'}</td>
       <td>
         <div style="font-weight:800;font-size:0.95rem">€${displayPrice}</div>
+        ${b.payoutAmount&&b.payoutAmount>0?`<div style="font-size:0.7rem;color:var(--status-cancelled);font-weight:600">−€${b.payoutAmount} ${b.payoutType||''}</div>`:''}
         <button class="payment-badge ${pay.toLowerCase()}" onclick="changePayment('${b.id}')" style="margin-top:3px;font-size:0.62rem;padding:2px 7px">${payIcon} ${pay}</button>
       </td>
       <td class="hide-mobile">${ctBadge}</td>
@@ -1836,6 +1913,58 @@ function carTypeBadge(ct){
 function commPaidBadge(cp){
   if(!cp||cp==='N/A')return '<span class="comm-paid-badge na">— N/A</span>';
   return cp==='Yes'?'<span class="comm-paid-badge yes">✅ Paid</span>':'<span class="comm-paid-badge no">❌ Unpaid</span>';
+}
+function buildMobileCard(b){
+  const card=document.createElement('div');
+  card.className='m-card';
+  const pay=b.paymentStatus||'Unpaid';
+  const payIcon=pay==='Paid'?'✅':'💳';
+  const displayPrice=(b.price!==undefined&&b.price!==null&&!isNaN(b.price))?b.price:0;
+  const dateStr=fmtDateCompact(b.datetime);
+  const statusClass=(b.status||'pending').toLowerCase();
+  card.innerHTML=`
+    <div class="m-card-header">
+      <div class="m-card-name">${esc(b.name)}</div>
+      <span class="status-badge ${statusClass}" style="font-size:0.66rem;padding:2px 7px;">${b.status||'Pending'}</span>
+    </div>
+    <div class="m-card-num">#${(b.bookingNumber||0).toString().padStart(4,'0')} &middot; <span style="color:var(--gold)">${dateStr}</span></div>
+    <div class="m-card-route" style="margin-top:6px">
+      <div class="m-card-route-line">🛫 ${esc(b.pickup||'TBD')}</div>
+      <div class="m-card-route-line">🏁 ${esc(b.dropoff||'TBD')}</div>
+    </div>
+    <div class="m-card-meta">
+      ${b.car?`<span class="m-card-pill">🚗 ${esc(b.car)}</span>`:''}
+      ${b.driver?`<span class="m-card-pill">👤 ${esc(b.driver)}</span>`:''}
+      <span class="m-card-pill">👥 ${b.passengers||1}</span>
+    </div>
+    <div class="m-card-footer">
+      <div>
+        <div class="m-card-price">€${displayPrice}${b.payoutAmount&&b.payoutAmount>0?` <span style="font-size:0.72rem;color:var(--status-cancelled);font-weight:600">−€${b.payoutAmount}</span>`:''}</div>
+        <button class="payment-badge ${pay.toLowerCase()}" onclick="event.stopPropagation();changePayment('${b.id}')" style="font-size:0.62rem;padding:2px 7px;margin-top:2px">${payIcon} ${pay}</button>
+      </div>
+      <div class="m-card-actions">
+        <button class="action-pill" onclick="event.stopPropagation();openModal('${b.id}')" style="min-height:38px">✏️ Edit</button>
+        <button class="action-pill" onclick="event.stopPropagation();showNotifyMenu(event,'${b.id}')" style="min-height:38px">📞 Notify</button>
+        <button class="action-pill delete-pill" onclick="event.stopPropagation();deleteBooking('${b.id}')" style="min-height:38px">🗑️</button>
+      </div>
+    </div>`;
+  card.addEventListener('click',()=>openModal(b.id));
+  return card;
+}
+function saveLogistPhone(){
+  const ph=(document.getElementById('logist-phone-input').value||'').trim();
+  if(!ph){showToast('Enter logist phone',false);return;}
+  settings.logistPhone=ph;
+  saveSettings();
+  showToast('Logist phone saved!');
+  updateLogistPhoneDisplay();
+}
+function updateLogistPhoneDisplay(){
+  const inp=document.getElementById('logist-phone-input');
+  const disp=document.getElementById('logist-phone-display');
+  if(!inp||!disp)return;
+  const ph=settings.logistPhone||'';
+  if(ph){inp.value=ph;disp.textContent='📋 '+ph;}else{disp.textContent='';}
 }
 function actionBtns(id){
   return `<button class="action-pill" onclick="openModal('${id}')" title="Edit">✏️ Edit</button>
@@ -1900,21 +2029,59 @@ function showNotifyMenu(e,id){
   if(openNotifyId===id){closeAllNotifyMenus();return;}
   openNotifyId=id;
   menu.innerHTML=`
-    <button class="notify-item wa" onclick="notifyClientWA('${id}');closeAllNotifyMenus()">📱 WhatsApp</button>
-    <button class="notify-item sms" onclick="notifyClientSMS('${id}');closeAllNotifyMenus()">💬 SMS</button>`;
+    <button class="notify-item wa" onclick="notifyWA('client','${id}');closeAllNotifyMenus()">📱 Client</button>
+    <button class="notify-item" style="color:var(--status-confirmed)" onclick="notifyWA('driver','${id}');closeAllNotifyMenus()">🚗 Driver</button>
+    <button class="notify-item" style="color:var(--status-completed)" onclick="notifyWA('logist','${id}');closeAllNotifyMenus()">📋 Logist</button>`;
   const rect=e.currentTarget.getBoundingClientRect();
   menu.style.top=(rect.bottom+window.scrollY+5)+'px';
   menu.style.right=(window.innerWidth-rect.right)+'px';
   menu.style.left='auto';
   menu.classList.add('open');
 }
-function buildNotifyMsg(b){
+function buildClientMsg(b){
   const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
   const driverPart=b.driver?`\n👤 Driver: ${b.driver}`:'';
   return `Bonjour ${b.name}! 🚗\n\nYour V-Transfer is confirmed:\n📅 ${ds}\n📍 From: ${b.pickup}\n📍 To: ${b.dropoff}\n🚘 ${b.car||''}${driverPart}${b.flightInfo?'\n✈️ '+b.flightInfo:''}\n💰 €${b.price}\n\nV-Transfer Team`;
 }
-function notifyClientWA(id){const b=bookings.find(x=>x.id===id);if(!b)return;const ph=(b.phone||'').replace(/[^0-9+]/g,'');if(!ph){showToast('No phone number',false);return;}const i=bookings.findIndex(x=>x.id===id);if(i>=0){bookings[i].notified=true;saveLocalData();pushToCloud(bookings[i]);}window.open(`https://wa.me/${ph.replace('+','')}?text=${encodeURIComponent(buildNotifyMsg(b))}`,'_blank');showToast('Opening WhatsApp...');}
-function notifyClientSMS(id){const b=bookings.find(x=>x.id===id);if(!b)return;const ph=(b.phone||'').replace(/\s/g,'');if(!ph){showToast('No phone number',false);return;}const i=bookings.findIndex(x=>x.id===id);if(i>=0){bookings[i].notified=true;saveLocalData();pushToCloud(bookings[i]);}window.open(`sms:${ph}?body=${encodeURIComponent(buildNotifyMsg(b))}`,'_blank');showToast('Opening SMS...');}
+function buildDriverMsg(b){
+  const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
+  return `🚗 TRIP #${(b.bookingNumber||0).toString().padStart(4,'0')}\n\n📅 ${ds}\n👤 Client: ${b.name}\n📞 ${b.phone||'—'}\n📍 From: ${b.pickup}\n📍 To: ${b.dropoff}\n${b.flightInfo?'✈️ '+b.flightInfo+'\n':''}👥 ${b.passengers||1} pax · 💼 ${b.luggage||0} bags\n${b.requirements&&b.requirements!=='None'?'💬 '+b.requirements:''}`;
+}
+function buildLogistMsg(b){
+  const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
+  return `📋 DISPATCH #${(b.bookingNumber||0).toString().padStart(4,'0')}\n\n📅 ${ds}\n👤 ${b.name} · 📞 ${b.phone||'—'}\n🚗 ${b.car||'—'} · 👤 ${b.driver||'—'}\n📍 ${b.pickup} ➝ ${b.dropoff}\n${b.flightInfo?'✈️ '+b.flightInfo+'\n':''}👥 ${b.passengers||1} pax · ${b.payoutAmount?'💸 Payout: €'+b.payoutAmount+' ('+b.payoutType+')':''}\n💰 €${b.price} (${b.paymentStatus||'Unpaid'})`;
+}
+function notifyWA(role,id){
+  const b=bookings.find(x=>x.id===id);if(!b)return;
+  let ph='',msg='';
+  if(role==='client'){
+    ph=(b.phone||'').replace(/[^0-9+]/g,'');
+    if(!ph){showToast('No client phone number',false);return;}
+    msg=buildClientMsg(b);
+    const i=bookings.findIndex(x=>x.id===id);
+    if(i>=0){bookings[i].notified=true;saveLocalData();pushToCloud(bookings[i]);}
+  } else if(role==='driver'){
+    if(!b.driver){showToast('No driver assigned',false);return;}
+    const dDef=settings.drivers.find(d=>d.name===b.driver);
+    ph=(dDef&&dDef.phone?dDef.phone:(b.driverPhone||'')).replace(/[^0-9+]/g,'');
+    if(!ph){showToast('Driver has no phone set. Add driver phone in Settings.',false);return;}
+    msg=buildDriverMsg(b);
+  } else if(role==='logist'){
+    ph=(settings.logistPhone||'').replace(/[^0-9+]/g,'');
+    if(!ph){showToast('No logist phone set. Go to Settings → Logist.',false);return;}
+    msg=buildLogistMsg(b);
+  }
+  window.open(`https://wa.me/${ph.replace('+','')}?text=${encodeURIComponent(msg)}`,'_blank');
+  showToast(`Opening WhatsApp for ${role}...`);
+}
+function notifyClientWA(id){notifyWA('client',id);}
+function notifyClientSMS(id){
+  const b=bookings.find(x=>x.id===id);if(!b)return;
+  const ph=(b.phone||'').replace(/\s/g,'');
+  if(!ph){showToast('No phone number',false);return;}
+  window.open(`sms:${ph}?body=${encodeURIComponent(buildClientMsg(b))}`,'_blank');
+  showToast('Opening SMS...');
+}
 
 // ═══════════════════════════════════════════════════
 // ARCHIVE
@@ -2321,6 +2488,8 @@ function buildBookingFromForm(){
     childSeats:parseInt(document.getElementById('m-childSeats').value)||0,
     holdBags:parseInt(document.getElementById('m-holdBags').value)||0,
     price:parseInt(document.getElementById('m-price').value)||0,
+    payoutAmount:parseFloat(document.getElementById('m-payoutAmount').value)||0,
+    payoutType:document.getElementById('m-payoutType').value||'None',
     status:document.getElementById('m-status').value,
     paymentStatus:'Unpaid',
     requirements:document.getElementById('m-requirements').value||'None',
@@ -2385,6 +2554,8 @@ function openModal(id){
   document.getElementById('edit-childSeats').value=b.childSeats||0;
   document.getElementById('edit-holdBags').value=b.holdBags||0;
   document.getElementById('edit-price').value=b.price||0;
+  document.getElementById('edit-payoutAmount').value=b.payoutAmount||0;
+  document.getElementById('edit-payoutType').value=b.payoutType||'None';
   document.getElementById('edit-status').value=b.status||'Pending';
   document.getElementById('edit-paymentStatus').value=b.paymentStatus||'Unpaid';
   populateVehicleSelect(document.getElementById('edit-car'),b.car);
@@ -2414,6 +2585,8 @@ function handleEditSubmit(e){
     bookings[i].childSeats=parseInt(document.getElementById('edit-childSeats').value)||0;
     bookings[i].holdBags=parseInt(document.getElementById('edit-holdBags').value)||0;
     bookings[i].price=parseInt(document.getElementById('edit-price').value)||0;
+    bookings[i].payoutAmount=parseFloat(document.getElementById('edit-payoutAmount').value)||0;
+    bookings[i].payoutType=document.getElementById('edit-payoutType').value||'None';
     bookings[i].status=document.getElementById('edit-status').value;
     bookings[i].paymentStatus=document.getElementById('edit-paymentStatus').value;
     bookings[i].carType=document.getElementById('edit-carType').value||'Own';
@@ -2468,6 +2641,15 @@ function copyReport(id){
 // ═══════════════════════════════════════════════════
 // EXPENSES
 // ═══════════════════════════════════════════════════
+function populateExpBookingLink(){
+  const sel=document.getElementById('exp-booking-link');if(!sel)return;
+  sel.innerHTML='<option value="">— General expense</option>';
+  const activeB=bookings.filter(b=>b.status!=='Completed').sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
+  activeB.slice(0,50).forEach(b=>{
+    const dt=b.datetime?new Date(b.datetime).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})+' '+new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'—';
+    const opt=document.createElement('option');opt.value=b.id;opt.textContent=`#${(b.bookingNumber||0).toString().padStart(4,'0')} ${b.name} — ${dt}`;sel.appendChild(opt);
+  });
+}
 function handleExpenseSubmit(e){
   e.preventDefault();
   const cat=document.getElementById('exp-category').value;
@@ -2478,12 +2660,14 @@ function handleExpenseSubmit(e){
     partnerName:(cat==='partner'||cat==='commission')?(document.getElementById('exp-partner-name').value||''):'',
     amount:parseFloat(document.getElementById('exp-amount').value)||0,
     description:document.getElementById('exp-description').value||'',
+    bookingId:document.getElementById('exp-booking-link').value||'',
     created_at:new Date().toISOString(),updated_at:new Date().toISOString()
   };
   expenses.push(exp);saveExpenses();pushExpenseToCloud(exp);
   document.getElementById('expense-form').reset();
   document.getElementById('exp-date').value=new Date().toISOString().slice(0,10);
   document.getElementById('exp-partner-group').style.display='none';
+  populateExpBookingLink();
   showToast(`${currentLang==='ru'?'Расход':'Expense'} €${exp.amount} ${currentLang==='ru'?'сохранён':'saved'}!`);
 }
 function deleteExpense(id){if(!confirm(currentLang==='ru'?'Удалить расход?':'Delete this expense?'))return;expenses=expenses.filter(e=>e.id!==id);saveExpenses();fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${id}/`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{});showToast(currentLang==='ru'?'Удалено':'Deleted');}
@@ -2505,7 +2689,7 @@ function renderExpenses(){
       <td><span class="expense-cat-badge ${exp.category}">${catLabel}</span></td>
       <td style="color:var(--text-muted);font-size:0.82rem">${esc(exp.partnerName||'—')}</td>
       <td style="font-weight:700;color:var(--status-cancelled)">€${(exp.amount||0).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})}</td>
-      <td style="color:var(--text-secondary)">${esc(exp.description||'—')}</td>
+      <td style="color:var(--text-secondary)">${esc(exp.description||'—')}${exp.bookingId?` <span style="font-size:0.68rem;color:var(--gold);cursor:pointer" onclick="openModal('${exp.bookingId}')">🔗 Trip</span>`:''}</td>
       <td><button class="action-icon delete-btn" onclick="deleteExpense('${exp.id}')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td>`;
     tbody.appendChild(tr);
   });
@@ -2712,7 +2896,8 @@ async function fetchAddresses(q, inp, drop, inputId) {
   drop.innerHTML = '<div class="autocomplete-loading">Searching...</div>';
   drop.classList.add('open');
   try {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`;
+    const euroCC='ad,al,at,ba,be,bg,by,ch,cy,cz,de,dk,ee,es,fi,fr,gb,gr,hr,hu,ie,is,it,li,lt,lu,lv,mc,md,me,mk,mt,nl,no,pl,pt,ro,rs,ru,se,si,sk,sm,tr,ua,va,xk';
+    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&countrycodes=${euroCC}&q=${encodeURIComponent(q)}`;
     const res = await fetch(url, {
       signal: acState[inputId].controller.signal,
       headers: { 'Accept-Language': 'en', 'User-Agent': 'VTransferPanel/1.0' }
