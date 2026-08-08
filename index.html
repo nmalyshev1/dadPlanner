@@ -1577,10 +1577,7 @@ function syncNow(silent=false) {
       }).catch(()=>{});
 
     const bookingFetches = bIds.length ? Promise.all(bIds.map(id => fetchBookingById(id))) : Promise.resolve([]);
-    const expFetches = eIds.length ? Promise.all(eIds.map(id =>
-      fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}`)
-        .then(r=>r.json()).then(ds=>{if(!ds || typeof ds !== 'string')return null;const cj=ds.replace(/^"+|"+$/g,'').trim();try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){return null;}}}).catch(()=>null)
-    )) : Promise.resolve([]);
+    const expFetches = eIds.length ? Promise.all(eIds.map(id => fetchExpenseById(id))) : Promise.resolve([]);
 
     Promise.all([bookingFetches, expFetches, settingsFetch]).then(([cb, ce]) => {
       // Merge bookings
@@ -2613,12 +2610,14 @@ function deleteBooking(id){
   if(!confirm(currentLang==='ru'?'Удалить этот заказ?':'Delete this booking?'))return;
   const i=bookings.findIndex(b=>b.id===id);
   if(i>=0){
-    bookings.splice(i,1); saveLocalData();
-    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${id}/`,{method:'POST',headers:{'Content-Length':'0'}});
+    bookings.splice(i,1); saveLocalData(); renderAll();
+    // 1. Wipe the booking data in cloud
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${id}/`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{});
+    // 2. Remove from the cloud ID list atomically
     fetchListFromCloud(listKey).then(list => {
       const updatedList = list.filter(x=>x!==id);
       saveListToCloud(listKey, updatedList);
-    });
+    }).catch(()=>{});
     showToast(currentLang==='ru'?'Заказ удалён':'Booking deleted');
   }
 }
