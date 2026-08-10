@@ -3266,6 +3266,40 @@ function updateAnalytics(){
   document.getElementById('stat-net-profit').textContent=fmt(netProfit);
   document.getElementById('stat-net-profit').style.color=netProfit>=0?'var(--status-confirmed)':'var(--status-cancelled)';
 }
+function deleteExpenseFromAnalytics(id, currentType){
+  if(!confirm(currentLang==='ru'?'Удалить эту стоимость/комиссию?':'Delete this single cost / commission?')) return;
+  expenses = expenses.filter(e => e.id !== id);
+  saveExpenses();
+  renderExpenses();
+  updateAnalytics();
+  addDeletedExpenseId(id);
+  wipeExpenseFromCloud(id);
+  fetchListFromCloud(expListKey).then(list => {
+    const updatedList = list.filter(x => x !== id);
+    saveListToCloud(expListKey, updatedList);
+  }).catch(()=>{});
+  showToast(currentLang==='ru'?'Расход/Комиссия удалена':'Single cost/commission deleted');
+  if(currentType) showStatDetail(currentType);
+}
+
+function deleteBookingFromAnalytics(id, currentType){
+  if(!confirm(currentLang==='ru'?'Удалить этот заказ?':'Delete this booking?')) return;
+  const i = bookings.findIndex(b => b.id === id);
+  if(i >= 0){
+    bookings.splice(i, 1);
+    saveLocalData();
+    addDeletedBookingId(id);
+    wipeBookingFromCloud(id);
+    fetchListFromCloud(bListKey).then(list => {
+      const updatedList = list.filter(x => x !== id);
+      saveListToCloud(bListKey, updatedList);
+    }).catch(()=>{});
+    renderAll();
+    showToast('Booking deleted');
+    if(currentType) showStatDetail(currentType);
+  }
+}
+
 function showStatDetail(type){
   const modal=document.getElementById('stat-detail-modal');
   const title=document.getElementById('stat-detail-title');
@@ -3273,57 +3307,58 @@ function showStatDetail(type){
   let html='';
   const fmtAmt=n=>'€'+(parseFloat(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2});
   const fmtDt=dt=>{if(!dt)return'—';try{return new Date(dt).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+new Date(dt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(e){return dt;}};
+
   if(type==='confirmed-rev'){
     title.textContent='Confirmed Revenue — Bookings';
     const list=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed');
-    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Amount</th><th>Status</th></tr></thead><tbody>`;
-    if(!list.length)html+='<tr><td colspan="6" class="no-data">No bookings</td></tr>';
-    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--gold)">${fmtAmt(b.price)}</td><td><span class="status-badge ${(b.status||'').toLowerCase()}">${b.status}</span></td></tr>`);
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Amount</th><th>Status</th><th style="text-align:center;">Action</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="7" class="no-data">No bookings</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--gold)">${fmtAmt(b.price)}</td><td><span class="status-badge ${(b.status||'').toLowerCase()}">${b.status}</span></td><td style="text-align:center;"><button type="button" class="action-icon delete-btn" onclick="deleteBookingFromAnalytics('${b.id}','${type}')" title="Delete booking"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td></tr>`);
     const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
-    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--gold)">${fmtAmt(total)}</td><td></td></tr></tfoot></table>`;
+    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--gold)">${fmtAmt(total)}</td><td colspan="2"></td></tr></tfoot></table>`;
   } else if(type==='paid'){
     title.textContent='Paid Bookings';
     const list=bookings.filter(b=>(b.paymentStatus||'Unpaid')==='Paid');
-    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Amount</th></tr></thead><tbody>`;
-    if(!list.length)html+='<tr><td colspan="5" class="no-data">No paid bookings</td></tr>';
-    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--status-confirmed)">${fmtAmt(b.price)}</td></tr>`);
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Amount</th><th style="text-align:center;">Action</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="6" class="no-data">No paid bookings</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--status-confirmed)">${fmtAmt(b.price)}</td><td style="text-align:center;"><button type="button" class="action-icon delete-btn" onclick="deleteBookingFromAnalytics('${b.id}','${type}')" title="Delete booking"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td></tr>`);
     const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
-    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total Paid</td><td style="font-weight:800;color:var(--status-confirmed)">${fmtAmt(total)}</td></tr></tfoot></table>`;
+    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total Paid</td><td style="font-weight:800;color:var(--status-confirmed)">${fmtAmt(total)}</td><td></td></tr></tfoot></table>`;
   } else if(type==='unpaid'){
     title.textContent='Awaiting Payment';
     const list=bookings.filter(b=>(b.status==='Confirmed'||b.status==='Completed')&&(b.paymentStatus||'Unpaid')==='Unpaid');
-    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Phone</th><th>Date</th><th>Amount</th></tr></thead><tbody>`;
-    if(!list.length)html+='<tr><td colspan="5" class="no-data">No unpaid bookings 🎉</td></tr>';
-    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="font-size:0.8rem;color:var(--text-muted)">${esc(b.phone||'—')}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(b.price)}</td></tr>`);
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Phone</th><th>Date</th><th>Amount</th><th style="text-align:center;">Action</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="6" class="no-data">No unpaid bookings 🎉</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="font-size:0.8rem;color:var(--text-muted)">${esc(b.phone||'—')}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(b.price)}</td><td style="text-align:center;"><button type="button" class="action-icon delete-btn" onclick="deleteBookingFromAnalytics('${b.id}','${type}')" title="Delete booking"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td></tr>`);
     const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
-    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total Outstanding</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(total)}</td></tr></tfoot></table>`;
+    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total Outstanding</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(total)}</td><td></td></tr></tfoot></table>`;
   } else if(type==='expenses'){
     title.textContent='All Expenses';
-    html=buildExpenseDetailTable(expenses);
+    html=buildExpenseDetailTable(expenses, '', type);
   } else if(type==='commission'){
     title.textContent='Commission Expenses';
-    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='commission'));
+    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='commission'), '', type);
   } else if(type==='rental'){
     title.textContent='Rental Expenses';
-    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='rental'));
+    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='rental'), '', type);
   } else if(type==='partner'){
     title.textContent='Partner Expenses';
-    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='partner'));
+    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='partner'), '', type);
   } else if(type==='all-bookings'){
     title.textContent='All Bookings';
     const list=[...bookings].sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
-    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Status</th><th>€</th></tr></thead><tbody>`;
-    if(!list.length)html+='<tr><td colspan="6" class="no-data">No bookings</td></tr>';
-    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td><span class="status-badge ${(b.status||'').toLowerCase()}">${b.status}</span></td><td style="font-weight:700">${fmtAmt(b.price)}</td></tr>`);
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Status</th><th>€</th><th style="text-align:center;">Action</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="7" class="no-data">No bookings</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td><span class="status-badge ${(b.status||'').toLowerCase()}">${b.status}</span></td><td style="font-weight:700">${fmtAmt(b.price)}</td><td style="text-align:center;"><button type="button" class="action-icon delete-btn" onclick="deleteBookingFromAnalytics('${b.id}','${type}')" title="Delete booking"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td></tr>`);
     html+=`</tbody></table>`;
   } else if(type==='completed'){
     title.textContent='Completed Transfers';
     const list=bookings.filter(b=>b.status==='Completed').sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
-    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>€</th><th>Payment</th></tr></thead><tbody>`;
-    if(!list.length)html+='<tr><td colspan="6" class="no-data">No completed transfers</td></tr>';
-    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--gold)">${fmtAmt(b.price)}</td><td><span class="payment-badge ${(b.paymentStatus||'Unpaid').toLowerCase()}" style="cursor:default">${b.paymentStatus||'Unpaid'}</span></td></tr>`);
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>€</th><th>Payment</th><th style="text-align:center;">Action</th></tr></thead><tbody>`;
+    if(!list.length)html+='<tr><td colspan="7" class="no-data">No completed transfers</td></tr>';
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--gold)">${fmtAmt(b.price)}</td><td><span class="payment-badge ${(b.paymentStatus||'Unpaid').toLowerCase()}" style="cursor:default">${b.paymentStatus||'Unpaid'}</span></td><td style="text-align:center;"><button type="button" class="action-icon delete-btn" onclick="deleteBookingFromAnalytics('${b.id}','${type}')" title="Delete booking"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td></tr>`);
     const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
-    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--gold)">${fmtAmt(total)}</td><td></td></tr></tfoot></table>`;
+    html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--gold)">${fmtAmt(total)}</td><td colspan="2"></td></tr></tfoot></table>`;
   } else if(type==='net-profit'){
     title.textContent='Net Profit Breakdown';
     const confRev=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
@@ -3333,21 +3368,33 @@ function showStatDetail(type){
       <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:var(--status-cancelled)">${fmtAmt(totalExp)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Expenses</div></div>
       <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:${confRev-totalExp>=0?'var(--status-confirmed)':'var(--status-cancelled)'}">${fmtAmt(confRev-totalExp)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Net Profit</div></div>
     </div>`;
-    html+=buildExpenseDetailTable(expenses,'Expense Breakdown');
+    html+=buildExpenseDetailTable(expenses,'Expense Breakdown', type);
   }
   body.innerHTML=html;
   modal.classList.add('open');
 }
-function buildExpenseDetailTable(list,caption=''){
+
+function buildExpenseDetailTable(list, caption='', currentType=''){
   const fmtAmt=n=>'€'+(parseFloat(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2});
-  let html=`<table class="stat-detail-table"><thead><tr><th>Date</th><th>Category</th><th>Partner</th><th>Amount</th><th>Description</th></tr></thead><tbody>`;
-  if(!list.length)html+='<tr><td colspan="5" class="no-data">No expenses</td></tr>';
+  let html=`<table class="stat-detail-table"><thead><tr><th>Date</th><th>Category</th><th>Partner</th><th>Amount</th><th>Description</th><th style="text-align:center;">Action</th></tr></thead><tbody>`;
+  if(!list.length)html+='<tr><td colspan="6" class="no-data">No expenses or commissions</td></tr>';
   list.sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(e=>{
     const catLabel=e.category?e.category.charAt(0).toUpperCase()+e.category.slice(1):'Other';
-    html+=`<tr><td style="font-weight:600">${e.date||'—'}</td><td><span class="expense-cat-badge ${e.category}">${catLabel}</span></td><td style="color:var(--text-muted);font-size:0.81rem">${esc(e.partnerName||'—')}</td><td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(e.amount)}</td><td style="color:var(--text-secondary);font-size:0.81rem">${esc(e.description||'—')}</td></tr>`;
+    html+=`<tr>
+      <td style="font-weight:600">${e.date||'—'}</td>
+      <td><span class="expense-cat-badge ${e.category}">${catLabel}</span></td>
+      <td style="color:var(--text-muted);font-size:0.81rem">${esc(e.partnerName||'—')}</td>
+      <td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(e.amount)}</td>
+      <td style="color:var(--text-secondary);font-size:0.81rem">${esc(e.description||'—')}</td>
+      <td style="text-align:center;">
+        <button type="button" class="action-icon delete-btn" onclick="deleteExpenseFromAnalytics('${e.id}','${currentType}')" title="Delete this single cost/commission">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+      </td>
+    </tr>`;
   });
   const total=list.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
-  html+=`</tbody><tfoot><tr><td colspan="3" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(total)}</td><td></td></tr></tfoot></table>`;
+  html+=`</tbody><tfoot><tr><td colspan="3" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(total)}</td><td colspan="2"></td></tr></tfoot></table>`;
   return html;
 }
 function closeStatDetail(){document.getElementById('stat-detail-modal').classList.remove('open');}
