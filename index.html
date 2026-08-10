@@ -414,7 +414,33 @@
     .alpinbus-link-blue { color:#3498DB; font-weight:500; font-size:0.78rem; text-decoration:underline; background:none; border:none; padding:0; cursor:pointer; display:inline-block; margin-right:10px; }
     .alpinbus-link-red { color:#E74C3C; font-weight:500; font-size:0.78rem; text-decoration:underline; background:none; border:none; padding:0; cursor:pointer; display:inline-block; margin-right:10px; }
 
-    /* ── FULL SCREEN CALENDAR & WORD TABS ─────────────── */
+    /* ── FULL SCREEN / FULL WIDTH CALENDAR ─────────────── */
+    main.full-width-layout {
+      max-width: 100% !important;
+      width: 100% !important;
+      padding: 12px 18px !important;
+      margin: 0 !important;
+    }
+    main.full-width-layout .content-area {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    main.full-width-layout #calendar-tab {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    main.full-width-layout #calendar-tab .panel {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-height: calc(100vh - 100px);
+    }
+    main.full-width-layout .dispatch-board-wrap {
+      width: 100% !important;
+    }
+    main.full-width-layout .dispatch-table {
+      width: 100% !important;
+      min-width: 100% !important;
+    }
     #calendar-tab { width:100%; min-height:85vh; }
     #calendar-tab .panel { width:100%; min-height:85vh; display:flex; flex-direction:column; }
     .cal-view-words { display:inline-flex; gap:4px; background:#E2E8F0; padding:3px; border-radius:6px; }
@@ -2068,6 +2094,11 @@ function switchTab(tabId,btn) {
   document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
   if(btn)btn.classList.add('active');
+  const mainEl=document.querySelector('main');
+  if(mainEl){
+    if(tabId==='calendar-tab') mainEl.classList.add('full-width-layout');
+    else mainEl.classList.remove('full-width-layout');
+  }
   const tabToMnav={'excel-tab':'mnav-excel','calendar-tab':'mnav-calendar','add-tab':'mnav-add','expenses-tab':'mnav-expenses','analytics-tab':'mnav-analytics','settings-tab':'mnav-settings'};
   if(tabToMnav[tabId]&&document.getElementById(tabToMnav[tabId]))setMobileNav(tabToMnav[tabId]);
   if(tabId==='calendar-tab')renderCalendar();
