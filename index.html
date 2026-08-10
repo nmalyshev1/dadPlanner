@@ -364,44 +364,84 @@
     .settings-add-row { display:flex; gap:9px; align-items:flex-end; flex-wrap:wrap; }
     .settings-add-row .form-group { flex:1; min-width:130px; margin:0; }
 
+    /* ── ALPINBUS CALENDAR THEME & LAYOUT ──────────────── */
+    .alpinbus-page-title-banner {
+      background:#8EA8F5; color:#FFF; padding:12px 20px;
+      display:flex; justify-content:space-between; align-items:center;
+      border-radius:6px 6px 0 0;
+    }
+    .alpinbus-page-title-banner h2 { font-size:1.15rem; font-weight:700; margin:0; }
+    .alpinbus-print-btn { background:rgba(255,255,255,0.3); border:1px solid rgba(255,255,255,0.5); color:#FFF; padding:6px 16px; border-radius:4px; font-size:0.82rem; font-weight:700; cursor:pointer; }
+    .alpinbus-print-btn:hover { background:rgba(255,255,255,0.45); }
+    .alpinbus-date-control-bar {
+      background:#EEF2F7; border-bottom:1px solid #D1D8E0; padding:8px 18px;
+      display:flex; align-items:center; gap:6px; font-size:0.85rem; flex-wrap:wrap;
+    }
+    .alpinbus-day-label { font-weight:700; color:#333; margin-right:4px; }
+    .alpinbus-date-arrow { background:#FFF; border:1px solid #B0BEC5; color:#333; width:26px; height:26px; border-radius:3px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; }
+    .alpinbus-date-arrow:hover { background:#F0F4F8; }
+    .alpinbus-date-input { border:1px solid #B0BEC5; border-radius:3px; padding:3px 8px; font-size:0.85rem; font-family:inherit; background:#FFF; }
+
+    /* Popover Tooltip (Screenshot 2) */
+    .alpinbus-popover {
+      position:fixed; z-index:9500; background:#EDF2FA; border:1.5px solid #B4C6E7;
+      border-radius:6px; box-shadow:0 12px 36px rgba(0,0,0,0.28); padding:14px 18px;
+      min-width:320px; max-width:380px; font-size:0.82rem; color:#222; animation:modalSlide 0.2s ease;
+    }
+    .alpinbus-popover-top { display:flex; align-items:center; gap:12px; margin-bottom:12px; border-bottom:1px solid #D5E1F2; padding-bottom:8px; }
+    .alpinbus-popover-viewbtn { background:#5B86E5; color:#FFF; border:none; padding:6px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:0.8rem; }
+    .alpinbus-popover-viewbtn:hover { background:#4772D0; }
+    .alpinbus-popover-status { font-weight:700; color:#155724; font-size:0.88rem; display:flex; align-items:center; gap:5px; }
+    .alpinbus-popover-table { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+    .alpinbus-popover-row { display:flex; gap:8px; font-size:0.81rem; }
+    .alpinbus-popover-row span.lbl { min-width:96px; color:#555; font-weight:500; }
+    .alpinbus-popover-row span.val { color:#111; font-weight:600; flex:1; }
+    .alpinbus-popover-invoicelink { color:#5B86E5; text-decoration:underline; font-size:0.8rem; cursor:pointer; font-weight:600; }
+
+    /* Screenshot 3 - Modal Layout */
+    .alpinbus-modal-layout { display:grid; grid-template-columns:260px 1fr 270px; gap:14px; }
+    @media (max-width:1100px) { .alpinbus-modal-layout { grid-template-columns:1fr; } }
+    .alpinbus-box { background:#F8FAFC; border:1px solid #CFD8E3; border-radius:6px; padding:12px 14px; margin-bottom:12px; }
+    .alpinbus-box-title { font-size:0.82rem; font-weight:800; text-transform:none; color:#2C3E50; margin-bottom:10px; border-bottom:1px solid #E1E8F0; padding-bottom:5px; }
+    .alpinbus-form-row { display:flex; align-items:center; margin-bottom:7px; gap:6px; font-size:0.8rem; }
+    .alpinbus-form-row label { min-width:90px; font-weight:600; color:#444; margin:0; font-size:0.78rem; }
+    .alpinbus-form-row input, .alpinbus-form-row select, .alpinbus-form-row textarea { flex:1; padding:4px 7px; border:1px solid #C0C8D0; border-radius:4px; font-size:0.81rem; font-family:inherit; background:#FFF; }
+    .alpinbus-inline-opts { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin:6px 0; }
+    .alpinbus-inline-opts .opt-item { display:flex; flex-direction:column; font-size:0.72rem; font-weight:600; color:#555; }
+    .alpinbus-inline-opts select { padding:2px 4px; font-size:0.78rem; border-radius:3px; }
+    .alpinbus-save-btn { background:#2ECC71; color:#FFF; border:none; padding:9px 28px; border-radius:4px; font-size:0.95rem; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(46,204,113,0.3); transition:background 0.15s; }
+    .alpinbus-save-btn:hover { background:#27AE60; }
+    .alpinbus-link-blue { color:#3498DB; font-weight:500; font-size:0.78rem; text-decoration:underline; background:none; border:none; padding:0; cursor:pointer; display:inline-block; margin-right:10px; }
+    .alpinbus-link-red { color:#E74C3C; font-weight:500; font-size:0.78rem; text-decoration:underline; background:none; border:none; padding:0; cursor:pointer; display:inline-block; margin-right:10px; }
+
     /* ── DISPATCH BOARD ────────────────────────────── */
-    /* ── DISPATCH / DAY CALENDAR ─────────────────── */
-    .dispatch-board-wrap { border:1.5px solid var(--border); border-radius:10px; background:var(--bg-card); overflow-x:auto; }
-    .dispatch-table { border-collapse:collapse; table-layout:fixed; min-width:max-content; }
-    .dispatch-table th, .dispatch-table td { border:1px solid var(--border); padding:0; margin:0; }
-    /* Header row */
-    .dispatch-th-label { width:140px; min-width:140px; padding:6px 10px; font-size:0.62rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); background:var(--table-hdr); border-right:2px solid var(--border-gold) !important; white-space:nowrap; }
-    .dispatch-th-hour { width:44px; min-width:44px; text-align:center; font-size:0.62rem; color:var(--text-muted); font-weight:600; background:var(--table-hdr); padding:5px 0; border-bottom:2px solid var(--border-gold) !important; }
-    /* Vehicle name row (first of pair) */
-    .dispatch-td-vname { background:rgba(184,148,42,0.05); border-right:2px solid var(--border-gold) !important; padding:3px 10px; font-size:0.74rem; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; }
-    .dispatch-td-vname small { display:block; font-size:0.6rem; color:var(--text-muted); font-weight:400; font-family:monospace; }
-    .dispatch-td-vname-spacer { background:rgba(184,148,42,0.05); }
-    /* Vehicle booking bar row (second of pair) */
-    .dispatch-td-rowlabel { background:var(--table-hdr); border-right:2px solid var(--border-gold) !important; padding:2px 8px; font-size:0.63rem; color:var(--text-muted); white-space:nowrap; }
-    /* Each hour column cell in booking row */
-    .dispatch-td-hour { position:relative; height:34px; min-width:44px; width:44px; padding:0; overflow:visible; background:var(--bg-card); }
-    .dispatch-td-hour.major { background:rgba(184,148,42,0.025); }
-    /* Now-line */
-    .dispatch-now-col { position:absolute; top:0; bottom:0; left:0; width:2px; background:var(--status-cancelled); opacity:0.8; pointer-events:none; z-index:8; }
-    /* Booking blocks — span multiple columns via colspan */
-    .dispatch-td-block { position:relative; padding:0; overflow:visible; vertical-align:middle; height:34px; }
-    /* The booking pill inside the cell */
-    .dispatch-pill { display:flex; flex-direction:column; justify-content:center; padding:2px 5px; border-radius:3px; cursor:pointer; height:28px; margin:3px 2px; border-left:3px solid rgba(0,0,0,0.25); transition:filter 0.15s, box-shadow 0.15s; white-space:nowrap; overflow:hidden; }
-    .dispatch-pill:hover { filter:brightness(1.12); box-shadow:0 3px 10px rgba(0,0,0,0.35); }
-    .dispatch-pill.pending { background:rgba(212,134,10,0.88); color:#fff; }
-    .dispatch-pill.confirmed { background:rgba(27,127,74,0.88); color:#fff; }
-    .dispatch-pill.completed { background:rgba(26,110,168,0.85); color:#fff; }
-    .dispatch-pill.cancelled { background:rgba(192,57,43,0.65); color:#fff; }
-    .dispatch-pill-time { font-size:0.6rem; font-weight:700; line-height:1.2; }
-    .dispatch-pill-name { font-size:0.63rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; line-height:1.2; }
-    .dispatch-empty-row { padding:11px 14px; font-size:0.78rem; color:var(--text-muted); font-style:italic; }
-    /* Sidebar */
-    .dispatch-sidebar { width:200px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
-    .dispatch-sidebar-card { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; padding:12px 13px; }
-    .dispatch-sidebar-title { font-size:0.7rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); margin-bottom:8px; }
-    .dispatch-sidebar-subtitle { font-size:0.75rem; color:var(--text-muted); font-style:italic; }
-    .dispatch-legend-item { display:flex; align-items:center; gap:7px; font-size:0.75rem; color:var(--text-secondary); margin-bottom:5px; }
-    .dispatch-legend-swatch { width:14px; height:14px; border-radius:2px; border:1px solid var(--border); flex-shrink:0; }
+    .dispatch-board-wrap { border:1px solid #C0C8D0; border-radius:6px; background:#FFF; overflow-x:auto; }
+    .dispatch-table { border-collapse:collapse; table-layout:fixed; min-width:max-content; width:100%; }
+    .dispatch-table th, .dispatch-table td { border:1px solid #D5DCE6; padding:0; margin:0; }
+    .dispatch-th-label { width:150px; min-width:150px; padding:6px 10px; font-size:0.7rem; font-weight:800; text-transform:uppercase; color:#333; background:#E8ECEF; border-right:2px solid #B0BEC5 !important; white-space:nowrap; }
+    .dispatch-th-hour { width:44px; min-width:44px; text-align:center; font-size:0.68rem; color:#444; font-weight:700; background:#E8ECEF; padding:6px 0; border-bottom:2px solid #B0BEC5 !important; }
+    .dispatch-td-vname { background:#F4F6FA; border-right:2px solid #B0BEC5 !important; padding:4px 10px; font-size:0.75rem; font-weight:700; color:#222; white-space:nowrap; overflow:hidden; }
+    .dispatch-td-vname small { display:block; font-size:0.62rem; color:#666; font-weight:400; }
+    .dispatch-td-vname-spacer { background:#F4F6FA; }
+    .dispatch-td-rowlabel { background:#E8ECEF; border-right:2px solid #B0BEC5 !important; padding:2px 8px; font-size:0.65rem; color:#555; white-space:nowrap; }
+    .dispatch-td-hour { position:relative; height:36px; min-width:44px; width:44px; padding:0; overflow:visible; background:#FFF; }
+    .dispatch-td-hour.major { background:#F9FAFC; }
+    .dispatch-now-col { position:absolute; top:0; bottom:0; left:0; width:2px; background:#E74C3C; opacity:0.85; pointer-events:none; z-index:8; }
+    .dispatch-td-block { position:relative; padding:0; overflow:visible; vertical-align:middle; height:36px; }
+    .dispatch-pill { display:flex; flex-direction:column; justify-content:center; padding:2px 6px; border-radius:3px; cursor:pointer; height:30px; margin:2px 2px; border-left:3px solid rgba(0,0,0,0.3); transition:filter 0.15s; white-space:nowrap; overflow:hidden; }
+    .dispatch-pill:hover { filter:brightness(1.1); box-shadow:0 2px 8px rgba(0,0,0,0.25); }
+    .dispatch-pill.pending { background:#E67E22; color:#FFF; }
+    .dispatch-pill.confirmed { background:#27AE60; color:#FFF; }
+    .dispatch-pill.completed { background:#2980B9; color:#FFF; }
+    .dispatch-pill.cancelled { background:#C0392B; color:#FFF; }
+    .dispatch-pill-time { font-size:0.62rem; font-weight:700; line-height:1.2; }
+    .dispatch-pill-name { font-size:0.65rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; line-height:1.2; }
+    .dispatch-empty-row { padding:11px 14px; font-size:0.78rem; color:#777; font-style:italic; }
+    .dispatch-sidebar { width:210px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+    .dispatch-sidebar-card { background:#F4F6FA; border:1px solid #D5DCE6; border-radius:6px; padding:10px 12px; }
+    .dispatch-sidebar-title { font-size:0.78rem; font-weight:800; text-transform:none; color:#222; margin-bottom:6px; border-bottom:1px solid #E1E8F0; padding-bottom:4px; }
+    .dispatch-legend-item { display:flex; align-items:center; gap:8px; font-size:0.76rem; color:#333; margin-bottom:4px; }
+    .dispatch-legend-swatch { width:14px; height:14px; border-radius:2px; flex-shrink:0; }
     .dispatch-assigned-item { padding:6px 9px; border-radius:7px; border:1.5px solid rgba(27,127,74,0.25); background:rgba(27,127,74,0.05); cursor:pointer; margin-bottom:5px; transition:all 0.2s; }
     .dispatch-assigned-item:hover { border-color:rgba(27,127,74,0.5); background:rgba(27,127,74,0.1); }
     .dispatch-unassigned-item { padding:6px 9px; border-radius:7px; border:1.5px solid rgba(192,57,43,0.3); background:rgba(192,57,43,0.06); cursor:pointer; margin-bottom:5px; transition:all 0.2s; }
@@ -642,22 +682,29 @@
 
       <!-- TAB: CALENDAR -->
       <div id="calendar-tab" class="tab-content">
-        <div class="panel" style="padding:14px 16px;">
-          <div class="calendar-header">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <button class="btn btn-secondary" style="padding:6px 11px;font-size:0.82rem;" onclick="prevPeriod()">◀</button>
-              <div class="calendar-title" id="calendar-month-year" style="min-width:180px;text-align:center;"></div>
-              <button class="btn btn-secondary" style="padding:6px 11px;font-size:0.82rem;" onclick="nextPeriod()">▶</button>
-              <button class="btn btn-secondary" style="padding:6px 13px;font-size:0.82rem;" onclick="goToToday()" data-i18n="cal_today">Today</button>
-            </div>
-            <div class="cal-view-toggle">
-              <button class="cal-view-btn active" id="cal-day-btn" onclick="setCalView('day')">📋 Day</button>
-              <button class="cal-view-btn" id="cal-month-btn" onclick="setCalView('month')" data-i18n="cal_month">Month</button>
+        <div class="panel" style="padding:0; overflow:hidden; border:1px solid #C5D1E0; border-radius:8px;">
+          <!-- Top Alpinbus title banner -->
+          <div class="alpinbus-page-title-banner">
+            <h2 id="alpinbus-day-title">Transfer calendar for Sun 09 Aug 2026</h2>
+            <button type="button" class="alpinbus-print-btn" onclick="window.print()">Print timetable</button>
+          </div>
+
+          <!-- Date control sub-bar -->
+          <div class="alpinbus-date-control-bar">
+            <span class="alpinbus-day-label">Day:</span>
+            <button type="button" class="alpinbus-date-arrow" onclick="prevPeriod()" title="Previous day">◀</button>
+            <input type="date" id="alpinbus-date-picker" class="alpinbus-date-input" onchange="onAlpinbusDateChange(this.value)">
+            <button type="button" class="alpinbus-date-arrow" onclick="nextPeriod()" title="Next day">▶</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="goToToday()" style="margin-left:12px;font-size:0.75rem;padding:3px 10px;">Today</button>
+            
+            <div class="cal-view-toggle" style="margin-left:auto;">
+              <button type="button" class="cal-view-btn active" id="cal-day-btn" onclick="setCalView('day')">📋 Day</button>
+              <button type="button" class="cal-view-btn" id="cal-month-btn" onclick="setCalView('month')">Month</button>
             </div>
           </div>
 
           <!-- DISPATCH (DAY) VIEW -->
-          <div id="cal-day-view">
+          <div id="cal-day-view" style="padding:14px;">
             <div style="display:flex;gap:14px;align-items:flex-start;">
               <!-- Timeline board -->
               <div style="flex:1;min-width:0;overflow-x:auto;" id="dispatch-scroll-area">
@@ -668,26 +715,29 @@
               <!-- Sidebar -->
               <div class="dispatch-sidebar" id="dispatch-sidebar">
                 <div class="dispatch-sidebar-card">
-                  <div class="dispatch-sidebar-title" id="dispatch-unassigned-title">⚠️ Unassigned</div>
-                  <div id="dispatch-unassigned-list"><div style="font-size:0.78rem;color:var(--text-muted);">All assigned ✓</div></div>
+                  <div class="dispatch-sidebar-title" id="dispatch-unassigned-title">Unassigned</div>
+                  <div id="dispatch-unassigned-list"><div style="font-size:0.78rem;color:#777;font-style:italic;">All jobs are assigned</div></div>
+                </div>
+                <div class="dispatch-sidebar-card" id="dispatch-assigned-card">
+                  <div class="dispatch-sidebar-title">Assigned</div>
+                  <div id="dispatch-assigned-list"></div>
                 </div>
                 <div class="dispatch-sidebar-card">
                   <div class="dispatch-sidebar-title">Legend</div>
-                  <div class="dispatch-legend-item"><div class="dispatch-legend-dot" style="background:var(--status-pending)"></div>Pending</div>
-                  <div class="dispatch-legend-item"><div class="dispatch-legend-dot" style="background:var(--status-confirmed)"></div>Confirmed</div>
-                  <div class="dispatch-legend-item"><div class="dispatch-legend-dot" style="background:var(--status-completed)"></div>Completed</div>
-                  <div class="dispatch-legend-item"><div class="dispatch-legend-dot" style="background:var(--status-cancelled)"></div>Cancelled</div>
+                  <div class="dispatch-legend-item"><div class="dispatch-legend-swatch" style="background:#555555"></div>Arrival</div>
+                  <div class="dispatch-legend-item"><div class="dispatch-legend-swatch" style="background:#FFFFFF;border:1px solid #888"></div>Departure</div>
+                  <div class="dispatch-legend-item"><div class="dispatch-legend-swatch" style="background:#CCCCCC"></div>Other</div>
                 </div>
-                <div class="dispatch-sidebar-card" id="dispatch-assigned-card" style="display:none;">
-                  <div class="dispatch-sidebar-title">✅ Assigned</div>
-                  <div id="dispatch-assigned-list"></div>
+                <div class="dispatch-sidebar-card">
+                  <div class="dispatch-sidebar-title">Help</div>
+                  <div class="dispatch-legend-item" style="font-size:0.78rem;"><input type="checkbox" id="help-cal-check" checked style="accent-color:#5B86E5;margin-right:4px;"> <label for="help-cal-check" style="cursor:pointer;color:#333;">Using the transfer calendar</label></div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- MONTH VIEW -->
-          <div id="cal-month-view" style="display:none;">
+          <div id="cal-month-view" style="display:none;padding:14px;">
             <div class="calendar-grid" id="cal-headers">
               <div class="calendar-day-header" data-i18n="day_mon">Mon</div><div class="calendar-day-header" data-i18n="day_tue">Tue</div>
               <div class="calendar-day-header" data-i18n="day_wed">Wed</div><div class="calendar-day-header" data-i18n="day_thu">Thu</div>
@@ -982,89 +1032,186 @@
 </div>
 
 <!-- EDIT MODAL -->
+<!-- EDIT MODAL (Screenshot 3) -->
 <div class="modal-overlay" id="details-modal" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-title">Edit Booking</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+  <div class="modal" style="max-width:980px; width:95%;">
+    <div class="modal-header" style="background:#5B86E5; color:#FFF; padding:12px 18px;">
+      <div class="modal-title" id="modal-title" style="font-family:inherit; font-size:1.1rem; font-weight:700; color:#FFF;">Transfer Booking #42811</div>
+      <button class="modal-close" onclick="closeModal()" style="color:#FFF;">✕</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="padding:16px; background:#EEF2F7;">
       <form id="edit-booking-form" onsubmit="handleEditSubmit(event)">
         <input type="hidden" id="edit-id">
-        <div class="form-grid edit-mode">
-          <div class="form-group"><label data-i18n="f_name">Customer Name</label><input type="text" id="edit-name" required></div>
-          <div class="form-group"><label>Email</label><input type="email" id="edit-email"></div>
-          <div class="form-group"><label data-i18n="f_phone">Phone</label><input type="tel" id="edit-phone"></div>
-          <div class="form-group"><label data-i18n="f_datetime">Date &amp; Time</label><input type="datetime-local" id="edit-datetime" required></div>
-          <div class="form-group"><label data-i18n="f_pickup">Pickup</label><div class="autocomplete-wrap"><input type="text" id="edit-pickup" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-edit-pickup"></div></div></div>
-          <!-- MULTI-STOP edit -->
-          <div class="form-group full-width stops-section">
-            <div class="stops-section-label">
-              <span>📍 Intermediate Stops</span>
-              <button type="button" class="add-stop-btn" onclick="addStop('edit-stops-list')">+ Add Stop</button>
+        <input type="hidden" id="edit-name">
+        <input type="hidden" id="edit-datetime">
+
+        <div class="alpinbus-modal-layout">
+          <!-- COLUMN 1: Customer & Booking details -->
+          <div>
+            <!-- Box 1: Customer details -->
+            <div class="alpinbus-box">
+              <div class="alpinbus-box-title">Customer details</div>
+              <div class="alpinbus-form-row"><label>First name:</label><input type="text" id="edit-firstName"></div>
+              <div class="alpinbus-form-row"><label>Last name:</label><input type="text" id="edit-lastName"></div>
+              <div class="alpinbus-form-row"><label>Email:</label><input type="email" id="edit-email"></div>
+              <div class="alpinbus-form-row"><label>Mobile:</label><input type="text" id="edit-phone"></div>
+              <div class="alpinbus-form-row"><label>Alt. Phone:</label><input type="text" id="edit-altPhone"></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-address" rows="2"></textarea></div>
+              <div style="border-top:1px dashed #CCC; margin:10px 0 6px;"></div>
+              <div style="font-size:0.78rem; color:#777; font-weight:600;">First time customer</div>
             </div>
-            <div id="edit-stops-list"></div>
+
+            <!-- Box 2: Booking details -->
+            <div class="alpinbus-box">
+              <div class="alpinbus-box-title">Booking details</div>
+              <div class="alpinbus-form-row">
+                <label>Status:</label>
+                <select id="edit-status">
+                  <option value="Confirmed">✔ Confirmed booking</option>
+                  <option value="Pending">Pending booking</option>
+                  <option value="Completed">Completed booking</option>
+                  <option value="Cancelled">Cancelled booking</option>
+                </select>
+              </div>
+              <div style="margin: 0 0 10px 96px;">
+                <button type="button" class="alpinbus-link-blue" onclick="changeStatus(document.getElementById('edit-id').value,'Cancelled')">Cancel booking</button>
+                <button type="button" class="alpinbus-link-red" onclick="deleteBooking(document.getElementById('edit-id').value);closeModal();">Delete booking</button>
+              </div>
+              <div class="alpinbus-form-row">
+                <label>Source:</label>
+                <select id="edit-source">
+                  <option value="Alpinbus">Alpinbus</option>
+                  <option value="Transfer">Transfer</option>
+                  <option value="Direct">Direct</option>
+                </select>
+              </div>
+              <div class="alpinbus-form-row">
+                <label>From affiliate:</label>
+                <select id="edit-fromAffiliate"><option value="">— Select —</option></select>
+              </div>
+              <div class="alpinbus-form-row"><label>Cust. Ref. Nº:</label><input type="text" id="edit-custRefNum"></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Customer notes:</label><textarea id="edit-customerNotes" rows="2"></textarea></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Internal notes:</label><textarea id="edit-internalNotes" rows="2"></textarea></div>
+              <div style="margin-top:6px;">
+                <button type="button" class="alpinbus-link-blue" onclick="addTripForClient(document.getElementById('edit-id').value)">+ Add journey</button>
+              </div>
+            </div>
+
+            <!-- Operational Assignments (Driver / Vehicle) -->
+            <div class="alpinbus-box">
+              <div class="alpinbus-box-title">Operations</div>
+              <div class="alpinbus-form-row"><label>Vehicle:</label><select id="edit-car"></select></div>
+              <div class="alpinbus-form-row"><label>Driver:</label><select id="edit-driver"></select></div>
+              <div class="alpinbus-form-row"><label>Car Type:</label><select id="edit-carType"><option value="Own">Own Car</option><option value="Rented">Rented</option><option value="Commission">Commission</option></select></div>
+              <div class="alpinbus-form-row"><label>Payout (€):</label><input type="number" id="edit-payoutAmount" min="0" value="0"></div>
+              <div class="alpinbus-form-row"><label>Payout Type:</label><select id="edit-payoutType"><option value="None">None</option><option value="Commission">Commission</option><option value="Rental">Rental</option><option value="Partner">Partner</option></select></div>
+            </div>
           </div>
-          <div class="form-group"><label data-i18n="f_dropoff">Dropoff</label><div class="autocomplete-wrap"><input type="text" id="edit-dropoff" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-edit-dropoff"></div></div></div>
-          <div class="form-group"><label data-i18n="f_vehicle">Vehicle</label><select id="edit-car"></select></div>
-          <div class="form-group"><label data-i18n="f_driver">Driver</label><select id="edit-driver"></select></div>
-          <div class="form-group"><label data-i18n="f_pax">Passengers</label><input type="number" id="edit-passengers" min="1" max="15"></div>
-          <div class="form-group"><label data-i18n="f_carryon">Carry-on Bags</label><input type="number" id="edit-luggage" min="0"></div>
-          <div class="form-group"><label data-i18n="f_price">Price (€)</label><input type="number" id="edit-price" min="0"></div>
-          <div class="form-group"><label>💸 Payout (€)</label><input type="number" id="edit-payoutAmount" min="0" value="0"></div>
-          <div class="form-group"><label>Payout Type</label><select id="edit-payoutType"><option value="None">— None</option><option value="Commission">💸 Commission</option><option value="Rental">🏠 Rental</option><option value="Partner">🤝 Partner</option></select></div>
-          <div class="form-group"><label data-i18n="f_status">Status</label>
-            <select id="edit-status">
-              <option value="Pending">Pending</option><option value="Confirmed">Confirmed</option>
-              <option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
-            </select>
+
+          <!-- COLUMN 2: Journey #1 & Journey #2 -->
+          <div>
+            <!-- Box 3: Journey #1 -->
+            <div class="alpinbus-box">
+              <div class="alpinbus-box-title">Journey #1</div>
+              <div style="display:flex;gap:10px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="flex:1;"><label>Transfer type:</label><select id="edit-transferType"><option value="Private">Private</option><option value="Shared">Shared</option><option value="Executive">Executive</option></select></div>
+                <div class="alpinbus-form-row" style="width:120px;"><label style="min-width:65px;">Pax:</label><input type="number" id="edit-passengers" min="1" max="50"></div>
+              </div>
+              <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-pickup" required></div>
+              <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-dropoff" required></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-addressDetail" rows="1"></textarea></div>
+              <div style="display:flex;gap:10px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="flex:1;"><label>Flight number:</label><input type="text" id="edit-flightInfo"></div>
+                <div class="alpinbus-form-row" style="flex:1;"><label style="min-width:65px;">Flying from:</label><input type="text" id="edit-flyingFrom"></div>
+              </div>
+              <div style="display:flex;gap:10px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="flex:1;"><label>Flight arrives:</label><input type="date" id="edit-flightDate"><input type="time" id="edit-flightTime"></div>
+                <div class="alpinbus-form-row" style="flex:1;"><label style="min-width:65px;">Pickup time:</label><input type="date" id="edit-pickupDate"><input type="time" id="edit-pickupTime"></div>
+              </div>
+
+              <!-- Options Grid (Baby, Child, Bst, Ski, Bike, Bags, Bst H) -->
+              <div class="alpinbus-inline-opts">
+                <div class="opt-item"><label>Baby:</label><select id="edit-babySeats"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                <div class="opt-item"><label>Child:</label><select id="edit-childSeats"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                <div class="opt-item"><label>Bst:</label><select id="edit-boosterSeats"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                <div class="opt-item"><label>Ski:</label><select id="edit-ski"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                <div class="opt-item"><label>Bike:</label><select id="edit-bike"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                <div class="opt-item"><label>Bags:</label><select id="edit-luggage"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                <div class="opt-item"><label>Bst (H):</label><select id="edit-holdBags"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+              </div>
+
+              <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-price"> <span style="font-size:0.75rem;color:#777;margin-left:4px;">(normally €<span id="edit-normalPrice">209.00</span>)</span></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Notes:</label><textarea id="edit-requirements" rows="2"></textarea></div>
+
+              <div style="margin-top:8px;">
+                <button type="button" class="alpinbus-link-blue" onclick="switchTab('calendar-tab',document.getElementById('nav-calendar'));closeModal();">Show in calendar</button>
+                <button type="button" class="alpinbus-link-blue" onclick="changeStatus(document.getElementById('edit-id').value,'Cancelled')">Cancel journey</button>
+                <button type="button" class="alpinbus-link-red" onclick="deleteBooking(document.getElementById('edit-id').value);closeModal();">Delete journey</button>
+              </div>
+            </div>
+
+            <!-- Box 4: Journey #2 (Round trip panel) -->
+            <div class="alpinbus-box" id="j2-panel" style="display:none;">
+              <div class="alpinbus-box-title">Journey #2</div>
+              <div style="display:flex;gap:10px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="flex:1;"><label>Transfer type:</label><select id="edit-j2-transferType"><option value="Private">Private</option><option value="Shared">Shared</option><option value="Executive">Executive</option></select></div>
+                <div class="alpinbus-form-row" style="width:120px;"><label style="min-width:65px;">Pax:</label><input type="number" id="edit-j2-passengers" min="1" max="50"></div>
+              </div>
+              <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-j2-pickup"></div>
+              <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-j2-dropoff"></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-j2-addressDetail" rows="1"></textarea></div>
+              <div style="display:flex;gap:10px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="flex:1;"><label>Flight number:</label><input type="text" id="edit-j2-flightInfo"></div>
+                <div class="alpinbus-form-row" style="flex:1;"><label style="min-width:65px;">Flying to:</label><input type="text" id="edit-j2-flyingTo"></div>
+              </div>
+              <div style="display:flex;gap:10px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="flex:1;"><label>Flight departs:</label><input type="date" id="edit-j2-flightDate"><input type="time" id="edit-j2-flightTime"></div>
+                <div class="alpinbus-form-row" style="flex:1;"><label style="min-width:65px;">Pickup time:</label><input type="date" id="edit-j2-pickupDate"><input type="time" id="edit-j2-pickupTime"></div>
+              </div>
+
+              <div class="alpinbus-inline-opts">
+                <div class="opt-item"><label>Baby:</label><select id="edit-j2-babySeats"><option value="0">0</option><option value="1">1</option></select></div>
+                <div class="opt-item"><label>Child:</label><select id="edit-j2-childSeats"><option value="0">0</option><option value="1">1</option></select></div>
+                <div class="opt-item"><label>Bst:</label><select id="edit-j2-boosterSeats"><option value="0">0</option><option value="1">1</option></select></div>
+                <div class="opt-item"><label>Ski:</label><select id="edit-j2-ski"><option value="0">0</option><option value="1">1</option></select></div>
+                <div class="opt-item"><label>Bike:</label><select id="edit-j2-bike"><option value="0">0</option><option value="1">1</option></select></div>
+                <div class="opt-item"><label>Bags:</label><select id="edit-j2-luggage"><option value="0">0</option><option value="1">1</option><option value="4">4</option></select></div>
+                <div class="opt-item"><label>Bst (H):</label><select id="edit-j2-holdBags"><option value="0">0</option><option value="1">1</option></select></div>
+              </div>
+
+              <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-j2-price"> <span style="font-size:0.75rem;color:#777;margin-left:4px;">(normally €<span id="edit-j2-normalPrice">209.00</span>)</span></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Notes:</label><textarea id="edit-j2-requirements" rows="2"></textarea></div>
+
+              <div style="margin-top:8px;">
+                <button type="button" class="alpinbus-link-blue" onclick="switchTab('calendar-tab',document.getElementById('nav-calendar'));closeModal();">Show in calendar</button>
+                <button type="button" class="alpinbus-link-blue">Cancel journey</button>
+                <button type="button" class="alpinbus-link-red">Delete journey</button>
+              </div>
+            </div>
           </div>
-          <div class="form-group"><label data-i18n="f_payment">Payment</label>
-            <select id="edit-paymentStatus">
-              <option value="Unpaid">💳 Unpaid</option><option value="Paid">✅ Paid</option>
-            </select>
+
+          <!-- COLUMN 3: Billing details -->
+          <div>
+            <div class="alpinbus-box">
+              <div class="alpinbus-box-title">Billing details</div>
+              <div class="alpinbus-form-row"><label>Bill to:</label><select id="edit-billTo"><option value="Customer">Customer</option><option value="Company">Company</option><option value="Agent">Agent</option></select></div>
+              <div class="alpinbus-form-row"><label>Invoices:</label><span>📄 <strong id="edit-invoiceNum">11674</strong></span></div>
+              <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-billingPrice"></div>
+              <div class="alpinbus-form-row"><label>Payment by:</label><select id="edit-paymentBy"><option value="Credit card">Credit card</option><option value="Cash">Cash</option><option value="Bank transfer">Bank transfer</option></select></div>
+              <div class="alpinbus-form-row"><label>Promo code:</label><input type="text" id="edit-promoCode"></div>
+              <div class="alpinbus-form-row"><label>Amount paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
+              <div class="alpinbus-form-row"><label>Amount due:</label><span style="font-weight:700;color:#27AE60;" id="edit-amountDue">€0.00</span></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Summary:</label><input type="text" id="edit-billingSummary"></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Details:</label><textarea id="edit-billingDetails" rows="3" readonly style="font-size:0.75rem;background:#F0F4F8;"></textarea></div>
+            </div>
           </div>
-          <div class="form-group"><label data-i18n="f_flight">Flight Info</label><input type="text" id="edit-flightInfo"></div>
-          <div class="form-group"><label data-i18n="f_child">Child Seats</label><input type="number" id="edit-childSeats" min="0"></div>
-          <div class="form-group"><label data-i18n="f_hold">Hold Bags</label><input type="number" id="edit-holdBags" min="0"></div>
-          <div class="form-group"><label>Car Type</label>
-            <select id="edit-carType">
-              <option value="Own">🚗 Own Car</option>
-              <option value="Rented">🏠 Rented</option>
-              <option value="Commission">💸 Commission</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Commission Paid</label>
-            <select id="edit-commissionPaid">
-              <option value="N/A">— N/A</option>
-              <option value="Yes">✅ Yes</option>
-              <option value="No">❌ No</option>
-            </select>
-          </div>
-          <div class="form-group full-width"><label data-i18n="f_notes">Notes</label><textarea id="edit-requirements" rows="2"></textarea></div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap;">
-          <div style="display:flex;gap:7px;flex-wrap:wrap;">
-            <button type="button" class="btn btn-wa btn-sm" onclick="notifyWA('client',document.getElementById('edit-id').value)">📱 Client</button>
-            <button type="button" class="btn btn-sm" style="background:var(--status-confirmed);color:#fff;" onclick="notifyWA('driver',document.getElementById('edit-id').value)">🚗 Driver</button>
-            <button type="button" class="btn btn-sm" style="background:var(--status-completed);color:#fff;" onclick="notifyWA('logist',document.getElementById('edit-id').value)">📋 Logist</button>
-          </div>
-          <div style="display:flex;gap:9px;">
-            <button type="button" class="btn btn-secondary" onclick="closeModal()" data-i18n-btn="btn_cancel">Cancel</button>
-            <button type="submit" class="btn" data-i18n-btn="btn_save_changes">Save Changes</button>
-          </div>
+
+        <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
+          <button type="submit" class="alpinbus-save-btn">Save</button>
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
         </div>
       </form>
-      <div class="linked-transfers-section" id="linked-section" style="display:none;">
-        <div class="linked-transfers-title">
-          <span style="display:flex;align-items:center;gap:6px;">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-            <span data-i18n="linked_title">Linked Transfers (same client)</span>
-          </span>
-          <button class="btn btn-secondary btn-sm" onclick="addTripForClient(document.getElementById('edit-id').value)" style="font-size:0.74rem;padding:4px 10px;">➕ Add Another Trip</button>
-        </div>
-        <div id="linked-list"></div>
-      </div>
     </div>
   </div>
 </div>
@@ -2131,128 +2278,41 @@ function changePayment(id){const i=bookings.findIndex(b=>b.id===id);if(i>=0){boo
 let openNotifyId=null;
 function closeAllNotifyMenus(){document.getElementById('global-notify-menu').classList.remove('open');openNotifyId=null;}
 document.addEventListener('click',e=>{if(!e.target.closest('.action-btn-row')&&!e.target.closest('#global-notify-menu'))closeAllNotifyMenus();});
-function showNotifyMenu(e,id){
-  e.stopPropagation();
-  const menu=document.getElementById('global-notify-menu');
-  if(openNotifyId===id){closeAllNotifyMenus();return;}
-  openNotifyId=id;
-  menu.innerHTML=`
-    <button class="notify-item wa" onclick="notifyWA('client','${id}');closeAllNotifyMenus()">📱 Client</button>
-    <button class="notify-item" style="color:var(--status-confirmed)" onclick="notifyWA('driver','${id}');closeAllNotifyMenus()">🚗 Driver</button>
-    <button class="notify-item" style="color:var(--status-completed)" onclick="notifyWA('logist','${id}');closeAllNotifyMenus()">📋 Logist</button>`;
-  const rect=e.currentTarget.getBoundingClientRect();
-  menu.style.top=(rect.bottom+window.scrollY+5)+'px';
-  menu.style.right=(window.innerWidth-rect.right)+'px';
-  menu.style.left='auto';
-  menu.classList.add('open');
-}
-function buildClientMsg(b){
-  const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
-  const driverPart=b.driver?`\n👤 Driver: ${b.driver}`:'';
-  return `Bonjour ${b.name}! 🚗\n\nYour V-Transfer is confirmed:\n📅 ${ds}\n📍 From: ${b.pickup}\n📍 To: ${b.dropoff}\n🚘 ${b.car||''}${driverPart}${b.flightInfo?'\n✈️ '+b.flightInfo:''}\n💰 €${b.price}\n\nV-Transfer Team`;
-}
-function buildDriverMsg(b){
-  const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
-  return `🚗 TRIP #${(b.bookingNumber||0).toString().padStart(4,'0')}\n\n📅 ${ds}\n👤 Client: ${b.name}\n📞 ${b.phone||'—'}\n📍 From: ${b.pickup}\n📍 To: ${b.dropoff}\n${b.flightInfo?'✈️ '+b.flightInfo+'\n':''}👥 ${b.passengers||1} pax · 💼 ${b.luggage||0} bags\n${b.requirements&&b.requirements!=='None'?'💬 '+b.requirements:''}`;
-}
-function buildLogistMsg(b){
-  const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
-  return `📋 DISPATCH #${(b.bookingNumber||0).toString().padStart(4,'0')}\n\n📅 ${ds}\n👤 ${b.name} · 📞 ${b.phone||'—'}\n🚗 ${b.car||'—'} · 👤 ${b.driver||'—'}\n📍 ${b.pickup} ➝ ${b.dropoff}\n${b.flightInfo?'✈️ '+b.flightInfo+'\n':''}👥 ${b.passengers||1} pax · ${b.payoutAmount?'💸 Payout: €'+b.payoutAmount+' ('+b.payoutType+')':''}\n💰 €${b.price} (${b.paymentStatus||'Unpaid'})`;
-}
-function notifyWA(role,id){
-  const b=bookings.find(x=>x.id===id);if(!b)return;
-  let ph='',msg='';
-  if(role==='client'){
-    ph=(b.phone||'').replace(/[^0-9+]/g,'');
-    if(!ph){showToast('No client phone number',false);return;}
-    msg=buildClientMsg(b);
-    const i=bookings.findIndex(x=>x.id===id);
-    if(i>=0){bookings[i].notified=true;saveLocalData();pushToCloud(bookings[i]);}
-  } else if(role==='driver'){
-    if(!b.driver){showToast('No driver assigned',false);return;}
-    const dDef=settings.drivers.find(d=>d.name===b.driver);
-    ph=(dDef&&dDef.phone?dDef.phone:(b.driverPhone||'')).replace(/[^0-9+]/g,'');
-    if(!ph){showToast('Driver has no phone set. Add driver phone in Settings.',false);return;}
-    msg=buildDriverMsg(b);
-  } else if(role==='logist'){
-    ph=(settings.logistPhone||'').replace(/[^0-9+]/g,'');
-    if(!ph){showToast('No logist phone set. Go to Settings → Logist.',false);return;}
-    msg=buildLogistMsg(b);
+function onAlpinbusDateChange(val){
+  if(!val)return;
+  const p=val.split('-');
+  if(p.length===3){
+    calDate=new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
+    renderCalendar();
   }
-  window.open(`https://wa.me/${ph.replace('+','')}?text=${encodeURIComponent(msg)}`,'_blank');
-  showToast(`Opening WhatsApp for ${role}...`);
-}
-function notifyClientWA(id){notifyWA('client',id);}
-function notifyClientSMS(id){
-  const b=bookings.find(x=>x.id===id);if(!b)return;
-  const ph=(b.phone||'').replace(/\s/g,'');
-  if(!ph){showToast('No phone number',false);return;}
-  window.open(`sms:${ph}?body=${encodeURIComponent(buildClientMsg(b))}`,'_blank');
-  showToast('Opening SMS...');
 }
 
-// ═══════════════════════════════════════════════════
-// ARCHIVE
-// ═══════════════════════════════════════════════════
-function clearArchiveFilters(){['archive-search','archive-filter-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('archive-filter-payment').value='ALL';renderArchive();}
-function sortArchive(col){if(archSort.col===col)archSort.asc=!archSort.asc;else{archSort.col=col;archSort.asc=false;}renderArchive();}
-function renderArchive(){
-  const tbody=document.getElementById('archive-table-body'),noData=document.getElementById('archive-no-data'),cnt=document.getElementById('archive-count');
-  const srch=(document.getElementById('archive-search').value||'').toLowerCase();
-  const fPay=document.getElementById('archive-filter-payment').value, fDate=document.getElementById('archive-filter-date').value;
-  const completed=bookings.filter(b=>b.status==='Completed');
-  let filtered=completed.filter(b=>{
-    const ms=!srch||(b.name||'').toLowerCase().includes(srch)||(b.phone||'').toLowerCase().includes(srch)||(b.pickup||'').toLowerCase().includes(srch)||(b.dropoff||'').toLowerCase().includes(srch)||(b.bookingNumber+'').includes(srch);
-    return ms&&(fPay==='ALL'||(b.paymentStatus||'Unpaid')===fPay)&&(!fDate||(b.datetime||'').startsWith(fDate));
-  });
-  filtered.sort((a,b)=>{let va=a[archSort.col]||'',vb=b[archSort.col]||'';if(archSort.col==='price'||archSort.col==='bookingNumber'){va=parseFloat(va)||0;vb=parseFloat(vb)||0;}return archSort.asc?(va<vb?-1:va>vb?1:0):(va<vb?1:va>vb?-1:0);});
-  cnt.textContent=`${completed.length} transfer${completed.length!==1?'s':''}`;
-  tbody.innerHTML='';
-  if(!filtered.length){noData.style.display='block';return;}noData.style.display='none';
-  filtered.forEach(b=>tbody.appendChild(buildRow(b,true)));
-}
-
-// ═══════════════════════════════════════════════════
-// CALENDAR
-// ═══════════════════════════════════════════════════
-function setCalView(v){
-  calView=v;
-  ['day','month'].forEach(n=>{
-    const btn=document.getElementById('cal-'+n+'-btn');
-    if(btn)btn.classList.toggle('active',v===n);
-  });
-  renderCalendar();
-}
-function prevPeriod(){
-  if(calView==='month')calDate.setMonth(calDate.getMonth()-1);
-  else calDate.setDate(calDate.getDate()-1);
-  renderCalendar();
-}
-function nextPeriod(){
-  if(calView==='month')calDate.setMonth(calDate.getMonth()+1);
-  else calDate.setDate(calDate.getDate()+1);
-  renderCalendar();
-}
-function goToToday(){calDate=new Date();renderCalendar();}
 function renderCalendar(){
   const dayView=document.getElementById('cal-day-view');
   const monthView=document.getElementById('cal-month-view');
+  const titleBanner=document.getElementById('alpinbus-day-title');
+  const datePicker=document.getElementById('alpinbus-date-picker');
+
+  const formattedTitle=calDate.toLocaleDateString('en-US',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+  if(titleBanner) titleBanner.textContent=`Transfer calendar for ${formattedTitle}`;
+
+  const yyyy=calDate.getFullYear(), mm=pad2(calDate.getMonth()+1), dd=pad2(calDate.getDate());
+  if(datePicker) datePicker.value=`${yyyy}-${mm}-${dd}`;
+
   if(calView==='month'){
     if(dayView)dayView.style.display='none';
     if(monthView)monthView.style.display='';
     renderGridCal();renderAgenda();
-    document.getElementById('calendar-month-year').textContent=calDate.toLocaleDateString(currentLang==='ru'?'ru-RU':'en-US',{month:'long',year:'numeric'});
   } else {
     if(dayView)dayView.style.display='';
     if(monthView)monthView.style.display='none';
     renderDispatchView();
-    document.getElementById('calendar-month-year').textContent=calDate.toLocaleDateString(currentLang==='ru'?'ru-RU':'en-US',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   }
 }
+
 function renderGridCal(){
   const c=document.getElementById('calendar-days-container');
   const year=calDate.getFullYear(),month=calDate.getMonth();
-  document.getElementById('calendar-month-year').textContent=calDate.toLocaleDateString(currentLang==='ru'?'ru-RU':'en-US',{month:'long',year:'numeric'});
   let fi=(new Date(year,month,1).getDay()+6)%7;
   const dm=new Date(year,month+1,0).getDate(),dp=new Date(year,month,0).getDate();
   c.innerHTML=''; const today=new Date();
@@ -2278,7 +2338,7 @@ function renderGridCal(){
 }
 
 // ═══════════════════════════════════════════════════
-// DISPATCH VIEW (Day Calendar)
+// DISPATCH VIEW (Day Calendar - Screenshot 1)
 // ═══════════════════════════════════════════════════
 function renderDispatchView(){
   const container=document.getElementById('dispatch-board-container');
@@ -2291,7 +2351,6 @@ function renderDispatchView(){
   const unassigned=dayBookings.filter(b=>!b.car&&!b.driver);
   const assigned=dayBookings.filter(b=>b.car||b.driver);
 
-  // Group by vehicle
   const vehicleMap={};
   assigned.forEach(b=>{
     const key=b.car||'No vehicle';
@@ -2301,16 +2360,14 @@ function renderDispatchView(){
   const vehicleKeys=[...new Set([...settings.vehicles.map(v=>v.name),...Object.keys(vehicleMap)])];
 
   const HOURS=24;
-  const CELL_W=44; // px per hour column
+  const CELL_W=44;
 
-  // Now line
   const now=new Date();
   const isToday=now.toISOString().startsWith(dayStr);
   const nowHour=now.getHours();
   const nowMin=now.getMinutes();
-  const nowFrac=nowMin/60; // fraction within the current hour column
+  const nowFrac=nowMin/60;
 
-  // Build table
   let html=`<table class="dispatch-table"><thead><tr>`;
   html+=`<th class="dispatch-th-label">VEHICLE / DRIVER</th>`;
   for(let h=0;h<HOURS;h++){
@@ -2318,43 +2375,31 @@ function renderDispatchView(){
   }
   html+=`</tr></thead><tbody>`;
 
-  if(!vehicleKeys.length){
-    html+=`<tr><td class="dispatch-empty-row" colspan="${HOURS+1}">No vehicles configured. Add vehicles in Settings.</td></tr>`;
-  }
-
   vehicleKeys.forEach(vname=>{
     const vDef=settings.vehicles.find(v=>v.name===vname);
     const plate=vDef&&vDef.plate?vDef.plate:'';
     const vBookings=vehicleMap[vname]||[];
 
-    // ── ROW 1: Vehicle name row (full width, no booking content) ──
+    // ROW 1: Vehicle name row
     html+=`<tr>`;
-    html+=`<td class="dispatch-td-vname">${esc(vname)}${plate?`<small>${esc(plate)}</small>`:''}</td>`;
+    html+=`<td class="dispatch-td-vname">▼ ${esc(vname)}${plate?`<small>${esc(plate)}</small>`:''}</td>`;
     for(let h=0;h<HOURS;h++){
       html+=`<td class="dispatch-td-vname-spacer"></td>`;
     }
     html+=`</tr>`;
 
-    // ── ROW 2: Booking bar row ──
-    // We need to lay bookings out without overlap.
-    // Strategy: walk hour by hour, emit colspan cells for booking blocks.
-    // Build a map: hour -> booking that starts at or spans that hour
-    // For simplicity: sort bookings by start time, place them left to right.
-    // Build a coverage array of 24 slots (each slot = 1 hour column).
-    // Each booking starts at its start hour and spans ceil(duration/60) columns.
-    const coverage = new Array(HOURS).fill(null); // null = empty
-    const bMeta = []; // {booking, startH, spanCols}
+    // ROW 2: Booking timeline row
+    const coverage = new Array(HOURS).fill(null);
+    const bMeta = [];
     vBookings.forEach(b=>{
       if(!b.datetime)return;
       const bd=new Date(b.datetime);
       const startH=bd.getHours();
       const startMin=bd.getMinutes();
-      // Duration: use b.duration field if set, else 90 min default
       const durMin=parseInt(b.duration||90)||90;
       const endMin=startH*60+startMin+durMin;
       const endH=Math.min(HOURS,Math.ceil(endMin/60));
       const spanCols=Math.max(1,endH-startH);
-      // Mark columns
       for(let c=startH;c<Math.min(startH+spanCols,HOURS);c++){
         coverage[c]=b.id;
       }
@@ -2362,35 +2407,28 @@ function renderDispatchView(){
     });
 
     html+=`<tr>`;
-    html+=`<td class="dispatch-td-rowlabel">${esc(vname.split(' ').slice(-1)[0])}</td>`; // short label
+    const tagIcon=vname.includes('AT INN')?'🚗 AT INN Ulli taxi':(vname.includes('SZG')?'🚗 AT SZG LoneSta':(vname.includes('PMC')?'🚗 CH PMC':'🚗 Taxi'));
+    html+=`<td class="dispatch-td-rowlabel">${tagIcon}</td>`;
 
     let h=0;
     while(h<HOURS){
-      // Check if a booking starts here
       const bm=bMeta.find(x=>x.startH===h);
       if(bm){
         const {b,spanCols,startMin}=bm;
-        const icon=b.car&&(b.car.toLowerCase().includes('v-class')||b.car.toLowerCase().includes('trafic')||b.car.toLowerCase().includes('vito'))?'🚐':'🚗';
         const ts=new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-        // Left offset within first column (based on minutes)
         const leftPct=Math.round(startMin/60*100);
         html+=`<td class="dispatch-td-block" colspan="${spanCols}" onclick="showCalPopup(event,'${b.id}')">`;
         html+=`<div class="dispatch-pill ${(b.status||'pending').toLowerCase()}" style="margin-left:${leftPct}%;margin-right:2px;" title="${esc(b.name)} ${ts}">`;
-        html+=`<div class="dispatch-pill-time">${ts} ${icon}</div>`;
+        html+=`<div class="dispatch-pill-time">${ts}</div>`;
         html+=`<div class="dispatch-pill-name">${esc(b.name)}</div>`;
         html+=`</div></td>`;
         h+=spanCols;
       } else if(coverage[h]!==null){
-        // This column is spanned by a booking that started earlier — skip
-        // (already consumed by colspan)
         h++;
       } else {
-        // Empty hour cell
         const isMaj=h%6===0;
         let nowStyle='';
-        if(isToday&&h===nowHour){
-          nowStyle=`position:relative;`;
-        }
+        if(isToday&&h===nowHour) nowStyle=`position:relative;`;
         html+=`<td class="dispatch-td-hour${isMaj?' major':''}" style="${nowStyle}">`;
         if(isToday&&h===nowHour){
           const leftPx=Math.round(nowFrac*CELL_W);
@@ -2406,9 +2444,8 @@ function renderDispatchView(){
   html+=`</tbody></table>`;
   container.innerHTML=html;
 
-  // ── Sidebar ──
+  // Sidebar (Screenshot 1)
   const unassignedList=document.getElementById('dispatch-unassigned-list');
-  const assignedCard=document.getElementById('dispatch-assigned-card');
   const assignedList=document.getElementById('dispatch-assigned-list');
 
   if(unassignedList){
@@ -2417,80 +2454,64 @@ function renderDispatchView(){
       unassigned.forEach(b=>{
         const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
         uhtml+=`<div class="dispatch-unassigned-item" onclick="showCalPopup(event,'${b.id}')">`;
-        uhtml+=`<div style="font-size:0.76rem;font-weight:700;color:var(--text-primary)">${esc(b.name)}</div>`;
-        uhtml+=`<div style="font-size:0.69rem;color:var(--text-muted)">${ts} · €${b.price||0}</div>`;
+        uhtml+=`<div style="font-size:0.76rem;font-weight:700;color:#222">${esc(b.name)}</div>`;
+        uhtml+=`<div style="font-size:0.69rem;color:#666">${ts} · €${b.price||0}</div>`;
         uhtml+=`</div>`;
       });
       unassignedList.innerHTML=uhtml;
     } else {
-      unassignedList.innerHTML='<div style="font-size:0.78rem;color:var(--text-muted)">All assigned ✓</div>';
+      unassignedList.innerHTML='<div style="font-size:0.78rem;color:#777;font-style:italic;">All jobs are assigned</div>';
     }
   }
 
-  if(assignedCard&&assignedList){
+  if(assignedList){
     if(assigned.length){
-      assignedCard.style.display='block';
       let ahtml='';
-      assigned.slice(0,6).forEach(b=>{
+      assigned.forEach(b=>{
         const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
-        ahtml+=`<div class="dispatch-assigned-item" onclick="showCalPopup(event,'${b.id}')">`;
-        ahtml+=`<div style="font-size:0.76rem;font-weight:700;color:var(--text-primary)">${ts} ${esc(b.name)}</div>`;
-        ahtml+=`<div style="font-size:0.69rem;color:var(--text-muted)">${esc(b.car||'—')}</div>`;
+        ahtml+=`<div class="dispatch-assigned-item" onclick="showCalPopup(event,'${b.id}')" style="font-size:0.76rem;padding:4px 6px;margin-bottom:4px;color:#222;">`;
+        ahtml+=`⌂ <strong>${ts}</strong> Px${b.passengers||1} - ${esc(b.name)}`;
         ahtml+=`</div>`;
       });
-      if(assigned.length>6)ahtml+=`<div style="font-size:0.74rem;color:var(--text-muted);padding:4px 9px;">+${assigned.length-6} more</div>`;
       assignedList.innerHTML=ahtml;
     } else {
-      assignedCard.style.display='none';
+      assignedList.innerHTML='<div style="font-size:0.78rem;color:#777;font-style:italic;">No assigned jobs yet</div>';
     }
-  }
-
-  // Auto-scroll to current hour
-  const scrollArea=document.getElementById('dispatch-scroll-area');
-  if(scrollArea&&isToday){
-    const scrollTo=Math.max(0,(nowHour-2)*CELL_W+140);
-    setTimeout(()=>scrollArea.scrollLeft=scrollTo,100);
   }
 }
 
-
 // ═══════════════════════════════════════════════════
-// CALENDAR BOOKING POPUP
+// CALENDAR POPOVER TOOLTIP (Screenshot 2)
 // ═══════════════════════════════════════════════════
 function showCalPopup(e, bookingId){
   e.stopPropagation();
   const b=bookings.find(x=>x.id===bookingId);
   if(!b)return;
   const popup=document.getElementById('cal-popup');
-  const pay=b.paymentStatus||'Unpaid';
-  const fmtDt=dt=>{if(!dt)return'TBD';try{const d=new Date(dt);return d.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(err){return dt;}};
-  const statusColors={Pending:'var(--status-pending)',Confirmed:'var(--status-confirmed)',Completed:'var(--status-completed)',Cancelled:'var(--status-cancelled)'};
-  const sc=statusColors[b.status]||'var(--text-muted)';
-  popup.innerHTML=`
-    <div class="cal-popup-header">
-      <span class="cal-popup-num">#${(b.bookingNumber||0).toString().padStart(5,'0')}</span>
-      <div style="display:flex;align-items:center;gap:7px;">
-        <span class="status-badge ${(b.status||'pending').toLowerCase()}">${b.status||'Pending'}</span>
-        <button class="cal-popup-close" onclick="hideCalPopup()">✕</button>
-      </div>
-    </div>
-    <div class="cal-popup-row"><span class="cal-popup-label">👤 Client</span><span class="cal-popup-val" style="font-weight:700">${esc(b.name||'—')}</span></div>
-    ${b.phone?`<div class="cal-popup-row"><span class="cal-popup-label">📞 Phone</span><span class="cal-popup-val">${esc(b.phone)}</span></div>`:''}
-    ${b.email?`<div class="cal-popup-row"><span class="cal-popup-label">✉️ Email</span><span class="cal-popup-val" style="font-size:0.79rem">${esc(b.email)}</span></div>`:''}
-    <div class="cal-popup-row"><span class="cal-popup-label">📅 Time</span><span class="cal-popup-val" style="color:var(--gold);font-weight:700">${fmtDt(b.datetime)}</span></div>
-    <div class="cal-popup-row"><span class="cal-popup-label">🛫 Pickup</span><span class="cal-popup-val">${esc(b.pickup||'—')}</span></div>
-    <div class="cal-popup-row"><span class="cal-popup-label">🏁 Dropoff</span><span class="cal-popup-val">${esc(b.dropoff||'—')}</span></div>
-    ${b.car?`<div class="cal-popup-row"><span class="cal-popup-label">🚗 Vehicle</span><span class="cal-popup-val">${esc(b.car)}${b.driver?' · 👤 '+esc(b.driver):''}</span></div>`:''}
-    ${b.flightInfo?`<div class="cal-popup-row"><span class="cal-popup-label">✈️ Flight</span><span class="cal-popup-val">${esc(b.flightInfo)}</span></div>`:''}
-    <div class="cal-popup-row"><span class="cal-popup-label">👥 Pax</span><span class="cal-popup-val">${b.passengers||1} pax · 💼 ${b.luggage||0} · 📦 ${b.holdBags||0} · 👶 ${b.childSeats||0}</span></div>
-    <div class="cal-popup-row"><span class="cal-popup-label">💰 Amount</span><span class="cal-popup-val" style="font-weight:800;font-size:0.95rem">€${b.price||0} <span style="font-size:0.72rem;color:var(--text-muted);font-weight:400">(${pay})</span></span></div>
-    ${b.requirements&&b.requirements!=='None'?`<div class="cal-popup-row"><span class="cal-popup-label">💬 Notes</span><span class="cal-popup-val" style="font-size:0.79rem;color:var(--text-secondary)">${esc(b.requirements)}</span></div>`:''}
-    <div class="cal-popup-actions">
-      <button class="btn btn-sm" onclick="hideCalPopup();openModal('${b.id}')">✏️ Edit</button>
-      <button class="btn btn-secondary btn-sm" onclick="notifyClientWA('${b.id}')">📱 WhatsApp</button>
-    </div>`;
+  const fmtDt=dt=>{if(!dt)return'TBD';try{const d=new Date(dt);return d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(err){return dt;}};
 
-  // Position popup near click
+  popup.className='alpinbus-popover';
+  popup.innerHTML=`
+    <div class="alpinbus-popover-top">
+      <button type="button" class="alpinbus-popover-viewbtn" onclick="hideCalPopup();openModal('${b.id}')">View details</button>
+      <span class="alpinbus-popover-status">✔ Booking #${(b.bookingNumber||0).toString().padStart(5,'0')}</span>
+    </div>
+    <div class="alpinbus-popover-table">
+      <div class="alpinbus-popover-row"><span class="lbl">Name:</span> <span class="val">${esc(b.name||'—')}</span></div>
+      <div class="alpinbus-popover-row"><span class="lbl">Email:</span> <span class="val" style="color:#3498DB">${esc(b.email||'—')}</span></div>
+      <div class="alpinbus-popover-row"><span class="lbl">Mobile:</span> <span class="val">${esc(b.phone||'—')}</span></div>
+      <div class="alpinbus-popover-row"><span class="lbl">Passengers:</span> <span class="val">${b.passengers||1} pax</span></div>
+      <div class="alpinbus-popover-row"><span class="lbl">Flight info:</span> <span class="val">${esc(b.flightInfo||'—')}</span></div>
+      <div class="alpinbus-popover-row"><span class="lbl">Pickup at:</span> <span class="val">${esc(b.pickup||'—')}</span></div>
+      <div class="alpinbus-popover-row"><span class="lbl">Dropoff at:</span> <span class="val">${esc(b.dropoff||'—')}</span></div>
+      <div class="alpinbus-popover-row"><span class="lbl">Pickup time:</span> <span class="val">${fmtDt(b.datetime)}</span></div>
+      <div class="alpinbus-popover-row"><span class="lbl">Hold bags:</span> <span class="val">${b.holdBags||0}</span></div>
+    </div>
+    <div>
+      <a href="#" class="alpinbus-popover-invoicelink" onclick="copyReport('${b.id}');return false;">Print invoice</a>
+    </div>
+  `;
+
   popup.style.display='block';
   const vw=window.innerWidth, vh=window.innerHeight;
   let x=e.clientX+10, y=e.clientY+10;
@@ -2509,27 +2530,163 @@ document.addEventListener('click',e=>{
   const p=document.getElementById('cal-popup');
   if(p&&p.style.display!=='none'&&!p.contains(e.target))hideCalPopup();
 });
-function renderWeekCal(){
-  const container=document.getElementById('week-grid-container');
-  const today=new Date(),dow=(calDate.getDay()+6)%7;
-  const weekStart=new Date(calDate);weekStart.setDate(calDate.getDate()-dow);
-  const days=[];for(let i=0;i<7;i++){const d=new Date(weekStart);d.setDate(weekStart.getDate()+i);days.push(d);}
-  const em=days[6];
-  document.getElementById('calendar-month-year').textContent=`${weekStart.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})} – ${em.toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})}`;
-  const dayNames=[t('day_mon'),t('day_tue'),t('day_wed'),t('day_thu'),t('day_fri'),t('day_sat'),t('day_sun')];
-  let html=`<div class="week-time-label" style="background:var(--table-hdr);border-bottom:1px solid var(--border);"></div>`;
-  days.forEach((d,i)=>{const isT=d.getDate()===today.getDate()&&d.getMonth()===today.getMonth()&&d.getFullYear()===today.getFullYear();html+=`<div class="week-day-header${isT?' today-col':''}"><div class="week-day-name">${dayNames[i]}</div><div class="week-day-num">${d.getDate()}</div></div>`;});
-  for(let h=6;h<=22;h++){
-    html+=`<div class="week-time-label">${pad2(h)}:00</div>`;
-    days.forEach(d=>{
-      const ds=`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(h)}`;
-      const db=bookings.filter(b=>b.datetime&&b.datetime.startsWith(ds));
-      let ev='';db.forEach(b=>{const icon=b.car&&(b.car.toLowerCase().includes('v-class')||b.car.toLowerCase().includes('trafic'))?'🚐':'🚗';ev+=`<div class="calendar-event ${b.status.toLowerCase()}" onclick="openModal('${b.id}')" style="margin-bottom:2px;">${icon} ${esc((b.name||'').split(' ')[0])} €${b.price}${b.driver?' · '+b.driver:''}</div>`;});
-      html+=`<div class="week-cell">${ev}</div>`;
-    });
+
+// ═══════════════════════════════════════════════════
+// EDIT MODAL JS (Screenshot 3)
+// ═══════════════════════════════════════════════════
+function openModal(id){
+  const b=bookings.find(x=>x.id===id); if(!b)return;
+  document.getElementById('edit-id').value=b.id;
+  document.getElementById('modal-title').textContent=`Transfer Booking #${(b.bookingNumber||0).toString().padStart(5,'0')}`;
+  
+  const nameParts=(b.name||'').split(' ');
+  document.getElementById('edit-firstName').value=b.firstName||nameParts[0]||'';
+  document.getElementById('edit-lastName').value=b.lastName||nameParts.slice(1).join(' ')||'';
+  document.getElementById('edit-email').value=b.email||'';
+  document.getElementById('edit-phone').value=b.phone||'';
+  document.getElementById('edit-altPhone').value=b.altPhone||'';
+  document.getElementById('edit-address').value=b.address||'';
+  
+  document.getElementById('edit-status').value=b.status||'Confirmed';
+  document.getElementById('edit-source').value=b.source||'Alpinbus';
+  document.getElementById('edit-custRefNum').value=b.custRefNum||'';
+  document.getElementById('edit-customerNotes').value=b.customerNotes||'';
+  document.getElementById('edit-internalNotes').value=b.internalNotes||'';
+
+  // Operations
+  populateVehicleSelect(document.getElementById('edit-car'),b.car);
+  populateDriverSelect(document.getElementById('edit-driver'),b.driver||'');
+  document.getElementById('edit-carType').value=b.carType||'Own';
+  document.getElementById('edit-payoutAmount').value=b.payoutAmount||0;
+  document.getElementById('edit-payoutType').value=b.payoutType||'None';
+
+  // Journey #1
+  document.getElementById('edit-transferType').value=b.transferType||'Private';
+  document.getElementById('edit-passengers').value=b.passengers||1;
+  document.getElementById('edit-pickup').value=b.pickup||'';
+  document.getElementById('edit-dropoff').value=b.dropoff||'';
+  document.getElementById('edit-addressDetail').value=b.addressDetail||'';
+  document.getElementById('edit-flightInfo').value=b.flightInfo||'';
+  document.getElementById('edit-flyingFrom').value=b.flyingFrom||'';
+
+  if(b.flightArrives){
+    const fd=b.flightArrives.split('T');
+    document.getElementById('edit-flightDate').value=fd[0]||'';
+    document.getElementById('edit-flightTime').value=fd[1]||'';
+  } else {
+    document.getElementById('edit-flightDate').value=''; document.getElementById('edit-flightTime').value='';
   }
-  container.innerHTML=html;
+  if(b.datetime){
+    const pd=b.datetime.split('T');
+    document.getElementById('edit-pickupDate').value=pd[0]||'';
+    document.getElementById('edit-pickupTime').value=pd[1]?pd[1].slice(0,5):'';
+  } else {
+    document.getElementById('edit-pickupDate').value=''; document.getElementById('edit-pickupTime').value='';
+  }
+
+  document.getElementById('edit-babySeats').value=b.babySeats||0;
+  document.getElementById('edit-childSeats').value=b.childSeats||0;
+  document.getElementById('edit-boosterSeats').value=b.boosterSeats||0;
+  document.getElementById('edit-ski').value=b.ski||0;
+  document.getElementById('edit-bike').value=b.bike||0;
+  document.getElementById('edit-luggage').value=b.luggage||0;
+  document.getElementById('edit-holdBags').value=b.holdBags||0;
+  document.getElementById('edit-price').value=b.price||0;
+  document.getElementById('edit-normalPrice').textContent=((b.price||0)*1.05).toFixed(2);
+  document.getElementById('edit-requirements').value=b.requirements&&b.requirements!=='None'?b.requirements:'';
+
+  // Journey #2 (if round trip exists)
+  const j2Panel=document.getElementById('j2-panel');
+  if(b.roundTripId || b.journey2){
+    j2Panel.style.display='block';
+    const j2=b.journey2 || bookings.find(x=>x.id===b.roundTripId) || {};
+    document.getElementById('edit-j2-transferType').value=j2.transferType||'Private';
+    document.getElementById('edit-j2-passengers').value=j2.passengers||1;
+    document.getElementById('edit-j2-pickup').value=j2.pickup||b.dropoff||'';
+    document.getElementById('edit-j2-dropoff').value=j2.dropoff||b.pickup||'';
+    document.getElementById('edit-j2-addressDetail').value=j2.addressDetail||'';
+    document.getElementById('edit-j2-flightInfo').value=j2.flightInfo||'';
+    document.getElementById('edit-j2-flyingTo').value=j2.flyingTo||'';
+    document.getElementById('edit-j2-price').value=j2.price||0;
+  } else {
+    j2Panel.style.display='none';
+  }
+
+  // Billing details
+  document.getElementById('edit-billTo').value=b.billTo||'Customer';
+  document.getElementById('edit-invoiceNum').textContent=b.invoiceNum||(10000+(b.bookingNumber||0)*3);
+  document.getElementById('edit-billingPrice').value=b.price||0;
+  document.getElementById('edit-paymentBy').value=b.paymentBy||'Credit card';
+  document.getElementById('edit-promoCode').value=b.promoCode||'ALPINPOP';
+  document.getElementById('edit-amountPaid').textContent=`€${(b.price||0).toFixed(2)}`;
+  document.getElementById('edit-amountDue').textContent=`€0.00`;
+  document.getElementById('edit-billingSummary').value=b.billingSummary||'Payment received';
+  document.getElementById('edit-billingDetails').value=b.billingDetails||`Payment received ${new Date().toLocaleDateString('fr-FR')} by bank system for €${b.price||0} (transaction id 470528)`;
+
+  document.getElementById('details-modal').classList.add('open');
 }
+
+function closeModal(){document.getElementById('details-modal').classList.remove('open');}
+
+function handleEditSubmit(e){
+  e.preventDefault();
+  const id=document.getElementById('edit-id').value, i=bookings.findIndex(b=>b.id===id);
+  if(i>=0){
+    const fn=document.getElementById('edit-firstName').value.trim();
+    const ln=document.getElementById('edit-lastName').value.trim();
+    bookings[i].firstName=fn; bookings[i].lastName=ln;
+    bookings[i].name=(fn+' '+ln).trim()||bookings[i].name;
+    bookings[i].email=document.getElementById('edit-email').value;
+    bookings[i].phone=document.getElementById('edit-phone').value;
+    bookings[i].altPhone=document.getElementById('edit-altPhone').value;
+    bookings[i].address=document.getElementById('edit-address').value;
+
+    bookings[i].status=document.getElementById('edit-status').value;
+    bookings[i].source=document.getElementById('edit-source').value;
+    bookings[i].custRefNum=document.getElementById('edit-custRefNum').value;
+    bookings[i].customerNotes=document.getElementById('edit-customerNotes').value;
+    bookings[i].internalNotes=document.getElementById('edit-internalNotes').value;
+
+    bookings[i].car=document.getElementById('edit-car').value;
+    bookings[i].driver=document.getElementById('edit-driver').value||'';
+    bookings[i].carType=document.getElementById('edit-carType').value||'Own';
+    bookings[i].payoutAmount=parseFloat(document.getElementById('edit-payoutAmount').value)||0;
+    bookings[i].payoutType=document.getElementById('edit-payoutType').value||'None';
+
+    bookings[i].transferType=document.getElementById('edit-transferType').value;
+    bookings[i].passengers=parseInt(document.getElementById('edit-passengers').value)||1;
+    bookings[i].pickup=document.getElementById('edit-pickup').value;
+    bookings[i].dropoff=document.getElementById('edit-dropoff').value;
+    bookings[i].addressDetail=document.getElementById('edit-addressDetail').value;
+    bookings[i].flightInfo=document.getElementById('edit-flightInfo').value;
+    bookings[i].flyingFrom=document.getElementById('edit-flyingFrom').value;
+
+    const pDate=document.getElementById('edit-pickupDate').value;
+    const pTime=document.getElementById('edit-pickupTime').value;
+    if(pDate&&pTime) bookings[i].datetime=`${pDate}T${pTime}`;
+    else if(pDate) bookings[i].datetime=`${pDate}T12:00`;
+
+    bookings[i].babySeats=parseInt(document.getElementById('edit-babySeats').value)||0;
+    bookings[i].childSeats=parseInt(document.getElementById('edit-childSeats').value)||0;
+    bookings[i].boosterSeats=parseInt(document.getElementById('edit-boosterSeats').value)||0;
+    bookings[i].ski=parseInt(document.getElementById('edit-ski').value)||0;
+    bookings[i].bike=parseInt(document.getElementById('edit-bike').value)||0;
+    bookings[i].luggage=parseInt(document.getElementById('edit-luggage').value)||0;
+    bookings[i].holdBags=parseInt(document.getElementById('edit-holdBags').value)||0;
+    bookings[i].price=parseFloat(document.getElementById('edit-price').value)||0;
+    bookings[i].requirements=document.getElementById('edit-requirements').value||'None';
+
+    bookings[i].billTo=document.getElementById('edit-billTo').value;
+    bookings[i].paymentBy=document.getElementById('edit-paymentBy').value;
+    bookings[i].promoCode=document.getElementById('edit-promoCode').value;
+    bookings[i].billingSummary=document.getElementById('edit-billingSummary').value;
+
+    bookings[i].updated_at=new Date().toISOString();
+    saveLocalData(); pushToCloud(bookings[i]); closeModal();
+    showToast(currentLang==='ru'?'Изменения сохранены!':'Changes saved!');
+  }
+}
+
 function renderAgenda(){
   const c=document.getElementById('agenda-view-container');
   const year=calDate.getFullYear(),month=calDate.getMonth();
