@@ -2278,6 +2278,115 @@ function changePayment(id){const i=bookings.findIndex(b=>b.id===id);if(i>=0){boo
 let openNotifyId=null;
 function closeAllNotifyMenus(){document.getElementById('global-notify-menu').classList.remove('open');openNotifyId=null;}
 document.addEventListener('click',e=>{if(!e.target.closest('.action-btn-row')&&!e.target.closest('#global-notify-menu'))closeAllNotifyMenus();});
+
+function showNotifyMenu(e,id){
+  e.stopPropagation();
+  const menu=document.getElementById('global-notify-menu');
+  if(openNotifyId===id){closeAllNotifyMenus();return;}
+  openNotifyId=id;
+  menu.innerHTML=`
+    <button class="notify-item wa" onclick="notifyWA('client','${id}');closeAllNotifyMenus()">📱 Client</button>
+    <button class="notify-item" style="color:var(--status-confirmed)" onclick="notifyWA('driver','${id}');closeAllNotifyMenus()">🚗 Driver</button>
+    <button class="notify-item" style="color:var(--status-completed)" onclick="notifyWA('logist','${id}');closeAllNotifyMenus()">📋 Logist</button>`;
+  const rect=e.currentTarget.getBoundingClientRect();
+  menu.style.top=(rect.bottom+window.scrollY+5)+'px';
+  menu.style.right=(window.innerWidth-rect.right)+'px';
+  menu.style.left='auto';
+  menu.classList.add('open');
+}
+
+function buildClientMsg(b){
+  const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
+  const driverPart=b.driver?`\n👤 Driver: ${b.driver}`:'';
+  return `Bonjour ${b.name}! 🚗\n\nYour V-Transfer is confirmed:\n📅 ${ds}\n📍 From: ${b.pickup}\n📍 To: ${b.dropoff}\n🚘 ${b.car||''}${driverPart}${b.flightInfo?'\n✈️ '+b.flightInfo:''}\n💰 €${b.price}\n\nV-Transfer Team`;
+}
+
+function buildDriverMsg(b){
+  const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
+  return `🚗 TRIP #${(b.bookingNumber||0).toString().padStart(4,'0')}\n\n📅 ${ds}\n👤 Client: ${b.name}\n📞 ${b.phone||'—'}\n📍 From: ${b.pickup}\n📍 To: ${b.dropoff}\n${b.flightInfo?'✈️ '+b.flightInfo+'\n':''}👥 ${b.passengers||1} pax · 💼 ${b.luggage||0} bags\n${b.requirements&&b.requirements!=='None'?'💬 '+b.requirements:''}`;
+}
+
+function buildLogistMsg(b){
+  const ds=b.datetime?new Date(b.datetime).toLocaleString('fr-FR',{weekday:'long',day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):'TBD';
+  return `📋 DISPATCH #${(b.bookingNumber||0).toString().padStart(4,'0')}\n\n📅 ${ds}\n👤 ${b.name} · 📞 ${b.phone||'—'}\n🚗 ${b.car||'—'} · 👤 ${b.driver||'—'}\n📍 ${b.pickup} ➝ ${b.dropoff}\n${b.flightInfo?'✈️ '+b.flightInfo+'\n':''}👥 ${b.passengers||1} pax · ${b.payoutAmount?'💸 Payout: €'+b.payoutAmount+' ('+b.payoutType+')':''}\n💰 €${b.price} (${b.paymentStatus||'Unpaid'})`;
+}
+
+function notifyWA(role,id){
+  const b=bookings.find(x=>x.id===id);if(!b)return;
+  let ph='',msg='';
+  if(role==='client'){
+    ph=(b.phone||'').replace(/[^0-9+]/g,'');
+    if(!ph){showToast('No client phone number',false);return;}
+    msg=buildClientMsg(b);
+    const i=bookings.findIndex(x=>x.id===id);
+    if(i>=0){bookings[i].notified=true;saveLocalData();pushToCloud(bookings[i]);}
+  } else if(role==='driver'){
+    if(!b.driver){showToast('No driver assigned',false);return;}
+    const dDef=settings.drivers.find(d=>d.name===b.driver);
+    ph=(dDef&&dDef.phone?dDef.phone:(b.driverPhone||'')).replace(/[^0-9+]/g,'');
+    if(!ph){showToast('Driver has no phone set. Add driver phone in Settings.',false);return;}
+    msg=buildDriverMsg(b);
+  } else if(role==='logist'){
+    ph=(settings.logistPhone||'').replace(/[^0-9+]/g,'');
+    if(!ph){showToast('No logist phone set. Go to Settings → Logist.',false);return;}
+    msg=buildLogistMsg(b);
+  }
+  window.open(`https://wa.me/${ph.replace('+','')}?text=${encodeURIComponent(msg)}`,'_blank');
+  showToast(`Opening WhatsApp for ${role}...`);
+}
+
+// ═══════════════════════════════════════════════════
+// ARCHIVE
+// ═══════════════════════════════════════════════════
+function clearArchiveFilters(){['archive-search','archive-filter-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});document.getElementById('archive-filter-payment').value='ALL';renderArchive();}
+function sortArchive(col){if(archSort.col===col)archSort.asc=!archSort.asc;else{archSort.col=col;archSort.asc=false;}renderArchive();}
+function renderArchive(){
+  const tbody=document.getElementById('archive-table-body'),noData=document.getElementById('archive-no-data'),cnt=document.getElementById('archive-count');
+  if(!tbody)return;
+  const srch=(document.getElementById('archive-search').value||'').toLowerCase();
+  const fPay=document.getElementById('archive-filter-payment').value, fDate=document.getElementById('archive-filter-date').value;
+  const completed=bookings.filter(b=>b.status==='Completed');
+  let filtered=completed.filter(b=>{
+    const ms=!srch||(b.name||'').toLowerCase().includes(srch)||(b.phone||'').toLowerCase().includes(srch)||(b.pickup||'').toLowerCase().includes(srch)||(b.dropoff||'').toLowerCase().includes(srch)||(b.bookingNumber+'').includes(srch);
+    return ms&&(fPay==='ALL'||(b.paymentStatus||'Unpaid')===fPay)&&(!fDate||(b.datetime||'').startsWith(fDate));
+  });
+  filtered.sort((a,b)=>{let va=a[archSort.col]||'',vb=b[archSort.col]||'';if(archSort.col==='price'||archSort.col==='bookingNumber'){va=parseFloat(va)||0;vb=parseFloat(vb)||0;}return archSort.asc?(va<vb?-1:va>vb?1:0):(va<vb?1:va>vb?-1:0);});
+  if(cnt)cnt.textContent=`${completed.length} transfer${completed.length!==1?'s':''}`;
+  tbody.innerHTML='';
+  if(!filtered.length){if(noData)noData.style.display='block';return;}
+  if(noData)noData.style.display='none';
+  filtered.forEach(b=>tbody.appendChild(buildRow(b,true)));
+}
+
+// ═══════════════════════════════════════════════════
+// CALENDAR CONTROLS & NAVIGATION
+// ═══════════════════════════════════════════════════
+function setCalView(v){
+  calView=v;
+  ['day','month'].forEach(n=>{
+    const btn=document.getElementById('cal-'+n+'-btn');
+    if(btn)btn.classList.toggle('active',v===n);
+  });
+  renderCalendar();
+}
+
+function prevPeriod(){
+  if(calView==='month') calDate.setMonth(calDate.getMonth()-1);
+  else calDate.setDate(calDate.getDate()-1);
+  renderCalendar();
+}
+
+function nextPeriod(){
+  if(calView==='month') calDate.setMonth(calDate.getMonth()+1);
+  else calDate.setDate(calDate.getDate()+1);
+  renderCalendar();
+}
+
+function goToToday(){
+  calDate=new Date();
+  renderCalendar();
+}
+
 function onAlpinbusDateChange(val){
   if(!val)return;
   const p=val.split('-');
@@ -2285,6 +2394,16 @@ function onAlpinbusDateChange(val){
     calDate=new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
     renderCalendar();
   }
+}
+
+function quickAddBooking(dtStr){
+  switchTab('add-tab',document.getElementById('nav-add'));
+  setMobileNav('mnav-add');
+  setTimeout(()=>{
+    const el=document.getElementById('m-datetime');
+    if(el)el.value=dtStr;
+    showToast(`Creating new booking for ${dtStr}`);
+  },100);
 }
 
 function renderCalendar(){
@@ -2301,10 +2420,10 @@ function renderCalendar(){
 
   if(calView==='month'){
     if(dayView)dayView.style.display='none';
-    if(monthView)monthView.style.display='';
+    if(monthView)monthView.style.display='block';
     renderGridCal();renderAgenda();
   } else {
-    if(dayView)dayView.style.display='';
+    if(dayView)dayView.style.display='block';
     if(monthView)monthView.style.display='none';
     renderDispatchView();
   }
@@ -2375,6 +2494,10 @@ function renderDispatchView(){
   }
   html+=`</tr></thead><tbody>`;
 
+  if(!vehicleKeys.length){
+    html+=`<tr><td class="dispatch-empty-row" colspan="${HOURS+1}">No vehicles configured. Add vehicles in Settings.</td></tr>`;
+  }
+
   vehicleKeys.forEach(vname=>{
     const vDef=settings.vehicles.find(v=>v.name===vname);
     const plate=vDef&&vDef.plate?vDef.plate:'';
@@ -2429,7 +2552,8 @@ function renderDispatchView(){
         const isMaj=h%6===0;
         let nowStyle='';
         if(isToday&&h===nowHour) nowStyle=`position:relative;`;
-        html+=`<td class="dispatch-td-hour${isMaj?' major':''}" style="${nowStyle}">`;
+        const dtVal=`${dayStr}T${pad2(h)}:00`;
+        html+=`<td class="dispatch-td-hour${isMaj?' major':''}" style="${nowStyle}" onclick="quickAddBooking('${dtVal}')" title="Click to add booking at ${pad2(h)}:00">`;
         if(isToday&&h===nowHour){
           const leftPx=Math.round(nowFrac*CELL_W);
           html+=`<div class="dispatch-now-col" style="left:${leftPx}px"></div>`;
