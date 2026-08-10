@@ -515,18 +515,18 @@
       <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
     </div>
     <div class="pin-keypad">
-      <button type="button" class="pin-key" onclick="pinPress('1')" onpointerdown="pinPress('1')">1</button>
-      <button type="button" class="pin-key" onclick="pinPress('2')" onpointerdown="pinPress('2')">2</button>
-      <button type="button" class="pin-key" onclick="pinPress('3')" onpointerdown="pinPress('3')">3</button>
-      <button type="button" class="pin-key" onclick="pinPress('4')" onpointerdown="pinPress('4')">4</button>
-      <button type="button" class="pin-key" onclick="pinPress('5')" onpointerdown="pinPress('5')">5</button>
-      <button type="button" class="pin-key" onclick="pinPress('6')" onpointerdown="pinPress('6')">6</button>
-      <button type="button" class="pin-key" onclick="pinPress('7')" onpointerdown="pinPress('7')">7</button>
-      <button type="button" class="pin-key" onclick="pinPress('8')" onpointerdown="pinPress('8')">8</button>
-      <button type="button" class="pin-key" onclick="pinPress('9')" onpointerdown="pinPress('9')">9</button>
+      <button type="button" class="pin-key" onclick="pinPress('1')">1</button>
+      <button type="button" class="pin-key" onclick="pinPress('2')">2</button>
+      <button type="button" class="pin-key" onclick="pinPress('3')">3</button>
+      <button type="button" class="pin-key" onclick="pinPress('4')">4</button>
+      <button type="button" class="pin-key" onclick="pinPress('5')">5</button>
+      <button type="button" class="pin-key" onclick="pinPress('6')">6</button>
+      <button type="button" class="pin-key" onclick="pinPress('7')">7</button>
+      <button type="button" class="pin-key" onclick="pinPress('8')">8</button>
+      <button type="button" class="pin-key" onclick="pinPress('9')">9</button>
       <button type="button" class="pin-key empty"></button>
-      <button type="button" class="pin-key" onclick="pinPress('0')" onpointerdown="pinPress('0')">0</button>
-      <button type="button" class="pin-key" onclick="pinBackspace()" onpointerdown="pinBackspace()">⌫</button>
+      <button type="button" class="pin-key" onclick="pinPress('0')">0</button>
+      <button type="button" class="pin-key" onclick="pinBackspace()">⌫</button>
     </div>
     <div class="pin-error" id="pin-error"></div>
   </div>
@@ -1233,18 +1233,20 @@ const CORRECT_PIN = '1101';
 const SESSION_KEY = 'vtransfer_pin_session';
 let currentPin = '', lastPinPressTime = 0;
 function initPinScreen() { if(sessionStorage.getItem(SESSION_KEY)==='unlocked') unlockApp(false); }
-function pinPress(d, e) {
-  if (e && e.type === 'pointerdown') { e.preventDefault(); }
+function pinPress(d) {
   const now = Date.now();
-  if (now - lastPinPressTime < 100) return;
+  if (now - lastPinPressTime < 250) return;
   lastPinPressTime = now;
   if(currentPin.length>=4) return;
   currentPin += String(d);
+  document.getElementById('pin-error').textContent = '';
   updateDots();
   if(currentPin.length===4) setTimeout(checkPin, 120);
 }
-function pinBackspace(e) {
-  if (e && e.type === 'pointerdown') { e.preventDefault(); }
+function pinBackspace() {
+  const now = Date.now();
+  if (now - lastPinPressTime < 250) return;
+  lastPinPressTime = now;
   currentPin = currentPin.slice(0, -1);
   updateDots();
   document.getElementById('pin-error').textContent = '';
@@ -1271,7 +1273,50 @@ document.addEventListener('keydown',e=>{
 // STATE
 // ═══════════════════════════════════════════════════
 const appKey='mzmvife9', listKey='vtransfer_booking_ids', expListKey='vtransfer_expense_ids';
+const delListKey='vtransfer_deleted_booking_ids', expDelListKey='vtransfer_deleted_expense_ids';
 const COUNTER_KEY='vtransfer_booking_counter', SETTINGS_KEY='vtransfer_settings';
+
+function getDeletedBookingIds() {
+  try { return JSON.parse(localStorage.getItem('vtransfer_deleted_booking_ids') || '[]'); }
+  catch(e) { return []; }
+}
+function addDeletedBookingId(id) {
+  let list = getDeletedBookingIds();
+  if(!list.includes(id)) {
+    list.push(id);
+    if(list.length > 500) list = list.slice(-500);
+    localStorage.setItem('vtransfer_deleted_booking_ids', JSON.stringify(list));
+  }
+  saveListToCloud(delListKey, list);
+}
+function wipeBookingFromCloud(id) {
+  fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${id}/null`, {method:'POST', headers:{'Content-Length':'0'}}).catch(()=>{});
+  fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${id}_len/0`, {method:'POST', headers:{'Content-Length':'0'}}).catch(()=>{});
+  for (let c = 0; c < 10; c++) {
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${id}_c${c}/null`, {method:'POST', headers:{'Content-Length':'0'}}).catch(()=>{});
+  }
+}
+
+function getDeletedExpenseIds() {
+  try { return JSON.parse(localStorage.getItem('vtransfer_deleted_expense_ids') || '[]'); }
+  catch(e) { return []; }
+}
+function addDeletedExpenseId(id) {
+  let list = getDeletedExpenseIds();
+  if(!list.includes(id)) {
+    list.push(id);
+    if(list.length > 500) list = list.slice(-500);
+    localStorage.setItem('vtransfer_deleted_expense_ids', JSON.stringify(list));
+  }
+  saveListToCloud(expDelListKey, list);
+}
+function wipeExpenseFromCloud(id) {
+  fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${id}/null`, {method:'POST', headers:{'Content-Length':'0'}}).catch(()=>{});
+  fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${id}_len/0`, {method:'POST', headers:{'Content-Length':'0'}}).catch(()=>{});
+  for (let c = 0; c < 10; c++) {
+    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${id}_c${c}/null`, {method:'POST', headers:{'Content-Length':'0'}}).catch(()=>{});
+  }
+}
 const DEFAULT_SETTINGS = {
   vehicles:[
     {id:'v1',name:'Mercedes E-Class',plate:''},
@@ -1578,7 +1623,26 @@ function fetchFallbackList(keyName) {
 
 function syncNow(silent=false) {
   setSyncIndicator('pending','Syncing...');
-  Promise.all([fetchListFromCloud(listKey), fetchListFromCloud(expListKey)]).then(([bIds, eIds]) => {
+  Promise.all([
+    fetchListFromCloud(listKey),
+    fetchListFromCloud(expListKey),
+    fetchListFromCloud(delListKey),
+    fetchListFromCloud(expDelListKey)
+  ]).then(([bIds, eIds, cloudDelB, cloudDelE]) => {
+    const localDelB = getDeletedBookingIds();
+    const allDelB = [...new Set([...localDelB, ...(cloudDelB||[])])];
+    localStorage.setItem('vtransfer_deleted_booking_ids', JSON.stringify(allDelB));
+
+    const localDelE = getDeletedExpenseIds();
+    const allDelE = [...new Set([...localDelE, ...(cloudDelE||[])])];
+    localStorage.setItem('vtransfer_deleted_expense_ids', JSON.stringify(allDelE));
+
+    const activeBIds = (bIds||[]).filter(id => id && !allDelB.includes(id));
+    const activeEIds = (eIds||[]).filter(id => id && !allDelE.includes(id));
+
+    bookings = bookings.filter(b => b && b.id && !allDelB.includes(b.id));
+    expenses = expenses.filter(e => e && e.id && !allDelE.includes(e.id));
+
     // Fetch settings
     const settingsFetch = fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_settings_cfg`)
       .then(r=>r.json()).then(sd=>{
@@ -1591,32 +1655,32 @@ function syncNow(silent=false) {
         }catch(e){try{const ps=JSON.parse(sc);if(ps&&ps.vehicles){settings=ps;localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}}catch(e2){}}
       }).catch(()=>{});
 
-    const bookingFetches = bIds.length ? Promise.all(bIds.map(id => fetchBookingById(id))) : Promise.resolve([]);
-    const expFetches = eIds.length ? Promise.all(eIds.map(id => fetchExpenseById(id))) : Promise.resolve([]);
+    const bookingFetches = activeBIds.length ? Promise.all(activeBIds.map(id => fetchBookingById(id))) : Promise.resolve([]);
+    const expFetches = activeEIds.length ? Promise.all(activeEIds.map(id => fetchExpenseById(id))) : Promise.resolve([]);
 
     Promise.all([bookingFetches, expFetches, settingsFetch]).then(([cb, ce]) => {
       // Merge bookings
-      const vb = cb.filter(b=>b!==null); let merged=[...bookings], updated=0, maxN=nextNum-1;
+      const vb = cb.filter(b=>b!==null && b.id && !allDelB.includes(b.id)); let merged=[...bookings], updated=0, maxN=nextNum-1;
       vb.forEach(cb => {
         if(cb.bookingNumber>maxN) maxN=cb.bookingNumber;
         const li = merged.findIndex(lb=>lb.id===cb.id);
         if(li>=0){const lt=new Date(merged[li].updated_at||merged[li].created_at).getTime(),ct=new Date(cb.updated_at||cb.created_at).getTime();if(ct>lt){merged[li]=cb;updated++;}else if(lt>ct)pushToCloud(merged[li]);}
         else{merged.push(cb);updated++;}
       });
-      // Auto-upload any local bookings not present in cloud list bIds
+      // Auto-upload any local bookings not present in cloud list activeBIds (only if not deleted)
       bookings.forEach(lb => {
-        if (lb && lb.id && !bIds.includes(lb.id)) pushToCloud(lb);
+        if (lb && lb.id && !activeBIds.includes(lb.id) && !allDelB.includes(lb.id)) pushToCloud(lb);
       });
-      bookings = merged; migrateBookings(bookings);
+      bookings = merged.filter(b => b && b.id && !allDelB.includes(b.id)); migrateBookings(bookings);
       if(maxN>=nextNum){nextNum=maxN+1;localStorage.setItem(COUNTER_KEY,nextNum);}
       localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));
       // Merge expenses
-      const ve = ce.filter(e=>e!==null); let mergedE=[...expenses];
+      const ve = ce.filter(e=>e!==null && e.id && !allDelE.includes(e.id)); let mergedE=[...expenses];
       ve.forEach(ce=>{const li=mergedE.findIndex(le=>le.id===ce.id);if(li>=0){const lt=new Date(mergedE[li].updated_at||mergedE[li].created_at).getTime(),ct=new Date(ce.updated_at||ce.created_at).getTime();if(ct>lt){mergedE[li]=ce;}else pushExpenseToCloud(mergedE[li]);}else mergedE.push(ce);});
       expenses.forEach(le => {
-        if (le && le.id && !eIds.includes(le.id)) pushExpenseToCloud(le);
+        if (le && le.id && !activeEIds.includes(le.id) && !allDelE.includes(le.id)) pushExpenseToCloud(le);
       });
-      expenses = mergedE; localStorage.setItem('vtransfer_expenses',JSON.stringify(expenses));
+      expenses = mergedE.filter(e => e && e.id && !allDelE.includes(e.id)); localStorage.setItem('vtransfer_expenses',JSON.stringify(expenses));
       autoCompleteTrips();
       renderAll();
       const now=new Date(),ts=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
@@ -1627,6 +1691,8 @@ function syncNow(silent=false) {
 }
 
 function fetchBookingById(id) {
+  const allDelB = getDeletedBookingIds();
+  if (allDelB.includes(id)) return Promise.resolve(null);
   return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_b_${id}`)
     .then(r=>r.json()).then(ds=>{
       if(ds && typeof ds === 'string'){const cj=ds.replace(/^"+|"+$/g,'').trim();if(cj&&cj!=='null'&&cj!=='undefined'&&cj.length>2&&!cj.includes('Message')){try{return JSON.parse(decodeURIComponent(cj));}catch(e){try{return JSON.parse(cj);}catch(e2){}}}}
@@ -1649,6 +1715,9 @@ function fetchBookingById(id) {
 }
 
 function pushToCloud(b) {
+  if (!b || !b.id) return;
+  const delB = getDeletedBookingIds();
+  if (delB.includes(b.id)) return;
   saveBookingToCloud(b).then(() => {
     fetchListFromCloud(listKey).then(list => {
       if (!list.includes(b.id)) {
@@ -1679,6 +1748,8 @@ function saveExpenseToCloud(exp) {
 
 // Fetch one expense from cloud by ID
 function fetchExpenseById(id) {
+  const allDelE = getDeletedExpenseIds();
+  if (allDelE.includes(id)) return Promise.resolve(null);
   return fetch(`https://keyvalue.immanuel.co/api/KeyVal/GetValue/${appKey}/vtransfer_e_${id}_len`)
     .then(r=>r.json()).then(lenDs=>{
       if(!lenDs || typeof lenDs !== 'string') return null;
@@ -1702,7 +1773,10 @@ function fetchExpenseById(id) {
 }
 
 function pushExpenseToCloud(exp) {
+  if (!exp) return;
   if(!exp.id) exp.id = Date.now()+'_e_'+Math.random().toString(36).slice(2,7);
+  const delE = getDeletedExpenseIds();
+  if (delE.includes(exp.id)) return;
   saveExpenseToCloud(exp).then(()=>{
     fetchListFromCloud(expListKey).then(list => {
       if(!list.includes(exp.id)){
@@ -1751,11 +1825,31 @@ function fullSyncFromCloud() {
   // Fetch BOTH booking and expense ID lists in parallel
   Promise.all([
     fetchListFromCloud(listKey),
-    fetchListFromCloud(expListKey)
-  ]).then(([bIds, eIds]) => {
-    const missingB = bIds.filter(id => id && !bookings.find(b => b.id === id));
-    const missingE = eIds.filter(id => id && !expenses.find(e => e.id === id));
+    fetchListFromCloud(expListKey),
+    fetchListFromCloud(delListKey),
+    fetchListFromCloud(expDelListKey)
+  ]).then(([bIds, eIds, cloudDelB, cloudDelE]) => {
+    const localDelB = getDeletedBookingIds();
+    const allDelB = [...new Set([...localDelB, ...(cloudDelB||[])])];
+    localStorage.setItem('vtransfer_deleted_booking_ids', JSON.stringify(allDelB));
+
+    const localDelE = getDeletedExpenseIds();
+    const allDelE = [...new Set([...localDelE, ...(cloudDelE||[])])];
+    localStorage.setItem('vtransfer_deleted_expense_ids', JSON.stringify(allDelE));
+
+    bookings = bookings.filter(b => b && b.id && !allDelB.includes(b.id));
+    expenses = expenses.filter(e => e && e.id && !allDelE.includes(e.id));
+
+    const activeBIds = (bIds||[]).filter(id => id && !allDelB.includes(id));
+    const activeEIds = (eIds||[]).filter(id => id && !allDelE.includes(id));
+
+    const missingB = activeBIds.filter(id => id && !bookings.find(b => b.id === id));
+    const missingE = activeEIds.filter(id => id && !expenses.find(e => e.id === id));
     if(!missingB.length && !missingE.length){
+      localStorage.setItem('vtransfer_bookings', JSON.stringify(bookings));
+      localStorage.setItem('vtransfer_expenses', JSON.stringify(expenses));
+      renderAll();
+      updateAnalytics();
       setSyncIndicator('online','Already up to date ✓');
       showToast('✓ Already fully synced — no new data');
       return;
@@ -1765,10 +1859,10 @@ function fullSyncFromCloud() {
       missingE.length ? Promise.all(missingE.map(id => fetchExpenseById(id))) : Promise.resolve([])
     ]).then(([bResults, eResults]) => {
       let addedB = 0, addedE = 0;
-      bResults.filter(b => b !== null).forEach(cb => {
+      bResults.filter(b => b !== null && b.id && !allDelB.includes(b.id)).forEach(cb => {
         if(!bookings.find(lb => lb.id === cb.id)){ bookings.push(cb); addedB++; }
       });
-      eResults.filter(e => e !== null).forEach(ce => {
+      eResults.filter(e => e !== null && e.id && !allDelE.includes(e.id)).forEach(ce => {
         if(!expenses.find(le => le.id === ce.id)){ expenses.push(ce); addedE++; }
       });
       migrateBookings(bookings);
@@ -2628,9 +2722,8 @@ function deleteBooking(id){
   const i=bookings.findIndex(b=>b.id===id);
   if(i>=0){
     bookings.splice(i,1); saveLocalData(); renderAll();
-    // 1. Wipe the booking data in cloud
-    fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_b_${id}/`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{});
-    // 2. Remove from the cloud ID list atomically
+    addDeletedBookingId(id);
+    wipeBookingFromCloud(id);
     fetchListFromCloud(listKey).then(list => {
       const updatedList = list.filter(x=>x!==id);
       saveListToCloud(listKey, updatedList);
@@ -2686,7 +2779,20 @@ function handleExpenseSubmit(e){
   populateExpBookingLink();
   showToast(`${currentLang==='ru'?'Расход':'Expense'} €${exp.amount} ${currentLang==='ru'?'сохранён':'saved'}!`);
 }
-function deleteExpense(id){if(!confirm(currentLang==='ru'?'Удалить расход?':'Delete this expense?'))return;expenses=expenses.filter(e=>e.id!==id);saveExpenses();fetch(`https://keyvalue.immanuel.co/api/KeyVal/UpdateValue/${appKey}/vtransfer_e_${id}/`,{method:'POST',headers:{'Content-Length':'0'}}).catch(()=>{});showToast(currentLang==='ru'?'Удалено':'Deleted');}
+function deleteExpense(id){
+  if(!confirm(currentLang==='ru'?'Удалить расход?':'Delete this expense?'))return;
+  expenses=expenses.filter(e=>e.id!==id);
+  saveExpenses();
+  renderExpenses();
+  updateAnalytics();
+  addDeletedExpenseId(id);
+  wipeExpenseFromCloud(id);
+  fetchListFromCloud(expListKey).then(list => {
+    const updatedList = list.filter(x=>x!==id);
+    saveListToCloud(expListKey, updatedList);
+  }).catch(()=>{});
+  showToast(currentLang==='ru'?'Удалено':'Deleted');
+}
 function clearExpenseFilters(){document.getElementById('exp-filter-cat').value='ALL';document.getElementById('exp-filter-month').value='';renderExpenses();}
 function renderExpenses(){
   const tbody=document.getElementById('expense-table-body'),noData=document.getElementById('expense-no-data');
