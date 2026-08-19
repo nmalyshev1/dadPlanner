@@ -918,6 +918,8 @@
               <div class="form-group"><label data-i18n="f_price">Price (€)</label><input type="number" id="m-price" min="0" value="0"></div>
               <div class="form-group"><label>💸 Payout (€) <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400">commission/rental/partner</span></label><input type="number" id="m-payoutAmount" min="0" value="0"></div>
               <div class="form-group"><label>Payout Type</label><select id="m-payoutType"><option value="None">— None</option><option value="Commission">💸 Commission</option><option value="Rental">🏠 Rental</option><option value="Partner">🤝 Partner</option></select></div>
+              <div class="form-group"><label>Source</label><select id="m-source"></select></div>
+              <div class="form-group"><label>From Affiliate / Partner</label><select id="m-fromAffiliate"></select></div>
               <div class="form-group"><label data-i18n="f_status">Status</label>
                 <select id="m-status">
                   <option value="Pending" data-i18n-opt="s_pending">Pending</option>
@@ -1093,13 +1095,23 @@
             <div class="form-group"><label>&nbsp;</label><button class="btn btn-sm" onclick="addDriver()">+ <span data-i18n="set_add_driver">Add Driver</span></button></div>
           </div>
         </div>
-        <!-- Partners -->
+        <!-- Sources -->
         <div class="panel">
-          <div class="panel-title panel-title-gold">🤝 <span data-i18n="set_partners">Partners</span></div>
-          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;" data-i18n="set_partners_hint">Partners appear in Expense dropdown and Analytics breakdown.</p>
+          <div class="panel-title panel-title-gold">📍 Booking Sources</div>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;">Manage the booking channels (e.g. Direct, Website, WhatsApp, Alpinbus, GetTransfer, Hotel Concierge) available in booking forms.</p>
+          <div class="settings-list" id="settings-sources-list"></div>
+          <div class="settings-add-row">
+            <div class="form-group"><label>Source Name</label><input id="new-source-name" placeholder="Website / WhatsApp / Concierge"></div>
+            <div class="form-group"><label>&nbsp;</label><button class="btn btn-sm" onclick="addSource()">+ Add Source</button></div>
+          </div>
+        </div>
+        <!-- Partners & Affiliates -->
+        <div class="panel">
+          <div class="panel-title panel-title-gold">🤝 Partners &amp; Affiliates</div>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:14px;">Manage external partner agencies, affiliate dispatchers, and hotels. They appear in the "From Affiliate" dropdown on bookings, Expense commission dropdowns, and Analytics.</p>
           <div class="settings-list" id="settings-partners-list"></div>
           <div class="settings-add-row">
-            <div class="form-group"><label data-i18n="set_pname">Partner Name</label><input id="new-partner-name" placeholder="Monaco Agency"></div>
+            <div class="form-group"><label data-i18n="set_pname">Partner / Affiliate Name</label><input id="new-partner-name" placeholder="Alpinbus / Monaco Agency / VIP Concierge"></div>
             <div class="form-group"><label>&nbsp;</label><button class="btn btn-sm" onclick="addPartner()">+ <span data-i18n="set_add_partner">Add Partner</span></button></div>
           </div>
         </div>
@@ -1603,7 +1615,19 @@ const DEFAULT_SETTINGS = {
     {id:'d1',name:'Nikolai'},
     {id:'d2',name:'Sergei'},
   ],
-  partners:[]
+  partners:[
+    {id:'p1',name:'Alpinbus'},
+    {id:'p2',name:'VIP Concierge'},
+    {id:'p3',name:'Monaco Agency'}
+  ],
+  sources:[
+    {id:'s1',name:'Direct'},
+    {id:'s2',name:'Alpinbus'},
+    {id:'s3',name:'Transfer'},
+    {id:'s4',name:'Website'},
+    {id:'s5',name:'WhatsApp'},
+    {id:'s6',name:'Hotel Concierge'}
+  ]
 };
 let bookings=[], expenses=[], settings={...DEFAULT_SETTINGS};
 let calDate=new Date(), calView='day';
@@ -1626,7 +1650,7 @@ function unlockApp(animate) {
   updateLogistPhoneDisplay();
   populateExpBookingLink();
 }
-function renderAll() { renderTable(); renderArchive(); renderCalendar(); updateAnalytics(); renderExpenses(); renderSettings(); populateAllVehicleSelects(); populateAllDriverSelects(); updateFilterDropdowns(); updatePartnersDatalist(); }
+function renderAll() { renderTable(); renderArchive(); renderCalendar(); updateAnalytics(); renderExpenses(); renderSettings(); populateAllVehicleSelects(); populateAllDriverSelects(); populateAllSourceSelects(); populateAllAffiliateSelects(); updateFilterDropdowns(); updatePartnersDatalist(); }
 
 // ═══════════════════════════════════════════════════
 // SETTINGS CRUD
@@ -1636,6 +1660,8 @@ function saveSettings() {
   pushSettingsToCloud();
   populateAllVehicleSelects();
   populateAllDriverSelects();
+  populateAllSourceSelects();
+  populateAllAffiliateSelects();
   updateFilterDropdowns();
   updatePartnersDatalist();
   renderSettings();
@@ -1673,42 +1699,77 @@ function deleteDriver(id) {
 function addPartner() {
   const name=document.getElementById('new-partner-name').value.trim();
   if(!name){showToast(currentLang==='ru'?'Введите название':'Enter partner name',false);return;}
+  if(!settings.partners) settings.partners=[];
   settings.partners.push({id:'p_'+Date.now(),name});
   document.getElementById('new-partner-name').value='';
-  saveSettings(); showToast(currentLang==='ru'?'Партнёр добавлен':'Partner added');
+  saveSettings(); showToast(currentLang==='ru'?'Партнёр/Аффилиат добавлен':'Partner / Affiliate added');
 }
 function deletePartner(id) {
   if(!confirm(currentLang==='ru'?'Удалить партнёра?':'Delete this partner?'))return;
-  settings.partners=settings.partners.filter(p=>p.id!==id);
+  settings.partners=(settings.partners||[]).filter(p=>p.id!==id);
+  saveSettings(); showToast(currentLang==='ru'?'Удалено':'Deleted');
+}
+function addSource() {
+  const name=document.getElementById('new-source-name').value.trim();
+  if(!name){showToast(currentLang==='ru'?'Введите название источника':'Enter source name',false);return;}
+  if(!settings.sources) settings.sources=[];
+  settings.sources.push({id:'s_'+Date.now(),name});
+  document.getElementById('new-source-name').value='';
+  saveSettings(); showToast(currentLang==='ru'?'Источник добавлен':'Source added');
+}
+function deleteSource(id) {
+  if(!confirm(currentLang==='ru'?'Удалить источник?':'Delete this source?'))return;
+  settings.sources=(settings.sources||[]).filter(s=>s.id!==id);
   saveSettings(); showToast(currentLang==='ru'?'Удалено':'Deleted');
 }
 function renderSettings() {
   // Vehicles
-  const vl=document.getElementById('settings-vehicles-list'); if(!vl)return;
-  vl.innerHTML='';
-  if(!settings.vehicles.length){vl.innerHTML=`<div class="no-data" style="padding:12px;" data-i18n="no_vehicles">${currentLang==='ru'?'Нет автомобилей':'No vehicles added'}</div>`;}
-  settings.vehicles.forEach(v=>{
-    const d=document.createElement('div'); d.className='settings-item';
-    d.innerHTML=`<span class="settings-item-name">${esc(v.name)}</span>${v.plate?`<span class="settings-item-plate">${esc(v.plate)}</span>`:''}<button class="action-icon delete-btn" onclick="deleteVehicle('${v.id}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
-    vl.appendChild(d);
-  });
+  const vl=document.getElementById('settings-vehicles-list'); if(vl){
+    vl.innerHTML='';
+    if(!settings.vehicles.length){vl.innerHTML=`<div class="no-data" style="padding:12px;" data-i18n="no_vehicles">${currentLang==='ru'?'Нет автомобилей':'No vehicles added'}</div>`;}
+    settings.vehicles.forEach(v=>{
+      const d=document.createElement('div'); d.className='settings-item';
+      d.innerHTML=`<span class="settings-item-name">${esc(v.name)}</span>${v.plate?`<span class="settings-item-plate">${esc(v.plate)}</span>`:''}<button class="action-icon delete-btn" onclick="deleteVehicle('${v.id}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
+      vl.appendChild(d);
+    });
+  }
   updateLogistPhoneDisplay();
   // Drivers
-  const dl=document.getElementById('settings-drivers-list'); dl.innerHTML='';
-  if(!settings.drivers.length){dl.innerHTML=`<div class="no-data" style="padding:12px;">${currentLang==='ru'?'Нет водителей':'No drivers added'}</div>`;}
-  settings.drivers.forEach(d=>{
-    const el=document.createElement('div'); el.className='settings-item';
-    el.innerHTML=`<span class="settings-item-name">👤 ${esc(d.name)}</span><button class="action-icon delete-btn" onclick="deleteDriver('${d.id}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
-    dl.appendChild(el);
-  });
-  // Partners
-  const pl=document.getElementById('settings-partners-list'); pl.innerHTML='';
-  if(!settings.partners.length){pl.innerHTML=`<div class="no-data" style="padding:12px;">${currentLang==='ru'?'Нет партнёров':'No partners added'}</div>`;}
-  settings.partners.forEach(p=>{
-    const el=document.createElement('div'); el.className='settings-item';
-    el.innerHTML=`<span class="settings-item-name">🤝 ${esc(p.name)}</span><button class="action-icon delete-btn" onclick="deletePartner('${p.id}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
-    pl.appendChild(el);
-  });
+  const dl=document.getElementById('settings-drivers-list'); if(dl){
+    dl.innerHTML='';
+    if(!settings.drivers.length){dl.innerHTML=`<div class="no-data" style="padding:12px;">${currentLang==='ru'?'Нет водителей':'No drivers added'}</div>`;}
+    settings.drivers.forEach(d=>{
+      const el=document.createElement('div'); el.className='settings-item';
+      el.innerHTML=`<span class="settings-item-name">👤 ${esc(d.name)}</span><button class="action-icon delete-btn" onclick="deleteDriver('${d.id}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
+      dl.appendChild(el);
+    });
+  }
+  // Sources
+  const sl=document.getElementById('settings-sources-list'); if(sl){
+    sl.innerHTML='';
+    const sourcesList = (settings.sources && settings.sources.length) ? settings.sources : DEFAULT_SETTINGS.sources;
+    if(!sourcesList.length){sl.innerHTML=`<div class="no-data" style="padding:12px;">No sources added</div>`;}
+    sourcesList.forEach(s=>{
+      const sName = typeof s === 'object' ? s.name : s;
+      const sId = typeof s === 'object' ? s.id : 's_'+s;
+      const el=document.createElement('div'); el.className='settings-item';
+      el.innerHTML=`<span class="settings-item-name">📍 ${esc(sName)}</span><button class="action-icon delete-btn" onclick="deleteSource('${sId}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
+      sl.appendChild(el);
+    });
+  }
+  // Partners & Affiliates
+  const pl=document.getElementById('settings-partners-list'); if(pl){
+    pl.innerHTML='';
+    const partnersList = (settings.partners && settings.partners.length) ? settings.partners : DEFAULT_SETTINGS.partners;
+    if(!partnersList.length){pl.innerHTML=`<div class="no-data" style="padding:12px;">${currentLang==='ru'?'Нет партнёров':'No partners added'}</div>`;}
+    partnersList.forEach(p=>{
+      const pName = typeof p === 'object' ? p.name : p;
+      const pId = typeof p === 'object' ? p.id : 'p_'+p;
+      const el=document.createElement('div'); el.className='settings-item';
+      el.innerHTML=`<span class="settings-item-name">🤝 ${esc(pName)}</span><button class="action-icon delete-btn" onclick="deletePartner('${pId}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>`;
+      pl.appendChild(el);
+    });
+  }
 }
 function populateVehicleSelect(sel, currentVal) {
   if(!sel)return;
@@ -1731,11 +1792,55 @@ function populateDriverSelect(sel, currentVal) {
     sel.appendChild(o);
   });
 }
+function populateSourceSelect(sel, currentVal) {
+  if(!sel)return;
+  sel.innerHTML='';
+  const list = (settings.sources && settings.sources.length) ? settings.sources : DEFAULT_SETTINGS.sources;
+  let found = false;
+  list.forEach(s=>{
+    const name = typeof s === 'object' ? s.name : s;
+    const o=document.createElement('option');
+    o.value=name; o.textContent=name;
+    if(name===currentVal){ o.selected=true; found=true; }
+    sel.appendChild(o);
+  });
+  if(currentVal && !found){
+    const o=document.createElement('option');
+    o.value=currentVal; o.textContent=currentVal;
+    o.selected=true;
+    sel.appendChild(o);
+  }
+}
+function populateAffiliateSelect(sel, currentVal) {
+  if(!sel)return;
+  sel.innerHTML='<option value="">— Direct / None —</option>';
+  const list = (settings.partners && settings.partners.length) ? settings.partners : DEFAULT_SETTINGS.partners;
+  let found = !currentVal;
+  list.forEach(p=>{
+    const name = typeof p === 'object' ? p.name : p;
+    const o=document.createElement('option');
+    o.value=name; o.textContent=name;
+    if(name===currentVal){ o.selected=true; found=true; }
+    sel.appendChild(o);
+  });
+  if(currentVal && !found){
+    const o=document.createElement('option');
+    o.value=currentVal; o.textContent=currentVal;
+    o.selected=true;
+    sel.appendChild(o);
+  }
+}
 function populateAllVehicleSelects() {
   ['m-car','edit-car'].forEach(id=>{ const s=document.getElementById(id); if(s)populateVehicleSelect(s,s.value); });
 }
 function populateAllDriverSelects() {
   ['m-driver','edit-driver'].forEach(id=>{ const s=document.getElementById(id); if(s)populateDriverSelect(s,s.value); });
+}
+function populateAllSourceSelects() {
+  ['m-source','edit-source'].forEach(id=>{ const s=document.getElementById(id); if(s)populateSourceSelect(s,s.value); });
+}
+function populateAllAffiliateSelects() {
+  ['m-fromAffiliate','edit-fromAffiliate'].forEach(id=>{ const s=document.getElementById(id); if(s)populateAffiliateSelect(s,s.value); });
 }
 function updateFilterDropdowns() {
   const fc=document.getElementById('filter-car'); if(!fc)return;
@@ -1752,7 +1857,11 @@ function updateFilterDropdowns() {
 function updatePartnersDatalist() {
   const dl=document.getElementById('partners-datalist'); if(!dl)return;
   dl.innerHTML='';
-  settings.partners.forEach(p=>{ const o=document.createElement('option'); o.value=p.name; dl.appendChild(o); });
+  const list = (settings.partners && settings.partners.length) ? settings.partners : DEFAULT_SETTINGS.partners;
+  list.forEach(p=>{
+    const name = typeof p === 'object' ? p.name : p;
+    const o=document.createElement('option'); o.value=name; dl.appendChild(o);
+  });
 }
 function onExpCatChange() {
   const cat=document.getElementById('exp-category').value;
@@ -1792,7 +1901,13 @@ function loadLocalData() {
   try{expenses=JSON.parse(localStorage.getItem('vtransfer_expenses')||'[]');}catch(e){expenses=[];}
   try{
     const s=JSON.parse(localStorage.getItem(SETTINGS_KEY));
-    if(s&&s.vehicles){settings=s;}
+    if(s){
+      settings={...DEFAULT_SETTINGS, ...s};
+      if(!settings.vehicles || !settings.vehicles.length) settings.vehicles=[...DEFAULT_SETTINGS.vehicles];
+      if(!settings.drivers || !settings.drivers.length) settings.drivers=[...DEFAULT_SETTINGS.drivers];
+      if(!settings.partners || !settings.partners.length) settings.partners=[...DEFAULT_SETTINGS.partners];
+      if(!settings.sources || !settings.sources.length) settings.sources=[...DEFAULT_SETTINGS.sources];
+    }
   }catch(e){}
   const sc=localStorage.getItem(COUNTER_KEY);
   if(sc){nextNum=parseInt(sc)||1;}
@@ -2983,7 +3098,8 @@ function openModal(id){
   document.getElementById('edit-address').value=b.address||'';
   
   document.getElementById('edit-status').value=b.status||'Confirmed';
-  document.getElementById('edit-source').value=b.source||'Alpinbus';
+  populateSourceSelect(document.getElementById('edit-source'), b.source || 'Direct');
+  populateAffiliateSelect(document.getElementById('edit-fromAffiliate'), b.fromAffiliate || '');
   document.getElementById('edit-custRefNum').value=b.custRefNum||'';
   document.getElementById('edit-customerNotes').value=b.customerNotes||'';
   document.getElementById('edit-internalNotes').value=b.internalNotes||'';
@@ -3223,6 +3339,8 @@ function buildBookingFromForm(){
     price:parseInt(document.getElementById('m-price').value)||0,
     payoutAmount:parseFloat(document.getElementById('m-payoutAmount').value)||0,
     payoutType:document.getElementById('m-payoutType').value||'None',
+    source: (document.getElementById('m-source')||{}).value || 'Direct',
+    fromAffiliate: (document.getElementById('m-fromAffiliate')||{}).value || '',
     status:document.getElementById('m-status').value,
     paymentStatus:'Unpaid',
     requirements:document.getElementById('m-requirements').value||'None',
@@ -3255,7 +3373,7 @@ function resetAddForm(){
   document.getElementById('m-stops-list').innerHTML='';
   const cnt=document.getElementById('m-stop-count');if(cnt)cnt.textContent='';
   retClient=null;
-  populateAllVehicleSelects();populateAllDriverSelects();
+  populateAllVehicleSelects();populateAllDriverSelects();populateAllSourceSelects();populateAllAffiliateSelects();
 }
 function prefillReturnJourney(){
   const name=document.getElementById('m-name').value.trim(),pickup=document.getElementById('m-pickup').value.trim(),dropoff=document.getElementById('m-dropoff').value.trim(),dt=document.getElementById('m-datetime').value;
