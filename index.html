@@ -1338,7 +1338,6 @@
               <div class="alpinbus-form-row"><label>Invoices:</label><span>📄 <strong id="edit-invoiceNum">11674</strong></span></div>
               <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-billingPrice"></div>
               <div class="alpinbus-form-row"><label>Payment:</label><select id="edit-paymentBy"><option value="Credit card">Credit card</option><option value="Cash">Cash</option><option value="Bank transfer">Bank transfer</option></select></div>
-              <div class="alpinbus-form-row"><label>Promo code:</label><input type="text" id="edit-promoCode"></div>
               <div class="alpinbus-form-row"><label>Paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
               <div class="alpinbus-form-row"><label>Due:</label><span style="font-weight:700;color:var(--status-confirmed);" id="edit-amountDue">€0.00</span></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Summary:</label><input type="text" id="edit-billingSummary"></div>
@@ -3168,7 +3167,6 @@ function openModal(id){
   document.getElementById('edit-invoiceNum').textContent=b.invoiceNum||(10000+(b.bookingNumber||0)*3);
   document.getElementById('edit-billingPrice').value=b.price||0;
   document.getElementById('edit-paymentBy').value=b.paymentBy||'Credit card';
-  document.getElementById('edit-promoCode').value=b.promoCode||'ALPINPOP';
   document.getElementById('edit-amountPaid').textContent=`€${(b.price||0).toFixed(2)}`;
   document.getElementById('edit-amountDue').textContent=`€0.00`;
   document.getElementById('edit-billingSummary').value=b.billingSummary||'Payment received';
@@ -3236,7 +3234,6 @@ function handleEditSubmit(e){
 
     bookings[i].billTo=document.getElementById('edit-billTo').value;
     bookings[i].paymentBy=document.getElementById('edit-paymentBy').value;
-    bookings[i].promoCode=document.getElementById('edit-promoCode').value;
     bookings[i].billingSummary=document.getElementById('edit-billingSummary').value;
 
     // Save Journey 2 if present
