@@ -75,12 +75,12 @@
     .header-btn:hover { border-color:var(--gold); color:var(--gold); }
 
     /* ── LAYOUT ─────────────────────────────────────── */
-    main { flex:1; padding:26px 32px; max-width:1700px; width:100%; margin:0 auto; display:grid; grid-template-columns:225px 1fr; gap:26px; }
-    .sidebar { display:flex; flex-direction:column; gap:5px; }
-    .nav-btn { background:transparent; border:1px solid transparent; color:var(--text-secondary); padding:10px 16px; text-align:left; font-family:inherit; font-size:0.9rem; font-weight:500; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:10px; transition:all 0.25s ease; }
+    main { flex:1; padding:26px 20px; width:100%; margin:0 auto; display:grid; grid-template-columns:160px 1fr; gap:18px; }
+    .sidebar { display:flex; flex-direction:column; gap:4px; }
+    .nav-btn { background:transparent; border:1px solid transparent; color:var(--text-secondary); padding:8px 12px; text-align:left; font-family:inherit; font-size:0.82rem; font-weight:500; border-radius:10px; cursor:pointer; display:flex; align-items:center; gap:8px; transition:all 0.25s ease; }
     .nav-btn:hover { background:rgba(184,148,42,0.07); color:var(--text-primary); border-color:var(--border-gold); }
     .nav-btn.active { background:var(--gold-gradient); color:#FFF; font-weight:600; box-shadow:0 4px 14px rgba(184,148,42,0.3); border-color:transparent; }
-    .nav-btn svg { width:17px; height:17px; flex-shrink:0; }
+    .nav-btn svg { width:16px; height:16px; flex-shrink:0; }
     .content-area { min-width:0; }
     .tab-content { display:none; animation:fadeIn 0.35s ease; }
     .tab-content.active { display:block; }
@@ -416,10 +416,14 @@
 
     /* ── FULL SCREEN / FULL WIDTH CALENDAR ─────────────── */
     main.full-width-layout {
+      grid-template-columns: 1fr !important;
       max-width: 100% !important;
       width: 100% !important;
-      padding: 12px 18px !important;
+      padding: 8px 12px !important;
       margin: 0 !important;
+    }
+    main.full-width-layout .sidebar {
+      display: none !important;
     }
     main.full-width-layout .content-area {
       width: 100% !important;
@@ -449,7 +453,7 @@
     .cal-view-word-btn:hover:not(.active) { background:#CBD5E0; color:#1A202C; }
 
     /* Week View Grid */
-    .week-grid-container { display:grid; grid-template-columns:repeat(7, minmax(170px, 1fr)); gap:10px; min-width:1050px; }
+    .week-grid-container { display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; width:100%; }
     .week-day-col { background:#F8FAFC; border:1px solid #CFD8E3; border-radius:6px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:450px; }
     .week-day-col.today { border-color:#5B86E5; background:#EDF2FA; }
     .week-day-header { font-size:0.82rem; font-weight:800; color:#2C3E50; border-bottom:2px solid #CBD5E1; padding-bottom:6px; margin-bottom:4px; text-transform:uppercase; display:flex; justify-content:space-between; align-items:center; }
@@ -2171,7 +2175,7 @@ function buildRow(b,archived) {
   if(!archived){
     tr.innerHTML=`
       <td class="booking-num text-center" style="white-space:nowrap">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td>
-      <td>
+      <td onclick="openModal('${b.id}')" style="cursor:pointer">
         <div style="font-weight:700;font-size:0.88rem;display:flex;align-items:center;gap:4px;flex-wrap:wrap">${esc(b.name)}${lb}${notBadge}</div>
         <div style="font-size:0.74rem;color:var(--text-muted);margin-top:2px">📞 ${esc(b.phone||'—')}</div>
       </td>
@@ -3072,61 +3076,7 @@ function prefillReturnJourney(){
 }
 function clearReturnMode(){document.getElementById('return-journey-banner').style.display='none';document.getElementById('booking-manual-form').reset();populateAllVehicleSelects();populateAllDriverSelects();}
 
-// ═══════════════════════════════════════════════════
-// EDIT MODAL
-// ═══════════════════════════════════════════════════
-function openModal(id){
-  const b=bookings.find(x=>x.id===id);if(!b)return;
-  document.getElementById('modal-title').textContent=`Edit #${(b.bookingNumber||0).toString().padStart(5,'0')}`;
-  document.getElementById('edit-id').value=b.id;
-  ['name','email','phone','datetime','pickup','dropoff','flightInfo','requirements'].forEach(f=>{const el=document.getElementById('edit-'+f);if(el)el.value=b[f]||'';});
-  document.getElementById('edit-passengers').value=b.passengers||1;
-  document.getElementById('edit-luggage').value=b.luggage||0;
-  document.getElementById('edit-childSeats').value=b.childSeats||0;
-  document.getElementById('edit-holdBags').value=b.holdBags||0;
-  document.getElementById('edit-price').value=b.price||0;
-  document.getElementById('edit-payoutAmount').value=b.payoutAmount||0;
-  document.getElementById('edit-payoutType').value=b.payoutType||'None';
-  document.getElementById('edit-status').value=b.status||'Pending';
-  document.getElementById('edit-paymentStatus').value=b.paymentStatus||'Unpaid';
-  populateVehicleSelect(document.getElementById('edit-car'),b.car);
-  populateDriverSelect(document.getElementById('edit-driver'),b.driver||'');
-  document.getElementById('edit-carType').value=b.carType||'Own';
-  document.getElementById('edit-commissionPaid').value=b.commissionPaid||'N/A';
-  // Populate stops
-  renderStopsInList('edit-stops-list', b.stops||[]);
-  // Linked
-  const ph=(b.phone||'').trim(),em=(b.email||'').trim().toLowerCase();
-  let lhtml='';
-  if(ph||em){const lb=bookings.filter(o=>o.id!==b.id&&((ph&&o.phone&&o.phone.trim()===ph)||(em&&o.email&&o.email.trim().toLowerCase()===em)));lb.sort((x,y)=>(y.datetime||'').localeCompare(x.datetime||''));lb.forEach(l=>{const ld=l.datetime?new Date(l.datetime).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})+' '+new Date(l.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';lhtml+=`<div class="linked-transfer-item" onclick="openModal('${l.id}')"><span class="linked-transfer-num">#${(l.bookingNumber||0).toString().padStart(5,'0')}</span><span class="linked-transfer-route">${esc(l.pickup)} ➝ ${esc(l.dropoff)}</span><span style="font-size:0.73rem;color:var(--text-muted)">${ld}</span><span class="linked-transfer-status ${l.status.toLowerCase()}">${l.status}</span></div>`;});}
-  const ls=document.getElementById('linked-section'),ll=document.getElementById('linked-list');
-  if(lhtml){ll.innerHTML=lhtml;ls.style.display='block';}else{ll.innerHTML='';ls.style.display='none';}
-  document.getElementById('details-modal').classList.add('open');
-}
-function closeModal(){document.getElementById('details-modal').classList.remove('open');}
-function handleEditSubmit(e){
-  e.preventDefault();
-  const id=document.getElementById('edit-id').value,i=bookings.findIndex(b=>b.id===id);
-  if(i>=0){
-    ['name','email','phone','datetime','pickup','dropoff','flightInfo','requirements'].forEach(f=>{const el=document.getElementById('edit-'+f);if(el)bookings[i][f]=el.value;});
-    bookings[i].car=document.getElementById('edit-car').value;
-    bookings[i].driver=document.getElementById('edit-driver').value||'';
-    bookings[i].passengers=parseInt(document.getElementById('edit-passengers').value)||1;
-    bookings[i].luggage=parseInt(document.getElementById('edit-luggage').value)||0;
-    bookings[i].childSeats=parseInt(document.getElementById('edit-childSeats').value)||0;
-    bookings[i].holdBags=parseInt(document.getElementById('edit-holdBags').value)||0;
-    bookings[i].price=parseInt(document.getElementById('edit-price').value)||0;
-    bookings[i].payoutAmount=parseFloat(document.getElementById('edit-payoutAmount').value)||0;
-    bookings[i].payoutType=document.getElementById('edit-payoutType').value||'None';
-    bookings[i].status=document.getElementById('edit-status').value;
-    bookings[i].paymentStatus=document.getElementById('edit-paymentStatus').value;
-    bookings[i].carType=document.getElementById('edit-carType').value||'Own';
-    bookings[i].commissionPaid=document.getElementById('edit-commissionPaid').value||'N/A';
-    bookings[i].stops=collectStops('edit-stops-list');
-    bookings[i].updated_at=new Date().toISOString();
-    saveLocalData();pushToCloud(bookings[i]);closeModal();showToast(currentLang==='ru'?'Изменения сохранены!':'Changes saved!');
-  }
-}
+// (duplicate openModal/closeModal/handleEditSubmit removed — correct versions are above at line ~2803)
 function addTripForClient(bookingId){
   const b=bookings.find(x=>x.id===bookingId);
   if(!b)return;
