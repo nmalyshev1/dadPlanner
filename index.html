@@ -485,17 +485,17 @@
     .dispatch-day-stat { font-size:0.74rem; color:var(--text-muted); font-weight:600; }
     .dispatch-day-addbtn { font-size:0.72rem; color:var(--gold); background:none; border:1px dashed var(--border-gold); padding:3px 8px; border-radius:6px; cursor:pointer; font-weight:700; transition:all 0.15s; margin-top:4px; text-align:center; }
     .dispatch-day-addbtn:hover { background:rgba(184,148,42,0.1); border-style:solid; }
-    .dispatch-day-content { padding:10px 14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; min-height:68px; }
-    .dispatch-card-item { background:var(--bg-main); border:1.5px solid var(--border); border-left:4px solid var(--gold); border-radius:8px; padding:8px 12px; display:flex; flex-direction:column; gap:3px; cursor:pointer; transition:all 0.15s; min-width:240px; max-width:340px; flex:1 1 260px; font-size:0.8rem; }
+    .dispatch-day-content { padding:10px 14px; display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start; min-height:48px; }
+    .dispatch-card-item { background:var(--bg-main); border:1.5px solid var(--border); border-left:4px solid var(--gold); border-radius:8px; padding:8px 12px; display:flex; flex-direction:column; gap:4px; cursor:pointer; transition:all 0.15s; min-width:240px; max-width:340px; flex:1 1 260px; font-size:0.8rem; height:auto; }
     .dispatch-card-item:hover { transform:translateY(-1px); box-shadow:var(--shadow-md); border-color:var(--gold); }
     .dispatch-card-item.pending { border-left-color:var(--status-pending); }
     .dispatch-card-item.confirmed { border-left-color:var(--status-confirmed); }
     .dispatch-card-item.completed { border-left-color:var(--status-completed); }
     .dispatch-card-item.cancelled { border-left-color:var(--status-cancelled); opacity:0.75; }
-    .dispatch-card-top { display:flex; justify-content:space-between; align-items:center; gap:6px; font-weight:800; font-size:0.82rem; }
-    .dispatch-card-time { color:var(--gold); display:flex; align-items:center; gap:4px; }
-    .dispatch-card-name { font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .dispatch-card-route { font-size:0.74rem; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+    .dispatch-card-top { display:flex; justify-content:space-between; align-items:center; gap:8px; font-weight:800; font-size:0.82rem; }
+    .dispatch-card-time { color:var(--gold); display:flex; align-items:center; gap:4px; white-space:nowrap; }
+    .dispatch-card-name { font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:right; }
+    .dispatch-card-route { font-size:0.74rem; color:var(--text-secondary); line-height:1.35; margin-top:2px; }
     .dispatch-card-meta { display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:var(--text-muted); margin-top:3px; border-top:1px dashed var(--border); padding-top:4px; }
     .dispatch-no-trips { font-size:0.78rem; color:var(--text-muted); font-style:italic; padding:6px 0; }
     .dispatch-month-stats { display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
@@ -627,6 +627,23 @@
       /* Panel padding */
       .panel { padding:14px 12px; }
       .panel-title { font-size:0.9rem; margin-bottom:12px; }
+      /* Dispatch schedule board (Week & Month on mobile) */
+      .dispatch-day-row { grid-template-columns:1fr !important; }
+      .dispatch-day-sidebar {
+        border-right:none !important;
+        border-bottom:1.5px solid var(--border) !important;
+        padding:8px 12px !important;
+        flex-direction:row !important;
+        align-items:center !important;
+        justify-content:space-between !important;
+        flex-wrap:wrap !important;
+        gap:6px !important;
+      }
+      .dispatch-day-date { font-size:0.85rem !important; }
+      .dispatch-day-stat { margin-top:0 !important; display:flex !important; align-items:center !important; gap:6px !important; }
+      .dispatch-day-addbtn { margin-top:0 !important; padding:3px 8px !important; font-size:0.72rem !important; }
+      .dispatch-day-content { padding:8px !important; width:100% !important; box-sizing:border-box !important; display:flex !important; flex-direction:column !important; gap:8px !important; }
+      .dispatch-card-item { width:100% !important; min-width:100% !important; max-width:100% !important; box-sizing:border-box !important; padding:8px 10px !important; }
       /* Dispatch sidebar hidden on mobile */
       .dispatch-sidebar { display:none !important; }
       /* Calendar popup */
