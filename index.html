@@ -247,12 +247,14 @@
     .modal-overlay { position:fixed; inset:0; background:rgba(30,28,26,0.45); backdrop-filter:blur(5px); z-index:1000; display:none; justify-content:center; align-items:center; padding:20px; }
     .modal-overlay.open { display:flex; }
     .modal { background:var(--bg-card); border:1.5px solid var(--border); border-radius:16px; width:100%; max-width:720px; box-shadow:var(--shadow-lg); animation:modalSlide 0.3s ease; display:flex; flex-direction:column; max-height:92vh; }
+    #details-modal .modal { max-width:1220px; width:95%; max-height:90vh; }
     @keyframes modalSlide { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
     .modal-header { padding:18px 22px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
     .modal-title { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--text-primary); }
     .modal-close { background:none; border:none; color:var(--text-muted); font-size:1.4rem; cursor:pointer; transition:color 0.2s; }
     .modal-close:hover { color:var(--text-primary); }
     .modal-body { padding:22px; overflow-y:auto; }
+    #details-modal .modal-body { padding:14px 18px; max-height:calc(90vh - 60px); overflow-y:auto; }
 
     /* ── TOAST ──────────────────────────────────────── */
     .toast { position:fixed; bottom:76px; right:26px; background:var(--bg-card); border:1.5px solid var(--gold); color:var(--text-primary); padding:12px 18px; border-radius:10px; box-shadow:var(--shadow-lg); z-index:9000; display:flex; align-items:center; gap:9px; transform:translateY(100px); opacity:0; transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); max-width:360px; font-weight:500; font-size:0.9rem; }
@@ -366,64 +368,83 @@
 
     /* ── ALPINBUS CALENDAR THEME & LAYOUT ──────────────── */
     .alpinbus-page-title-banner {
-      background:#8EA8F5; color:#FFF; padding:12px 20px;
+      background:var(--gold-gradient); color:#FFF; padding:12px 20px;
       display:flex; justify-content:space-between; align-items:center;
-      border-radius:6px 6px 0 0;
+      border-radius:10px 10px 0 0;
     }
     .alpinbus-page-title-banner h2 { font-size:1.15rem; font-weight:700; margin:0; }
-    .alpinbus-print-btn { background:rgba(255,255,255,0.3); border:1px solid rgba(255,255,255,0.5); color:#FFF; padding:6px 16px; border-radius:4px; font-size:0.82rem; font-weight:700; cursor:pointer; }
-    .alpinbus-print-btn:hover { background:rgba(255,255,255,0.45); }
+    .alpinbus-print-btn { background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); color:#FFF; padding:6px 16px; border-radius:6px; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.2s; }
+    .alpinbus-print-btn:hover { background:rgba(255,255,255,0.35); }
     .alpinbus-date-control-bar {
-      background:#EEF2F7; border-bottom:1px solid #D1D8E0; padding:8px 18px;
-      display:flex; align-items:center; gap:6px; font-size:0.85rem; flex-wrap:wrap;
+      background:var(--table-hdr); border-bottom:1.5px solid var(--border); padding:10px 18px;
+      display:flex; align-items:center; gap:8px; font-size:0.85rem; flex-wrap:wrap;
     }
-    .alpinbus-day-label { font-weight:700; color:#333; margin-right:4px; }
-    .alpinbus-date-arrow { background:#FFF; border:1px solid #B0BEC5; color:#333; width:26px; height:26px; border-radius:3px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; }
-    .alpinbus-date-arrow:hover { background:#F0F4F8; }
-    .alpinbus-date-input { border:1px solid #B0BEC5; border-radius:3px; padding:3px 8px; font-size:0.85rem; font-family:inherit; background:#FFF; }
+    .alpinbus-day-label { font-weight:700; color:var(--text-primary); margin-right:2px; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.5px; }
+    .alpinbus-date-arrow { background:var(--bg-card); border:1.5px solid var(--border); color:var(--text-primary); width:30px; height:30px; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; transition:all 0.2s; }
+    .alpinbus-date-arrow:hover { background:rgba(184,148,42,0.1); border-color:var(--gold); color:var(--gold); }
+    .alpinbus-date-input { border:1.5px solid var(--border); border-radius:6px; padding:5px 10px; font-size:0.85rem; font-family:inherit; background:var(--bg-card); color:var(--text-primary); min-height:30px; }
 
     /* Popover Tooltip (Screenshot 2) */
     .alpinbus-popover {
-      position:fixed; z-index:9500; background:#EDF2FA; border:1.5px solid #B4C6E7;
-      border-radius:6px; box-shadow:0 12px 36px rgba(0,0,0,0.28); padding:14px 18px;
-      min-width:320px; max-width:380px; font-size:0.82rem; color:#222; animation:modalSlide 0.2s ease;
+      position:fixed; z-index:9500; background:var(--bg-card); border:1.5px solid var(--border-gold);
+      border-radius:12px; box-shadow:var(--shadow-lg); padding:16px 20px;
+      min-width:340px; max-width:400px; font-size:0.82rem; color:var(--text-primary); animation:modalSlide 0.2s ease;
     }
-    .alpinbus-popover-top { display:flex; align-items:center; gap:12px; margin-bottom:12px; border-bottom:1px solid #D5E1F2; padding-bottom:8px; }
-    .alpinbus-popover-viewbtn { background:#5B86E5; color:#FFF; border:none; padding:6px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:0.8rem; }
-    .alpinbus-popover-viewbtn:hover { background:#4772D0; }
-    .alpinbus-popover-status { font-weight:700; color:#155724; font-size:0.88rem; display:flex; align-items:center; gap:5px; }
-    .alpinbus-popover-table { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+    .alpinbus-popover-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:10px; }
+    .alpinbus-popover-viewbtn { background:var(--gold-gradient); color:#FFF; border:none; padding:6px 14px; border-radius:6px; font-weight:700; cursor:pointer; font-size:0.8rem; box-shadow:0 2px 8px rgba(184,148,42,0.3); }
+    .alpinbus-popover-viewbtn:hover { filter:brightness(1.1); }
+    .alpinbus-popover-status { font-weight:700; color:var(--status-confirmed); font-size:0.88rem; display:flex; align-items:center; gap:5px; }
+    .alpinbus-popover-table { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
     .alpinbus-popover-row { display:flex; gap:8px; font-size:0.81rem; }
-    .alpinbus-popover-row span.lbl { min-width:96px; color:#555; font-weight:500; }
-    .alpinbus-popover-row span.val { color:#111; font-weight:600; flex:1; }
-    .alpinbus-popover-invoicelink { color:#5B86E5; text-decoration:underline; font-size:0.8rem; cursor:pointer; font-weight:600; }
+    .alpinbus-popover-row span.lbl { min-width:96px; color:var(--text-muted); font-weight:600; text-transform:uppercase; font-size:0.72rem; letter-spacing:0.5px; }
+    .alpinbus-popover-row span.val { color:var(--text-primary); font-weight:600; flex:1; }
+    .alpinbus-popover-invoicelink { color:var(--gold); text-decoration:underline; font-size:0.8rem; cursor:pointer; font-weight:600; }
 
     /* Screenshot 3 - Modal Layout */
-    .alpinbus-modal-layout { display:grid; grid-template-columns:260px 1fr 270px; gap:14px; }
-    @media (max-width:1100px) { .alpinbus-modal-layout { grid-template-columns:1fr; } }
-    .alpinbus-box { background:#F8FAFC; border:1px solid #CFD8E3; border-radius:6px; padding:12px 14px; margin-bottom:12px; }
-    .alpinbus-box-title { font-size:0.82rem; font-weight:800; text-transform:none; color:#2C3E50; margin-bottom:10px; border-bottom:1px solid #E1E8F0; padding-bottom:5px; }
-    .alpinbus-form-row { display:flex; align-items:center; margin-bottom:7px; gap:6px; font-size:0.8rem; }
-    .alpinbus-form-row label { min-width:90px; font-weight:600; color:#444; margin:0; font-size:0.78rem; }
-    .alpinbus-form-row input, .alpinbus-form-row select, .alpinbus-form-row textarea { flex:1; padding:4px 7px; border:1px solid #C0C8D0; border-radius:4px; font-size:0.81rem; font-family:inherit; background:#FFF; }
-    .alpinbus-inline-opts { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin:6px 0; }
-    .alpinbus-inline-opts .opt-item { display:flex; flex-direction:column; font-size:0.72rem; font-weight:600; color:#555; }
-    .alpinbus-inline-opts select { padding:2px 4px; font-size:0.78rem; border-radius:3px; }
-    .alpinbus-save-btn { background:#2ECC71; color:#FFF; border:none; padding:9px 28px; border-radius:4px; font-size:0.95rem; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(46,204,113,0.3); transition:background 0.15s; }
-    .alpinbus-save-btn:hover { background:#27AE60; }
-    .alpinbus-link-blue { color:#3498DB; font-weight:500; font-size:0.78rem; text-decoration:underline; background:none; border:none; padding:0; cursor:pointer; display:inline-block; margin-right:10px; }
-    .alpinbus-link-red { color:#E74C3C; font-weight:500; font-size:0.78rem; text-decoration:underline; background:none; border:none; padding:0; cursor:pointer; display:inline-block; margin-right:10px; }
+    .alpinbus-modal-layout { display:grid; grid-template-columns:280px 1fr 270px; gap:14px; align-items:start; }
+    @media (max-width:1200px) { .alpinbus-modal-layout { grid-template-columns:1fr 1fr; } }
+    @media (max-width:800px) { .alpinbus-modal-layout { grid-template-columns:1fr; } }
+    .alpinbus-box { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px; box-shadow:var(--shadow-sm); }
+    .alpinbus-box-title { font-size:0.82rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); margin-bottom:10px; border-bottom:1px solid var(--border-gold); padding-bottom:5px; }
+    .alpinbus-form-row { display:grid; grid-template-columns:90px 1fr; align-items:center; margin-bottom:7px; gap:6px; font-size:0.8rem; }
+    .alpinbus-form-row label { font-weight:700; color:var(--text-muted); margin:0; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px; }
+    .alpinbus-form-row input, .alpinbus-form-row select, .alpinbus-form-row textarea { padding:5px 8px; border:1.5px solid var(--border); border-radius:6px; font-size:0.82rem; font-family:inherit; background:var(--input-bg); color:var(--text-primary); min-height:32px; box-sizing:border-box; width:100%; outline:none; transition:all 0.2s; }
+    .alpinbus-form-row input:focus, .alpinbus-form-row select:focus, .alpinbus-form-row textarea:focus { border-color:var(--gold); box-shadow:0 0 0 2px rgba(184,148,42,0.15); }
+    .alpinbus-inline-opts { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin:8px 0; }
+    .alpinbus-inline-opts .opt-item { display:flex; flex-direction:column; font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; gap:3px; }
+    .alpinbus-inline-opts select { padding:4px 6px; font-size:0.8rem; border-radius:6px; background:var(--input-bg); border:1.5px solid var(--border); color:var(--text-primary); min-height:32px; }
+    .alpinbus-save-btn { background:var(--gold-gradient); color:#FFF; border:none; padding:10px 32px; border-radius:8px; font-size:0.95rem; font-weight:700; cursor:pointer; box-shadow:0 4px 14px rgba(184,148,42,0.3); transition:all 0.2s; }
+    .alpinbus-save-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+    .alpinbus-link-blue { color:var(--gold); font-weight:600; font-size:0.78rem; text-decoration:underline; background:none; border:none; padding:0; cursor:pointer; display:inline-block; margin-right:12px; }
+    .alpinbus-link-red { color:var(--status-cancelled); font-weight:600; font-size:0.78rem; text-decoration:underline; background:none; border:none; padding:0; cursor:pointer; display:inline-block; margin-right:12px; }
 
     /* ── FULL SCREEN / FULL WIDTH CALENDAR ─────────────── */
     main.full-width-layout {
       grid-template-columns: 1fr !important;
       max-width: 100% !important;
       width: 100% !important;
-      padding: 8px 12px !important;
+      padding: 10px 18px !important;
       margin: 0 !important;
     }
     main.full-width-layout .sidebar {
-      display: none !important;
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 8px 14px;
+      box-shadow: var(--shadow-sm);
+      align-items: center;
+    }
+    main.full-width-layout .nav-btn {
+      padding: 7px 14px;
+      font-size: 0.82rem;
+    }
+    main.full-width-layout .nav-btn svg {
+      width: 15px; height: 15px;
     }
     main.full-width-layout .content-area {
       width: 100% !important;
@@ -436,7 +457,7 @@
     main.full-width-layout #calendar-tab .panel {
       width: 100% !important;
       max-width: 100% !important;
-      min-height: calc(100vh - 100px);
+      min-height: calc(100vh - 150px);
     }
     main.full-width-layout .dispatch-board-wrap {
       width: 100% !important;
@@ -447,27 +468,73 @@
     }
     #calendar-tab { width:100%; min-height:85vh; }
     #calendar-tab .panel { width:100%; min-height:85vh; display:flex; flex-direction:column; }
-    .cal-view-words { display:inline-flex; gap:4px; background:#E2E8F0; padding:3px; border-radius:6px; }
-    .cal-view-word-btn { background:none; border:none; padding:5px 15px; font-size:0.85rem; font-weight:700; color:#4A5568; border-radius:4px; cursor:pointer; transition:all 0.15s; }
-    .cal-view-word-btn.active { background:#5B86E5; color:#FFF; box-shadow:0 2px 5px rgba(91,134,229,0.35); }
-    .cal-view-word-btn:hover:not(.active) { background:#CBD5E0; color:#1A202C; }
+    .cal-view-words { display:inline-flex; gap:4px; background:rgba(184,148,42,0.1); padding:3px; border-radius:6px; border:1px solid var(--border-gold); }
+    .cal-view-word-btn { background:none; border:none; padding:5px 16px; font-size:0.85rem; font-weight:700; color:var(--text-secondary); border-radius:4px; cursor:pointer; transition:all 0.15s; }
+    .cal-view-word-btn.active { background:var(--gold-gradient); color:#FFF; box-shadow:0 2px 6px rgba(184,148,42,0.35); }
+    .cal-view-word-btn:hover:not(.active) { background:rgba(184,148,42,0.12); color:var(--text-primary); }
 
-    /* Week View Grid */
-    .week-grid-container { display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; width:100%; }
-    .week-day-col { background:#F8FAFC; border:1px solid #CFD8E3; border-radius:6px; padding:10px; display:flex; flex-direction:column; gap:8px; min-height:450px; }
-    .week-day-col.today { border-color:#5B86E5; background:#EDF2FA; }
-    .week-day-header { font-size:0.82rem; font-weight:800; color:#2C3E50; border-bottom:2px solid #CBD5E1; padding-bottom:6px; margin-bottom:4px; text-transform:uppercase; display:flex; justify-content:space-between; align-items:center; }
-    .week-day-header.today { color:#5B86E5; }
-    .week-card { background:#FFF; border:1px solid #CBD5E1; border-left:4px solid #5B86E5; border-radius:5px; padding:8px 10px; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; display:flex; flex-direction:column; gap:3px; font-size:0.78rem; }
-    .week-card:hover { transform:translateY(-1px); box-shadow:0 3px 8px rgba(0,0,0,0.12); }
-    .week-card.pending { border-left-color:#E67E22; }
-    .week-card.confirmed { border-left-color:#27AE60; }
-    .week-card.completed { border-left-color:#2980B9; }
-    .week-card.cancelled { border-left-color:#C0392B; }
-    .week-card-time { font-weight:800; color:#222; font-size:0.75rem; }
-    .week-card-name { font-weight:700; color:#111; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .week-card-route { font-size:0.71rem; color:#666; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .week-card-meta { font-size:0.68rem; color:#888; display:flex; justify-content:space-between; margin-top:2px; }
+    /* ── DISPATCH WEEK & MONTH SCHEDULE BOARD ─────────── */
+    .dispatch-schedule-board { display:flex; flex-direction:column; gap:10px; width:100%; }
+    .dispatch-day-row { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; overflow:hidden; display:grid; grid-template-columns:180px 1fr; transition:all 0.2s; }
+    .dispatch-day-row:hover { border-color:var(--border-gold); box-shadow:var(--shadow-sm); }
+    .dispatch-day-row.today-row { border-color:var(--gold); box-shadow:0 0 0 1.5px rgba(184,148,42,0.25); }
+    .dispatch-day-sidebar { background:var(--table-hdr); border-right:1.5px solid var(--border); padding:12px 16px; display:flex; flex-direction:column; justify-content:space-between; gap:6px; }
+    .dispatch-day-date { font-size:0.88rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
+    .dispatch-day-row.today-row .dispatch-day-date { color:var(--gold); }
+    .dispatch-day-badge { font-size:0.68rem; font-weight:700; text-transform:uppercase; padding:2px 7px; border-radius:12px; background:rgba(184,148,42,0.15); color:var(--gold); display:inline-block; }
+    .dispatch-day-stat { font-size:0.74rem; color:var(--text-muted); font-weight:600; }
+    .dispatch-day-addbtn { font-size:0.72rem; color:var(--gold); background:none; border:1px dashed var(--border-gold); padding:3px 8px; border-radius:6px; cursor:pointer; font-weight:700; transition:all 0.15s; margin-top:4px; text-align:center; }
+    .dispatch-day-addbtn:hover { background:rgba(184,148,42,0.1); border-style:solid; }
+    .dispatch-day-content { padding:10px 14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; min-height:68px; }
+    .dispatch-card-item { background:var(--bg-main); border:1.5px solid var(--border); border-left:4px solid var(--gold); border-radius:8px; padding:8px 12px; display:flex; flex-direction:column; gap:3px; cursor:pointer; transition:all 0.15s; min-width:240px; max-width:340px; flex:1 1 260px; font-size:0.8rem; }
+    .dispatch-card-item:hover { transform:translateY(-1px); box-shadow:var(--shadow-md); border-color:var(--gold); }
+    .dispatch-card-item.pending { border-left-color:var(--status-pending); }
+    .dispatch-card-item.confirmed { border-left-color:var(--status-confirmed); }
+    .dispatch-card-item.completed { border-left-color:var(--status-completed); }
+    .dispatch-card-item.cancelled { border-left-color:var(--status-cancelled); opacity:0.75; }
+    .dispatch-card-top { display:flex; justify-content:space-between; align-items:center; gap:6px; font-weight:800; font-size:0.82rem; }
+    .dispatch-card-time { color:var(--gold); display:flex; align-items:center; gap:4px; }
+    .dispatch-card-name { font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .dispatch-card-route { font-size:0.74rem; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+    .dispatch-card-meta { display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:var(--text-muted); margin-top:3px; border-top:1px dashed var(--border); padding-top:4px; }
+    .dispatch-no-trips { font-size:0.78rem; color:var(--text-muted); font-style:italic; padding:6px 0; }
+    .dispatch-month-stats { display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+    .dispatch-stat-chip { background:var(--bg-card); border:1.5px solid var(--border); border-radius:8px; padding:8px 14px; font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:flex; align-items:center; gap:8px; box-shadow:var(--shadow-sm); }
+    .dispatch-stat-chip strong { color:var(--gold); font-size:0.95rem; }
+
+    /* ── DISPATCH BOARD ────────────────────────────── */
+    .dispatch-board-wrap { border:1.5px solid var(--border); border-radius:10px; background:var(--bg-card); overflow-x:auto; }
+    .dispatch-table { border-collapse:collapse; table-layout:fixed; min-width:max-content; width:100%; }
+    .dispatch-table th, .dispatch-table td { border:1px solid var(--border); padding:0; margin:0; }
+    .dispatch-th-label { width:160px; min-width:160px; padding:8px 12px; font-size:0.72rem; font-weight:800; text-transform:uppercase; color:var(--gold); background:var(--table-hdr); border-right:2px solid var(--border-gold) !important; white-space:nowrap; }
+    .dispatch-th-hour { width:44px; min-width:44px; text-align:center; font-size:0.7rem; color:var(--text-muted); font-weight:700; background:var(--table-hdr); padding:7px 0; border-bottom:2px solid var(--border-gold) !important; }
+    .dispatch-td-vname { background:var(--table-hdr); border-right:2px solid var(--border-gold) !important; padding:6px 12px; font-size:0.78rem; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; }
+    .dispatch-td-vname small { display:block; font-size:0.65rem; color:var(--text-muted); font-weight:500; font-family:monospace; }
+    .dispatch-td-vname-spacer { background:var(--table-hdr); }
+    .dispatch-td-rowlabel { background:var(--table-hdr); border-right:2px solid var(--border-gold) !important; padding:4px 10px; font-size:0.68rem; color:var(--text-secondary); white-space:nowrap; font-weight:600; }
+    .dispatch-td-hour { position:relative; height:38px; min-width:44px; width:44px; padding:0; overflow:visible; background:var(--bg-card); cursor:pointer; }
+    .dispatch-td-hour.major { background:rgba(184,148,42,0.03); }
+    .dispatch-td-hour:hover { background:rgba(184,148,42,0.08); }
+    .dispatch-now-col { position:absolute; top:0; bottom:0; left:0; width:2px; background:var(--status-cancelled); opacity:0.9; pointer-events:none; z-index:8; }
+    .dispatch-td-block { position:relative; padding:0; overflow:visible; vertical-align:middle; height:38px; }
+    .dispatch-pill { display:flex; flex-direction:column; justify-content:center; padding:2px 8px; border-radius:5px; cursor:pointer; height:32px; margin:2px 2px; border-left:3px solid rgba(0,0,0,0.25); transition:all 0.15s; white-space:nowrap; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.12); }
+    .dispatch-pill:hover { filter:brightness(1.08); transform:scale(1.02); box-shadow:0 3px 8px rgba(0,0,0,0.2); }
+    .dispatch-pill.pending { background:var(--status-pending); color:#FFF; }
+    .dispatch-pill.confirmed { background:var(--status-confirmed); color:#FFF; }
+    .dispatch-pill.completed { background:var(--status-completed); color:#FFF; }
+    .dispatch-pill.cancelled { background:var(--status-cancelled); color:#FFF; }
+    .dispatch-pill-time { font-size:0.64rem; font-weight:800; line-height:1.2; }
+    .dispatch-pill-name { font-size:0.68rem; font-weight:700; overflow:hidden; text-overflow:ellipsis; line-height:1.2; }
+    .dispatch-empty-row { padding:14px; font-size:0.82rem; color:var(--text-muted); font-style:italic; text-align:center; }
+    .dispatch-sidebar { width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+    .dispatch-sidebar-card { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; padding:12px 14px; box-shadow:var(--shadow-sm); }
+    .dispatch-sidebar-title { font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; color:var(--gold); margin-bottom:8px; border-bottom:1px solid var(--border-gold); padding-bottom:5px; }
+    .dispatch-legend-item { display:flex; align-items:center; gap:8px; font-size:0.76rem; color:var(--text-secondary); margin-bottom:5px; font-weight:500; }
+    .dispatch-legend-swatch { width:14px; height:14px; border-radius:3px; flex-shrink:0; }
+    .dispatch-assigned-item { padding:7px 10px; border-radius:8px; border:1.5px solid rgba(27,127,74,0.25); background:rgba(27,127,74,0.06); cursor:pointer; margin-bottom:6px; transition:all 0.2s; }
+    .dispatch-assigned-item:hover { border-color:var(--status-confirmed); background:rgba(27,127,74,0.12); }
+    .dispatch-unassigned-item { padding:7px 10px; border-radius:8px; border:1.5px solid rgba(192,57,43,0.25); background:rgba(192,57,43,0.06); cursor:pointer; margin-bottom:6px; transition:all 0.2s; }
+    .dispatch-unassigned-item:hover { border-color:var(--status-cancelled); background:rgba(192,57,43,0.12); }
 
 
     /* ── DISPATCH BOARD ────────────────────────────── */
@@ -794,22 +861,18 @@
             </div>
           </div>
 
-          <!-- WEEK VIEW -->
+          <!-- WEEK VIEW (DISPATCH SCHEDULE BOARD) -->
           <div id="cal-week-view" style="display:none; padding:14px; overflow-x:auto; flex:1;">
             <div id="week-board-container">
               <!-- rendered by JS -->
             </div>
           </div>
 
-          <!-- MONTH VIEW -->
-          <div id="cal-month-view" style="display:none; padding:14px; flex:1;">
-            <div class="calendar-grid" id="cal-headers">
-              <div class="calendar-day-header" data-i18n="day_mon">Mon</div><div class="calendar-day-header" data-i18n="day_tue">Tue</div>
-              <div class="calendar-day-header" data-i18n="day_wed">Wed</div><div class="calendar-day-header" data-i18n="day_thu">Thu</div>
-              <div class="calendar-day-header" data-i18n="day_fri">Fri</div><div class="calendar-day-header" data-i18n="day_sat">Sat</div>
-              <div class="calendar-day-header" data-i18n="day_sun">Sun</div>
+          <!-- MONTH VIEW (MONTHLY DISPATCH BOARD) -->
+          <div id="cal-month-view" style="display:none; padding:14px; overflow-x:auto; flex:1;">
+            <div id="month-board-container">
+              <!-- rendered by JS -->
             </div>
-            <div class="calendar-grid" id="calendar-days-container"></div>
           </div>
           <div class="agenda-view" id="agenda-view-container"></div>
         </div>
@@ -1099,12 +1162,12 @@
 <!-- EDIT MODAL -->
 <!-- EDIT MODAL (Screenshot 3) -->
 <div class="modal-overlay" id="details-modal" onclick="if(event.target===this)closeModal()">
-  <div class="modal" style="max-width:980px; width:95%;">
-    <div class="modal-header" style="background:#5B86E5; color:#FFF; padding:12px 18px;">
+  <div class="modal">
+    <div class="modal-header" style="background:var(--gold-gradient); color:#FFF; padding:12px 18px;">
       <div class="modal-title" id="modal-title" style="font-family:inherit; font-size:1.1rem; font-weight:700; color:#FFF;">Transfer Booking #42811</div>
       <button class="modal-close" onclick="closeModal()" style="color:#FFF;">✕</button>
     </div>
-    <div class="modal-body" style="padding:16px; background:#EEF2F7;">
+    <div class="modal-body" style="padding:16px; background:var(--table-hdr);">
       <form id="edit-booking-form" onsubmit="handleEditSubmit(event)">
         <input type="hidden" id="edit-id">
         <input type="hidden" id="edit-name">
@@ -1178,20 +1241,20 @@
             <!-- Box 3: Journey #1 -->
             <div class="alpinbus-box">
               <div class="alpinbus-box-title">Journey #1</div>
-              <div style="display:flex;gap:10px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="flex:1;"><label>Transfer type:</label><select id="edit-transferType"><option value="Private">Private</option><option value="Shared">Shared</option><option value="Executive">Executive</option></select></div>
-                <div class="alpinbus-form-row" style="width:120px;"><label style="min-width:65px;">Pax:</label><input type="number" id="edit-passengers" min="1" max="50"></div>
+              <div style="display:flex;gap:8px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="flex:1;margin-bottom:0;"><label>Transfer:</label><select id="edit-transferType"><option value="Private">Private</option><option value="Shared">Shared</option><option value="Executive">Executive</option></select></div>
+                <div class="alpinbus-form-row" style="width:115px;margin-bottom:0;grid-template-columns:35px 1fr;"><label>Pax:</label><input type="number" id="edit-passengers" min="1" max="50"></div>
               </div>
               <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-pickup" required></div>
               <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-dropoff" required></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-addressDetail" rows="1"></textarea></div>
-              <div style="display:flex;gap:10px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="flex:1;"><label>Flight number:</label><input type="text" id="edit-flightInfo"></div>
-                <div class="alpinbus-form-row" style="flex:1;"><label style="min-width:65px;">Flying from:</label><input type="text" id="edit-flyingFrom"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="margin-bottom:0;"><label>Flight #:</label><input type="text" id="edit-flightInfo"></div>
+                <div class="alpinbus-form-row" style="margin-bottom:0;grid-template-columns:55px 1fr;"><label>From:</label><input type="text" id="edit-flyingFrom"></div>
               </div>
-              <div style="display:flex;gap:10px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="flex:1;"><label>Flight arrives:</label><input type="date" id="edit-flightDate"><input type="time" id="edit-flightTime"></div>
-                <div class="alpinbus-form-row" style="flex:1;"><label style="min-width:65px;">Pickup time:</label><input type="date" id="edit-pickupDate"><input type="time" id="edit-pickupTime"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="margin-bottom:0;"><label>Flight in:</label><div style="display:flex;gap:3px;"><input type="date" id="edit-flightDate" style="flex:1;min-width:0;"><input type="time" id="edit-flightTime" style="width:75px;"></div></div>
+                <div class="alpinbus-form-row" style="margin-bottom:0;grid-template-columns:55px 1fr;"><label>Pickup:</label><div style="display:flex;gap:3px;"><input type="date" id="edit-pickupDate" style="flex:1;min-width:0;"><input type="time" id="edit-pickupTime" style="width:75px;"></div></div>
               </div>
 
               <!-- Options Grid (Baby, Child, Bst, Ski, Bike, Bags, Bst H) -->
@@ -1205,7 +1268,7 @@
                 <div class="opt-item"><label>Bst (H):</label><select id="edit-holdBags"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
               </div>
 
-              <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-price"> <span style="font-size:0.75rem;color:#777;margin-left:4px;">(normally €<span id="edit-normalPrice">209.00</span>)</span></div>
+              <div class="alpinbus-form-row"><label>Price (€):</label><div style="display:flex;align-items:center;gap:6px;"><input type="number" step="0.01" id="edit-price" style="flex:1;"> <span style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap;">(norm €<span id="edit-normalPrice">209.00</span>)</span></div></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Notes:</label><textarea id="edit-requirements" rows="2"></textarea></div>
 
               <div style="margin-top:8px;">
@@ -1218,20 +1281,20 @@
             <!-- Box 4: Journey #2 (Round trip panel) -->
             <div class="alpinbus-box" id="j2-panel" style="display:none;">
               <div class="alpinbus-box-title">Journey #2</div>
-              <div style="display:flex;gap:10px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="flex:1;"><label>Transfer type:</label><select id="edit-j2-transferType"><option value="Private">Private</option><option value="Shared">Shared</option><option value="Executive">Executive</option></select></div>
-                <div class="alpinbus-form-row" style="width:120px;"><label style="min-width:65px;">Pax:</label><input type="number" id="edit-j2-passengers" min="1" max="50"></div>
+              <div style="display:flex;gap:8px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="flex:1;margin-bottom:0;"><label>Transfer:</label><select id="edit-j2-transferType"><option value="Private">Private</option><option value="Shared">Shared</option><option value="Executive">Executive</option></select></div>
+                <div class="alpinbus-form-row" style="width:115px;margin-bottom:0;grid-template-columns:35px 1fr;"><label>Pax:</label><input type="number" id="edit-j2-passengers" min="1" max="50"></div>
               </div>
               <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-j2-pickup"></div>
               <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-j2-dropoff"></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-j2-addressDetail" rows="1"></textarea></div>
-              <div style="display:flex;gap:10px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="flex:1;"><label>Flight number:</label><input type="text" id="edit-j2-flightInfo"></div>
-                <div class="alpinbus-form-row" style="flex:1;"><label style="min-width:65px;">Flying to:</label><input type="text" id="edit-j2-flyingTo"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="margin-bottom:0;"><label>Flight #:</label><input type="text" id="edit-j2-flightInfo"></div>
+                <div class="alpinbus-form-row" style="margin-bottom:0;grid-template-columns:55px 1fr;"><label>To:</label><input type="text" id="edit-j2-flyingTo"></div>
               </div>
-              <div style="display:flex;gap:10px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="flex:1;"><label>Flight departs:</label><input type="date" id="edit-j2-flightDate"><input type="time" id="edit-j2-flightTime"></div>
-                <div class="alpinbus-form-row" style="flex:1;"><label style="min-width:65px;">Pickup time:</label><input type="date" id="edit-j2-pickupDate"><input type="time" id="edit-j2-pickupTime"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px;">
+                <div class="alpinbus-form-row" style="margin-bottom:0;"><label>Flight out:</label><div style="display:flex;gap:3px;"><input type="date" id="edit-j2-flightDate" style="flex:1;min-width:0;"><input type="time" id="edit-j2-flightTime" style="width:75px;"></div></div>
+                <div class="alpinbus-form-row" style="margin-bottom:0;grid-template-columns:55px 1fr;"><label>Pickup:</label><div style="display:flex;gap:3px;"><input type="date" id="edit-j2-pickupDate" style="flex:1;min-width:0;"><input type="time" id="edit-j2-pickupTime" style="width:75px;"></div></div>
               </div>
 
               <div class="alpinbus-inline-opts">
@@ -1244,7 +1307,7 @@
                 <div class="opt-item"><label>Bst (H):</label><select id="edit-j2-holdBags"><option value="0">0</option><option value="1">1</option></select></div>
               </div>
 
-              <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-j2-price"> <span style="font-size:0.75rem;color:#777;margin-left:4px;">(normally €<span id="edit-j2-normalPrice">209.00</span>)</span></div>
+              <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-j2-price"></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Notes:</label><textarea id="edit-j2-requirements" rows="2"></textarea></div>
 
               <div style="margin-top:8px;">
@@ -1262,12 +1325,12 @@
               <div class="alpinbus-form-row"><label>Bill to:</label><select id="edit-billTo"><option value="Customer">Customer</option><option value="Company">Company</option><option value="Agent">Agent</option></select></div>
               <div class="alpinbus-form-row"><label>Invoices:</label><span>📄 <strong id="edit-invoiceNum">11674</strong></span></div>
               <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-billingPrice"></div>
-              <div class="alpinbus-form-row"><label>Payment by:</label><select id="edit-paymentBy"><option value="Credit card">Credit card</option><option value="Cash">Cash</option><option value="Bank transfer">Bank transfer</option></select></div>
+              <div class="alpinbus-form-row"><label>Payment:</label><select id="edit-paymentBy"><option value="Credit card">Credit card</option><option value="Cash">Cash</option><option value="Bank transfer">Bank transfer</option></select></div>
               <div class="alpinbus-form-row"><label>Promo code:</label><input type="text" id="edit-promoCode"></div>
-              <div class="alpinbus-form-row"><label>Amount paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
-              <div class="alpinbus-form-row"><label>Amount due:</label><span style="font-weight:700;color:#27AE60;" id="edit-amountDue">€0.00</span></div>
+              <div class="alpinbus-form-row"><label>Paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
+              <div class="alpinbus-form-row"><label>Due:</label><span style="font-weight:700;color:var(--status-confirmed);" id="edit-amountDue">€0.00</span></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Summary:</label><input type="text" id="edit-billingSummary"></div>
-              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Details:</label><textarea id="edit-billingDetails" rows="3" readonly style="font-size:0.75rem;background:#F0F4F8;"></textarea></div>
+              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Details:</label><textarea id="edit-billingDetails" rows="3" readonly style="font-size:0.75rem;background:var(--table-hdr);"></textarea></div>
             </div>
           </div>
         </div>
@@ -2507,7 +2570,7 @@ function renderCalendar(){
   if(monthView) monthView.style.display=(calView==='month'?'block':'none');
 
   if(calView==='month'){
-    renderGridCal(); renderAgenda();
+    renderMonthCal();
   } else if(calView==='week'){
     renderWeekCal();
   } else {
@@ -2533,7 +2596,23 @@ function renderWeekCal(){
   const today=new Date();
   const todayStr=`${today.getFullYear()}-${pad2(today.getMonth()+1)}-${pad2(today.getDate())}`;
 
-  let html=`<div class="week-grid-container">`;
+  let totalWeekTrips = 0;
+  let totalWeekRev = 0;
+
+  days.forEach(d => {
+    const dStr=`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+    const dayBookings=bookings.filter(b=>b.datetime&&b.datetime.startsWith(dStr)&&b.status!=='Cancelled');
+    totalWeekTrips += dayBookings.length;
+    totalWeekRev += dayBookings.reduce((sum, b) => sum + (parseFloat(b.price)||0), 0);
+  });
+
+  let html=`
+    <div class="dispatch-month-stats">
+      <div class="dispatch-stat-chip">📅 <strong>${days[0].toLocaleDateString('en-US',{day:'numeric',month:'short'})} – ${days[6].toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'})}</strong></div>
+      <div class="dispatch-stat-chip">🚗 Total Transfers: <strong>${totalWeekTrips}</strong></div>
+      <div class="dispatch-stat-chip">💰 Week Revenue: <strong>€${totalWeekRev.toFixed(2)}</strong></div>
+    </div>
+    <div class="dispatch-schedule-board">`;
 
   days.forEach((d)=>{
     const dStr=`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
@@ -2546,60 +2625,146 @@ function renderWeekCal(){
     const dayBookings=bookings.filter(b=>b.datetime&&b.datetime.startsWith(dStr));
     dayBookings.sort((a,b)=>(a.datetime||'').localeCompare(b.datetime||''));
 
-    html+=`<div class="week-day-col${isToday?' today':''}">`;
-    html+=`<div class="week-day-header${isToday?' today':''}">`;
-    html+=`<span>${dayName} ${dateNum} ${monthName}</span>`;
-    html+=`<span style="font-size:0.72rem;font-weight:600;opacity:0.8">${dayBookings.length} trip${dayBookings.length!==1?'s':''}</span>`;
-    html+=`</div>`;
+    const dayRev = dayBookings.filter(b=>b.status!=='Cancelled').reduce((sum,b)=>sum+(parseFloat(b.price)||0), 0);
+
+    html+=`
+      <div class="dispatch-day-row${isToday?' today-row':''}">
+        <div class="dispatch-day-sidebar">
+          <div>
+            <div class="dispatch-day-date">
+              ${isToday ? '📍 ' : ''}${dayName}, ${dateNum} ${monthName}
+            </div>
+            <div class="dispatch-day-stat" style="margin-top:3px;">
+              <span class="dispatch-day-badge">${dayBookings.length} trip${dayBookings.length!==1?'s':''}</span>
+              ${dayRev > 0 ? `<span style="margin-left:6px;font-weight:700;color:var(--text-primary);">€${dayRev}</span>` : ''}
+            </div>
+          </div>
+          <button type="button" class="dispatch-day-addbtn" onclick="quickAddBooking('${dStr}T12:00')">+ Add transfer</button>
+        </div>
+        <div class="dispatch-day-content">`;
 
     if(dayBookings.length){
       dayBookings.forEach(b=>{
         const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
         const stClass=(b.status||'pending').toLowerCase();
         const icon=b.car&&(b.car.toLowerCase().includes('v-class')||b.car.toLowerCase().includes('trafic'))?'🚐':'🚗';
-        html+=`<div class="week-card ${stClass}" onclick="showCalPopup(event,'${b.id}')">`;
-        html+=`<div class="week-card-time">${ts} ${icon}</div>`;
-        html+=`<div class="week-card-name">${esc(b.name||'—')}</div>`;
-        html+=`<div class="week-card-route">🛫 ${esc(b.pickup||'—')} ➝ 🏁 ${esc(b.dropoff||'—')}</div>`;
-        html+=`<div class="week-card-meta"><span>${esc(b.car||'Unassigned')}</span><span>€${b.price||0}</span></div>`;
-        html+=`</div>`;
+        html+=`
+          <div class="dispatch-card-item ${stClass}" onclick="showCalPopup(event,'${b.id}')">
+            <div class="dispatch-card-top">
+              <span class="dispatch-card-time">${icon} ${ts}</span>
+              <span class="dispatch-card-name">${esc(b.name||'—')}</span>
+            </div>
+            <div class="dispatch-card-route">🛫 ${esc(b.pickup||'—')} ➔ 🏁 ${esc(b.dropoff||'—')}</div>
+            <div class="dispatch-card-meta">
+              <span>🚗 ${esc(b.car||'Unassigned')}${b.driver?` · 👤 ${esc(b.driver)}`:''}</span>
+              <span style="font-weight:800;color:var(--text-primary);">€${b.price||0}</span>
+            </div>
+          </div>`;
       });
     } else {
-      html+=`<div style="font-size:0.76rem;color:#888;font-style:italic;padding:16px 4px;text-align:center;">No transfers</div>`;
+      html+=`<div class="dispatch-no-trips">No transfers scheduled for this day.</div>`;
     }
 
-    html+=`</div>`;
+    html+=`</div></div>`;
   });
 
   html+=`</div>`;
   container.innerHTML=html;
 }
 
-function renderGridCal(){
-  const c=document.getElementById('calendar-days-container');
-  const year=calDate.getFullYear(),month=calDate.getMonth();
-  let fi=(new Date(year,month,1).getDay()+6)%7;
-  const dm=new Date(year,month+1,0).getDate(),dp=new Date(year,month,0).getDate();
-  c.innerHTML=''; const today=new Date();
-  for(let i=fi-1;i>=0;i--){const d=document.createElement('div');d.className='calendar-day other-month';d.innerHTML=`<span class="calendar-day-num">${dp-i}</span>`;c.appendChild(d);}
-  for(let day=1;day<=dm;day++){
-    const d=document.createElement('div');d.className='calendar-day';
-    if(today.getDate()===day&&today.getMonth()===month&&today.getFullYear()===year)d.classList.add('today');
-    const numEl=document.createElement('span');numEl.className='calendar-day-num';numEl.textContent=day;d.appendChild(numEl);
-    const ds=`${year}-${pad2(month+1)}-${pad2(day)}`;
-    const db=bookings.filter(b=>b.datetime&&b.datetime.startsWith(ds));
-    db.sort((a,b)=>(a.datetime||'').localeCompare(b.datetime||''));
-    db.forEach(b=>{
-      const ev=document.createElement('div');ev.className=`calendar-event ${b.status.toLowerCase()}`;
-      let ts='';try{ts=new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}catch(e){}
-      const icon=b.car&&(b.car.toLowerCase().includes('v-class')||b.car.toLowerCase().includes('trafic'))?'🚐':'🚗';
-      ev.innerHTML=`<span class="calendar-event-time">${ts} ${icon}</span><span class="calendar-event-name">${esc(b.name)}${b.driver?' · '+b.driver:''}</span><span style="font-size:0.6rem;opacity:0.8">€${b.price}</span>`;
-      ev.onclick=e=>{e.stopPropagation();openModal(b.id);};d.appendChild(ev);
-    });
-    c.appendChild(d);
+function renderMonthCal(){
+  const container=document.getElementById('month-board-container');
+  if(!container)return;
+
+  const year=calDate.getFullYear();
+  const month=calDate.getMonth();
+  const daysInMonth=new Date(year, month+1, 0).getDate();
+
+  const monthPrefix=`${year}-${pad2(month+1)}`;
+  const monthBookings=bookings.filter(b=>b.datetime&&b.datetime.startsWith(monthPrefix));
+  monthBookings.sort((a,b)=>(a.datetime||'').localeCompare(b.datetime||''));
+
+  const activeTrips = monthBookings.filter(b=>b.status!=='Cancelled');
+  const totalRev = activeTrips.reduce((sum,b)=>sum+(parseFloat(b.price)||0),0);
+  const confirmedCount = monthBookings.filter(b=>b.status==='Confirmed'||b.status==='Completed').length;
+  const pendingCount = monthBookings.filter(b=>b.status==='Pending').length;
+
+  const today=new Date();
+  const todayStr=`${today.getFullYear()}-${pad2(today.getMonth()+1)}-${pad2(today.getDate())}`;
+
+  let html=`
+    <div class="dispatch-month-stats">
+      <div class="dispatch-stat-chip">📅 <strong>${calDate.toLocaleDateString('en-US',{month:'long',year:'numeric'})}</strong></div>
+      <div class="dispatch-stat-chip">🚗 Total Transfers: <strong>${monthBookings.length}</strong></div>
+      <div class="dispatch-stat-chip">💰 Month Revenue: <strong>€${totalRev.toFixed(2)}</strong></div>
+      <div class="dispatch-stat-chip">✔ Confirmed: <strong style="color:var(--status-confirmed);">${confirmedCount}</strong></div>
+      <div class="dispatch-stat-chip">⏳ Pending: <strong style="color:var(--status-pending);">${pendingCount}</strong></div>
+    </div>
+    <div class="dispatch-schedule-board">`;
+
+  let renderedDays = 0;
+  for(let day=1; day<=daysInMonth; day++){
+    const d=new Date(year, month, day);
+    const dStr=`${year}-${pad2(month+1)}-${pad2(day)}`;
+    const isToday=dStr===todayStr;
+    const dayBookings=bookings.filter(b=>b.datetime&&b.datetime.startsWith(dStr));
+    dayBookings.sort((a,b)=>(a.datetime||'').localeCompare(b.datetime||''));
+
+    if(!dayBookings.length && !isToday) continue;
+    renderedDays++;
+
+    const dayName=d.toLocaleDateString('en-US',{weekday:'short'});
+    const dateNum=d.getDate();
+    const monthName=d.toLocaleDateString('en-US',{month:'short'});
+    const dayRev = dayBookings.filter(b=>b.status!=='Cancelled').reduce((sum,b)=>sum+(parseFloat(b.price)||0), 0);
+
+    html+=`
+      <div class="dispatch-day-row${isToday?' today-row':''}">
+        <div class="dispatch-day-sidebar">
+          <div>
+            <div class="dispatch-day-date">
+              ${isToday ? '📍 ' : ''}${dayName}, ${dateNum} ${monthName}
+            </div>
+            <div class="dispatch-day-stat" style="margin-top:3px;">
+              <span class="dispatch-day-badge">${dayBookings.length} trip${dayBookings.length!==1?'s':''}</span>
+              ${dayRev > 0 ? `<span style="margin-left:6px;font-weight:700;color:var(--text-primary);">€${dayRev}</span>` : ''}
+            </div>
+          </div>
+          <button type="button" class="dispatch-day-addbtn" onclick="quickAddBooking('${dStr}T12:00')">+ Add transfer</button>
+        </div>
+        <div class="dispatch-day-content">`;
+
+    if(dayBookings.length){
+      dayBookings.forEach(b=>{
+        const ts=b.datetime?new Date(b.datetime).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'TBD';
+        const stClass=(b.status||'pending').toLowerCase();
+        const icon=b.car&&(b.car.toLowerCase().includes('v-class')||b.car.toLowerCase().includes('trafic'))?'🚐':'🚗';
+        html+=`
+          <div class="dispatch-card-item ${stClass}" onclick="showCalPopup(event,'${b.id}')">
+            <div class="dispatch-card-top">
+              <span class="dispatch-card-time">${icon} ${ts}</span>
+              <span class="dispatch-card-name">${esc(b.name||'—')}</span>
+            </div>
+            <div class="dispatch-card-route">🛫 ${esc(b.pickup||'—')} ➔ 🏁 ${esc(b.dropoff||'—')}</div>
+            <div class="dispatch-card-meta">
+              <span>🚗 ${esc(b.car||'Unassigned')}${b.driver?` · 👤 ${esc(b.driver)}`:''}</span>
+              <span style="font-weight:800;color:var(--text-primary);">€${b.price||0}</span>
+            </div>
+          </div>`;
+      });
+    } else {
+      html+=`<div class="dispatch-no-trips">No transfers scheduled for today.</div>`;
+    }
+
+    html+=`</div></div>`;
   }
-  const tc=fi+dm,pad=(7-(tc%7))%7;
-  for(let i=1;i<=pad;i++){const d=document.createElement('div');d.className='calendar-day other-month';d.innerHTML=`<span class="calendar-day-num">${i}</span>`;c.appendChild(d);}
+
+  if(renderedDays === 0){
+    html+=`<div style="text-align:center;padding:36px;color:var(--text-muted);font-size:0.9rem;background:var(--bg-card);border:1.5px solid var(--border);border-radius:10px;">No transfers found in ${calDate.toLocaleDateString('en-US',{month:'long',year:'numeric'})}. Click <button class="btn btn-secondary btn-sm" onclick="goToToday()">Go to Today</button> or add new transfers.</div>`;
+  }
+
+  html+=`</div>`;
+  container.innerHTML=html;
 }
 
 // ═══════════════════════════════════════════════════
@@ -2913,6 +3078,8 @@ function handleEditSubmit(e){
 
     bookings[i].status=document.getElementById('edit-status').value;
     bookings[i].source=document.getElementById('edit-source').value;
+    const affEl=document.getElementById('edit-fromAffiliate');
+    if(affEl) bookings[i].fromAffiliate=affEl.value;
     bookings[i].custRefNum=document.getElementById('edit-custRefNum').value;
     bookings[i].customerNotes=document.getElementById('edit-customerNotes').value;
     bookings[i].internalNotes=document.getElementById('edit-internalNotes').value;
@@ -2930,6 +3097,11 @@ function handleEditSubmit(e){
     bookings[i].addressDetail=document.getElementById('edit-addressDetail').value;
     bookings[i].flightInfo=document.getElementById('edit-flightInfo').value;
     bookings[i].flyingFrom=document.getElementById('edit-flyingFrom').value;
+
+    const fDate=document.getElementById('edit-flightDate').value;
+    const fTime=document.getElementById('edit-flightTime').value;
+    if(fDate&&fTime) bookings[i].flightArrives=`${fDate}T${fTime}`;
+    else if(fDate) bookings[i].flightArrives=`${fDate}T12:00`;
 
     const pDate=document.getElementById('edit-pickupDate').value;
     const pTime=document.getElementById('edit-pickupTime').value;
@@ -2951,8 +3123,34 @@ function handleEditSubmit(e){
     bookings[i].promoCode=document.getElementById('edit-promoCode').value;
     bookings[i].billingSummary=document.getElementById('edit-billingSummary').value;
 
+    // Save Journey 2 if present
+    const j2pickup=document.getElementById('edit-j2-pickup');
+    if(j2pickup&&j2pickup.value.trim()){
+      const j2pDate=document.getElementById('edit-j2-pickupDate').value;
+      const j2pTime=document.getElementById('edit-j2-pickupTime').value;
+      let j2Dt='';
+      if(j2pDate&&j2pTime) j2Dt=`${j2pDate}T${j2pTime}`;
+      else if(j2pDate) j2Dt=`${j2pDate}T12:00`;
+
+      bookings[i].journey2={
+        transferType: document.getElementById('edit-j2-transferType').value,
+        passengers: parseInt(document.getElementById('edit-j2-passengers').value)||1,
+        pickup: document.getElementById('edit-j2-pickup').value,
+        dropoff: document.getElementById('edit-j2-dropoff').value,
+        addressDetail: document.getElementById('edit-j2-addressDetail').value,
+        flightInfo: document.getElementById('edit-j2-flightInfo').value,
+        flyingTo: document.getElementById('edit-j2-flyingTo').value,
+        datetime: j2Dt,
+        price: parseFloat(document.getElementById('edit-j2-price').value)||0,
+        requirements: document.getElementById('edit-j2-requirements').value||'None'
+      };
+    }
+
     bookings[i].updated_at=new Date().toISOString();
-    saveLocalData(); pushToCloud(bookings[i]); closeModal();
+    saveLocalData();
+    pushToCloud(bookings[i]);
+    renderAll();
+    closeModal();
     showToast(currentLang==='ru'?'Изменения сохранены!':'Changes saved!');
   }
 }
