@@ -1330,7 +1330,7 @@
             <div class="alpinbus-box">
               <div class="alpinbus-box-title">Billing details</div>
               <div class="alpinbus-form-row"><label>Bill to:</label><select id="edit-billTo"><option value="Customer">Customer</option><option value="Company">Company</option><option value="Agent">Agent</option></select></div>
-              <div class="alpinbus-form-row"><label>Invoices:</label><span>📄 <strong id="edit-invoiceNum">11674</strong></span></div>
+              <div class="alpinbus-form-row"><label>Invoice #:</label><input type="text" id="edit-invoiceNum" placeholder="INV-0001"></div>
               <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-billingPrice"></div>
               <div class="alpinbus-form-row"><label>Payment:</label><select id="edit-paymentBy"><option value="Credit card">Credit card</option><option value="Cash">Cash</option><option value="Bank transfer">Bank transfer</option></select></div>
               <div class="alpinbus-form-row"><label>Paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
@@ -1902,6 +1902,9 @@ function renumberBookingsChronologically(silent = false) {
   // Assign sequential auto-increment numbers 1, 2, 3, ...
   bookings.forEach((b, idx) => {
     b.bookingNumber = idx + 1;
+    if (!b.invoiceNum || b.invoiceNum.startsWith('INV-') || !isNaN(Number(b.invoiceNum))) {
+      b.invoiceNum = `INV-${String(b.bookingNumber).padStart(4, '0')}`;
+    }
     b.updated_at = new Date().toISOString();
   });
   nextNum = bookings.length + 1;
@@ -3195,7 +3198,7 @@ function openModal(id){
 
   // Billing details
   document.getElementById('edit-billTo').value=b.billTo||'Customer';
-  document.getElementById('edit-invoiceNum').textContent=b.invoiceNum||(10000+(b.bookingNumber||0)*3);
+  document.getElementById('edit-invoiceNum').value=b.invoiceNum||(`INV-${String(b.bookingNumber||1).padStart(4,'0')}`);
   document.getElementById('edit-billingPrice').value=b.price||0;
   document.getElementById('edit-paymentBy').value=b.paymentBy||'Credit card';
   document.getElementById('edit-amountPaid').textContent=`€${(b.price||0).toFixed(2)}`;
@@ -3263,6 +3266,7 @@ function handleEditSubmit(e){
     bookings[i].requirements=document.getElementById('edit-requirements').value||'None';
 
     bookings[i].billTo=document.getElementById('edit-billTo').value;
+    bookings[i].invoiceNum=document.getElementById('edit-invoiceNum').value||(`INV-${String(bookings[i].bookingNumber||1).padStart(4,'0')}`);
     bookings[i].paymentBy=document.getElementById('edit-paymentBy').value;
     bookings[i].billingSummary=document.getElementById('edit-billingSummary').value;
 
@@ -3366,6 +3370,7 @@ function buildBookingFromForm(){
     childSeats:parseInt(document.getElementById('m-childSeats').value)||0,
     holdBags:parseInt(document.getElementById('m-holdBags').value)||0,
     price:parseInt(document.getElementById('m-price').value)||0,
+    invoiceNum: `INV-${String(nextNum).padStart(4,'0')}`,
     payoutAmount:parseFloat(document.getElementById('m-payoutAmount').value)||0,
     payoutType:document.getElementById('m-payoutType').value||'None',
     source: (document.getElementById('m-source')||{}).value || 'Direct',
