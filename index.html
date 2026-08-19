@@ -1133,6 +1133,7 @@
             <button class="btn btn-secondary" onclick="syncNow()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right:4px;"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> <span>Sync Now</span></button>
             <button class="btn btn-secondary" style="color:var(--status-completed);border-color:rgba(26,110,168,0.4);" onclick="fullSyncFromCloud()">⬇️ <span>Full Sync (Cloud to App)</span></button>
             <button class="btn btn-secondary" style="color:var(--gold);border-color:var(--border-gold);" onclick="pushAllToCloud(true)">☁️ <span>Push All (App to Cloud)</span></button>
+            <button class="btn btn-secondary" style="color:var(--text-primary);border-color:var(--border-gold);" onclick="renumberBookingsChronologically(false)">🔢 <span>Renumber Orders (Auto-Increment)</span></button>
           </div>
         </div>
       </div>
@@ -1889,6 +1890,29 @@ function autoCompleteTrips() {
   });
   if(count>0){localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));showToast(`✈️ ${count} trip${count>1?'s':''} auto-completed`);}
 }
+function renumberBookingsChronologically(silent = false) {
+  if (!bookings || !bookings.length) return;
+  // Sort chronologically: earliest datetime first
+  bookings.sort((a, b) => {
+    const timeA = new Date(a.datetime || a.created_at || 0).getTime();
+    const timeB = new Date(b.datetime || b.created_at || 0).getTime();
+    if (timeA !== timeB) return timeA - timeB;
+    return (a.bookingNumber || 0) - (b.bookingNumber || 0);
+  });
+  // Assign sequential auto-increment numbers 1, 2, 3, ...
+  bookings.forEach((b, idx) => {
+    b.bookingNumber = idx + 1;
+    b.updated_at = new Date().toISOString();
+  });
+  nextNum = bookings.length + 1;
+  localStorage.setItem(COUNTER_KEY, nextNum);
+  localStorage.setItem('vtransfer_bookings', JSON.stringify(bookings));
+  renderAll();
+  pushAllToCloud(true);
+  if (!silent) {
+    showToast(currentLang === 'ru' ? `✅ Заказы упорядочены по дате и перенумерованы (#0001 — #${String(bookings.length).padStart(4,'0')})` : `✅ Orders sequentially renumbered (#0001 — #${String(bookings.length).padStart(4,'0')})`);
+  }
+}
 function loadLocalData() {
   try{bookings=JSON.parse(localStorage.getItem('vtransfer_bookings')||'[]');}catch(e){bookings=[];}
   try{expenses=JSON.parse(localStorage.getItem('vtransfer_expenses')||'[]');}catch(e){expenses=[];}
@@ -1902,14 +1926,29 @@ function loadLocalData() {
       if(!settings.sources || !settings.sources.length) settings.sources=[...DEFAULT_SETTINGS.sources];
     }
   }catch(e){}
-  const sc=localStorage.getItem(COUNTER_KEY);
-  if(sc){nextNum=parseInt(sc)||1;}
-  else{let mx=0;bookings.forEach(b=>{if(b.bookingNumber>mx)mx=b.bookingNumber;});nextNum=mx>0?mx+1:1;localStorage.setItem(COUNTER_KEY,nextNum);}
-  let migrated=false;
-  bookings.forEach(b=>{if(!b.bookingNumber){b.bookingNumber=nextNum++;migrated=true;}});
-  // migrateBookings now also assigns missing IDs — save result to persist them
-  if(migrateBookings(bookings))migrated=true;
-  if(migrated){localStorage.setItem(COUNTER_KEY,nextNum);localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings));}
+  
+  migrateBookings(bookings);
+  
+  // Check if renumbering is needed (missing numbers, numbers >= 1000, duplicates, or gaps)
+  if(bookings.length > 0) {
+    let needsRenumber = false;
+    const seen = new Set();
+    bookings.forEach(b => {
+      if(!b.bookingNumber || b.bookingNumber >= 1000 || seen.has(b.bookingNumber)) needsRenumber = true;
+      seen.add(b.bookingNumber);
+    });
+    if(needsRenumber) {
+      renumberBookingsChronologically(true);
+    } else {
+      let mx = 0;
+      bookings.forEach(b => { if(b.bookingNumber > mx) mx = b.bookingNumber; });
+      nextNum = mx + 1;
+      localStorage.setItem(COUNTER_KEY, nextNum);
+    }
+  } else {
+    nextNum = 1;
+    localStorage.setItem(COUNTER_KEY, 1);
+  }
 }
 function saveLocalData() { localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings)); renderAll(); }
 function saveExpenses() { localStorage.setItem('vtransfer_expenses',JSON.stringify(expenses)); renderExpenses(); updateAnalytics(); }
@@ -3306,6 +3345,9 @@ function fillReturningClient(){if(!retClient)return;if(retClient.name)document.g
 function dismissClientSuggestion(){document.getElementById('client-suggestion').classList.remove('visible');}
 function toggleRoundTrip(){document.getElementById('round-trip-fields').style.display=document.getElementById('round-trip-check').checked?'block':'none';}
 function buildBookingFromForm(){
+  let maxN = 0;
+  bookings.forEach(b => { if((b.bookingNumber || 0) > maxN) maxN = b.bookingNumber; });
+  nextNum = Math.max(nextNum, maxN + 1);
   return {
     id:Date.now()+'_'+Math.random().toString(36).substring(2,9),
     bookingNumber:nextNum++,
