@@ -1253,10 +1253,7 @@
             <!-- Box 3: Journey #1 -->
             <div class="alpinbus-box">
               <div class="alpinbus-box-title">Journey #1</div>
-              <div style="display:flex;gap:8px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="flex:1;margin-bottom:0;"><label>Transfer:</label><select id="edit-transferType"><option value="Private">Private</option><option value="Shared">Shared</option><option value="Executive">Executive</option></select></div>
-                <div class="alpinbus-form-row" style="width:115px;margin-bottom:0;grid-template-columns:35px 1fr;"><label>Pax:</label><input type="number" id="edit-passengers" min="1" max="50"></div>
-              </div>
+              <div class="alpinbus-form-row"><label>Passengers:</label><input type="number" id="edit-passengers" min="1" max="50" style="max-width:120px;"></div>
               <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-pickup" required></div>
               <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-dropoff" required></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-addressDetail" rows="1"></textarea></div>
@@ -1293,10 +1290,7 @@
             <!-- Box 4: Journey #2 (Round trip panel) -->
             <div class="alpinbus-box" id="j2-panel" style="display:none;">
               <div class="alpinbus-box-title">Journey #2</div>
-              <div style="display:flex;gap:8px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="flex:1;margin-bottom:0;"><label>Transfer:</label><select id="edit-j2-transferType"><option value="Private">Private</option><option value="Shared">Shared</option><option value="Executive">Executive</option></select></div>
-                <div class="alpinbus-form-row" style="width:115px;margin-bottom:0;grid-template-columns:35px 1fr;"><label>Pax:</label><input type="number" id="edit-j2-passengers" min="1" max="50"></div>
-              </div>
+              <div class="alpinbus-form-row"><label>Passengers:</label><input type="number" id="edit-j2-passengers" min="1" max="50" style="max-width:120px;"></div>
               <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-j2-pickup"></div>
               <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-j2-dropoff"></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-j2-addressDetail" rows="1"></textarea></div>
@@ -3111,7 +3105,6 @@ function openModal(id){
   document.getElementById('edit-payoutType').value=b.payoutType||'None';
 
   // Journey #1
-  document.getElementById('edit-transferType').value=b.transferType||'Private';
   document.getElementById('edit-passengers').value=b.passengers||1;
   document.getElementById('edit-pickup').value=b.pickup||'';
   document.getElementById('edit-dropoff').value=b.dropoff||'';
@@ -3150,7 +3143,6 @@ function openModal(id){
   if(b.roundTripId || b.journey2){
     j2Panel.style.display='block';
     const j2=b.journey2 || bookings.find(x=>x.id===b.roundTripId) || {};
-    document.getElementById('edit-j2-transferType').value=j2.transferType||'Private';
     document.getElementById('edit-j2-passengers').value=j2.passengers||1;
     document.getElementById('edit-j2-pickup').value=j2.pickup||b.dropoff||'';
     document.getElementById('edit-j2-dropoff').value=j2.dropoff||b.pickup||'';
@@ -3204,7 +3196,6 @@ function handleEditSubmit(e){
     bookings[i].payoutAmount=parseFloat(document.getElementById('edit-payoutAmount').value)||0;
     bookings[i].payoutType=document.getElementById('edit-payoutType').value||'None';
 
-    bookings[i].transferType=document.getElementById('edit-transferType').value;
     bookings[i].passengers=parseInt(document.getElementById('edit-passengers').value)||1;
     bookings[i].pickup=document.getElementById('edit-pickup').value;
     bookings[i].dropoff=document.getElementById('edit-dropoff').value;
@@ -3246,7 +3237,6 @@ function handleEditSubmit(e){
       else if(j2pDate) j2Dt=`${j2pDate}T12:00`;
 
       bookings[i].journey2={
-        transferType: document.getElementById('edit-j2-transferType').value,
         passengers: parseInt(document.getElementById('edit-j2-passengers').value)||1,
         pickup: document.getElementById('edit-j2-pickup').value,
         dropoff: document.getElementById('edit-j2-dropoff').value,
