@@ -935,7 +935,7 @@
               <div class="form-group"><label data-i18n="f_hold">Hold Bags</label><input type="number" id="m-holdBags" min="0" max="20" value="0"></div>
               <div class="form-group"><label data-i18n="f_price">Price (€)</label><input type="number" id="m-price" min="0" value="0"></div>
               <div class="form-group"><label>💸 Payout (€) <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400">commission/rental/partner</span></label><input type="number" id="m-payoutAmount" min="0" value="0"></div>
-              <div class="form-group"><label>Payout Type</label><select id="m-payoutType"><option value="None">— None</option><option value="Commission">💸 Commission</option><option value="Rental">🏠 Rental</option><option value="Partner">🤝 Partner</option></select></div>
+              <div class="form-group"><label>Payout Type</label><select id="m-payoutType"><option value="None">— None</option><option value="Me">🧑‍✈️ Me</option><option value="Commission">💸 Commission</option><option value="Rental">🏠 Rental</option><option value="Partner">🤝 Partner</option></select></div>
               <div class="form-group"><label>Source</label><select id="m-source"></select></div>
               <div class="form-group"><label>From Affiliate / Partner</label><select id="m-fromAffiliate"></select></div>
               <div class="form-group"><label data-i18n="f_status">Status</label>
@@ -1263,7 +1263,7 @@
               <div class="alpinbus-form-row"><label>Driver:</label><select id="edit-driver"></select></div>
               <div class="alpinbus-form-row"><label>Car Type:</label><select id="edit-carType"><option value="Own">Own Car</option><option value="Rented">Rented</option><option value="Commission">Commission</option></select></div>
               <div class="alpinbus-form-row"><label>Payout (€):</label><input type="number" id="edit-payoutAmount" min="0" value="0"></div>
-              <div class="alpinbus-form-row"><label>Payout Type:</label><select id="edit-payoutType"><option value="None">None</option><option value="Commission">Commission</option><option value="Rental">Rental</option><option value="Partner">Partner</option></select></div>
+              <div class="alpinbus-form-row"><label>Payout Type:</label><select id="edit-payoutType"><option value="None">None</option><option value="Me">🧑‍✈️ Me (I'm driving)</option><option value="Commission">Commission</option><option value="Rental">Rental</option><option value="Partner">Partner</option></select></div>
             </div>
           </div>
 
@@ -1353,7 +1353,7 @@
               <div class="alpinbus-form-row"><label>Payment:</label><select id="edit-paymentBy"><option value="Credit card">Credit card</option><option value="Cash">Cash</option><option value="Bank transfer">Bank transfer</option></select></div>
               <div class="alpinbus-form-row"><label>Paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
               <div class="alpinbus-form-row"><label>Due:</label><span style="font-weight:700;color:var(--status-confirmed);" id="edit-amountDue">€0.00</span></div>
-              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Summary:</label><input type="text" id="edit-billingSummary"></div>
+
 
             </div>
           </div>
@@ -3231,7 +3231,7 @@ function openModal(id){
   document.getElementById('edit-paymentBy').value=b.paymentBy||'Credit card';
   document.getElementById('edit-amountPaid').textContent=`€${(b.price||0).toFixed(2)}`;
   document.getElementById('edit-amountDue').textContent=`€0.00`;
-  document.getElementById('edit-billingSummary').value=b.billingSummary||'Payment received';
+  // billingSummary field removed
   // billingDetails field removed
 
   document.getElementById('details-modal').classList.add('open');
@@ -3296,7 +3296,7 @@ function handleEditSubmit(e){
     bookings[i].billTo=document.getElementById('edit-billTo').value;
     bookings[i].invoiceNum=document.getElementById('edit-invoiceNum').value||(`INV-${String(bookings[i].bookingNumber||1).padStart(4,'0')}`);
     bookings[i].paymentBy=document.getElementById('edit-paymentBy').value;
-    bookings[i].billingSummary=document.getElementById('edit-billingSummary').value;
+    // billingSummary field removed
 
     // Save Journey 2 if present
     const j2pickup=document.getElementById('edit-j2-pickup');
