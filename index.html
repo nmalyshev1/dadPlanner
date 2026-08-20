@@ -1354,7 +1354,7 @@
               <div class="alpinbus-form-row"><label>Paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
               <div class="alpinbus-form-row"><label>Due:</label><span style="font-weight:700;color:var(--status-confirmed);" id="edit-amountDue">€0.00</span></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Summary:</label><input type="text" id="edit-billingSummary"></div>
-              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Details:</label><textarea id="edit-billingDetails" rows="3" readonly style="font-size:0.75rem;background:var(--table-hdr);"></textarea></div>
+
             </div>
           </div>
         </div>
@@ -1890,6 +1890,9 @@ function migrateBookings(arr) {
   arr.forEach(b=>{
     if(map[b.status]){b.status=map[b.status];changed=true;}
     if(!b.paymentStatus){b.paymentStatus='Unpaid';changed=true;}
+    // Coerce price to number so sums are never shown as 0 due to string storage
+    if(b.price !== undefined && b.price !== null) { const p=parseFloat(b.price); b.price=isNaN(p)?0:p; }
+    if(b.payoutAmount !== undefined && b.payoutAmount !== null) { const p=parseFloat(b.payoutAmount); b.payoutAmount=isNaN(p)?0:p; }
     // CRITICAL: assign ID if missing — without this booking never syncs to cloud
     if(!b.id){
       b.id=Date.now()+'_'+Math.random().toString(36).slice(2,9)+'_mig';
@@ -2646,7 +2649,14 @@ function renderArchive(){
   if(!tbody)return;
   const srch=(document.getElementById('archive-search').value||'').toLowerCase();
   const fPay=document.getElementById('archive-filter-payment').value, fDate=document.getElementById('archive-filter-date').value;
-  const completed=bookings.filter(b=>b.status==='Completed');
+  const now=new Date();
+  // Archive = Completed, OR past trips (datetime > 2h ago) that are Confirmed/Pending (auto-complete may have missed them)
+  const completed=bookings.filter(b=>{
+    if(b.status==='Completed') return true;
+    if(b.status==='Cancelled') return false;
+    if(b.datetime){const dt=new Date(b.datetime);if(dt<new Date(now.getTime()-2*60*60*1000))return true;}
+    return false;
+  });
   let filtered=completed.filter(b=>{
     const ms=!srch||(b.name||'').toLowerCase().includes(srch)||(b.phone||'').toLowerCase().includes(srch)||(b.pickup||'').toLowerCase().includes(srch)||(b.dropoff||'').toLowerCase().includes(srch)||(b.bookingNumber+'').includes(srch);
     return ms&&(fPay==='ALL'||(b.paymentStatus||'Unpaid')===fPay)&&(!fDate||(b.datetime||'').startsWith(fDate));
@@ -3222,7 +3232,7 @@ function openModal(id){
   document.getElementById('edit-amountPaid').textContent=`€${(b.price||0).toFixed(2)}`;
   document.getElementById('edit-amountDue').textContent=`€0.00`;
   document.getElementById('edit-billingSummary').value=b.billingSummary||'Payment received';
-  document.getElementById('edit-billingDetails').value=b.billingDetails||`Payment received ${new Date().toLocaleDateString('fr-FR')} by bank system for €${b.price||0} (transaction id 470528)`;
+  // billingDetails field removed
 
   document.getElementById('details-modal').classList.add('open');
 }
@@ -3387,7 +3397,7 @@ function buildBookingFromForm(){
     flightInfo:document.getElementById('m-flightInfo').value||'',
     childSeats:parseInt(document.getElementById('m-childSeats').value)||0,
     holdBags:parseInt(document.getElementById('m-holdBags').value)||0,
-    price:parseInt(document.getElementById('m-price').value)||0,
+    price:parseFloat(document.getElementById('m-price').value)||0,
     invoiceNum: `INV-${String(nextNum).padStart(4,'0')}`,
     payoutAmount:parseFloat(document.getElementById('m-payoutAmount').value)||0,
     payoutType:document.getElementById('m-payoutType').value||'None',
