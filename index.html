@@ -427,30 +427,30 @@
     .cal-view-word-btn:hover:not(.active) { background:rgba(184,148,42,0.12); color:var(--text-primary); }
 
     /* ── DISPATCH WEEK & MONTH SCHEDULE BOARD ─────────── */
-    .dispatch-schedule-board { display:flex; flex-direction:column; gap:10px; width:100%; }
-    .dispatch-day-row { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; overflow:hidden; display:grid; grid-template-columns:140px 1fr; transition:all 0.2s; }
+    .dispatch-schedule-board { display:flex; flex-direction:column; gap:6px; width:100%; }
+    .dispatch-day-row { background:var(--bg-card); border:1.5px solid var(--border); border-radius:8px; overflow:hidden; display:grid; grid-template-columns:120px 1fr; transition:all 0.2s; }
     .dispatch-day-row:hover { border-color:var(--border-gold); box-shadow:var(--shadow-sm); }
     .dispatch-day-row.today-row { border-color:var(--gold); box-shadow:0 0 0 1.5px rgba(184,148,42,0.25); }
-    .dispatch-day-sidebar { background:rgba(184,148,42,0.13); border-right:3px solid var(--gold); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between; gap:6px; }
-    .dispatch-day-date { font-size:0.88rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
+    .dispatch-day-sidebar { background:var(--table-hdr); border-right:4px solid var(--gold); padding:7px 10px; display:flex; flex-direction:column; justify-content:center; gap:4px; }
+    .dispatch-day-date { font-size:0.8rem; font-weight:800; color:var(--text-primary); }
     .dispatch-day-row.today-row .dispatch-day-date { color:var(--gold); }
-    .dispatch-day-badge { font-size:0.68rem; font-weight:700; text-transform:uppercase; padding:2px 7px; border-radius:12px; background:rgba(184,148,42,0.15); color:var(--gold); display:inline-block; }
-    .dispatch-day-stat { font-size:0.74rem; color:var(--text-muted); font-weight:600; }
-    .dispatch-day-addbtn { font-size:0.72rem; color:var(--gold); background:none; border:1px dashed var(--border-gold); padding:3px 8px; border-radius:6px; cursor:pointer; font-weight:700; transition:all 0.15s; margin-top:4px; text-align:center; }
+    .dispatch-day-badge { font-size:0.63rem; font-weight:700; text-transform:uppercase; padding:1px 5px; border-radius:10px; background:rgba(184,148,42,0.18); color:var(--gold); display:inline-block; }
+    .dispatch-day-stat { font-size:0.72rem; color:var(--text-muted); font-weight:600; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+    .dispatch-day-addbtn { font-size:0.67rem; color:var(--gold); background:none; border:1px dashed var(--border-gold); padding:2px 6px; border-radius:5px; cursor:pointer; font-weight:700; transition:all 0.15s; margin-top:3px; text-align:center; }
     .dispatch-day-addbtn:hover { background:rgba(184,148,42,0.1); border-style:solid; }
-    .dispatch-day-content { padding:10px 14px; display:flex; flex-wrap:wrap; gap:8px; align-items:flex-start; min-height:48px; }
-    .dispatch-card-item { background:var(--bg-main); border:1.5px solid var(--border); border-left:4px solid var(--gold); border-radius:8px; padding:8px 12px; display:flex; flex-direction:column; gap:4px; cursor:pointer; transition:all 0.15s; min-width:240px; max-width:340px; flex:1 1 260px; font-size:0.8rem; height:auto; }
+    .dispatch-day-content { padding:7px 12px; display:flex; flex-wrap:wrap; gap:6px; align-items:flex-start; min-height:40px; }
+    .dispatch-card-item { background:var(--bg-main); border:1.5px solid var(--border); border-left:4px solid var(--gold); border-radius:7px; padding:5px 10px; display:flex; flex-direction:column; gap:2px; cursor:pointer; transition:all 0.15s; min-width:220px; max-width:340px; flex:1 1 240px; font-size:0.77rem; height:auto; }
     .dispatch-card-item:hover { transform:translateY(-1px); box-shadow:var(--shadow-md); border-color:var(--gold); }
     .dispatch-card-item.pending { border-left-color:var(--status-pending); }
     .dispatch-card-item.confirmed { border-left-color:var(--status-confirmed); }
     .dispatch-card-item.completed { border-left-color:var(--status-completed); }
     .dispatch-card-item.cancelled { border-left-color:var(--status-cancelled); opacity:0.75; }
-    .dispatch-card-top { display:flex; justify-content:space-between; align-items:center; gap:8px; font-weight:800; font-size:0.82rem; }
+    .dispatch-card-top { display:flex; justify-content:space-between; align-items:center; gap:6px; font-weight:800; font-size:0.78rem; }
     .dispatch-card-time { color:var(--gold); display:flex; align-items:center; gap:4px; white-space:nowrap; }
     .dispatch-card-name { font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:right; }
-    .dispatch-card-route { font-size:0.74rem; color:var(--text-secondary); line-height:1.35; margin-top:2px; }
-    .dispatch-card-meta { display:flex; justify-content:space-between; align-items:center; font-size:0.72rem; color:var(--text-muted); margin-top:3px; border-top:1px dashed var(--border); padding-top:4px; }
-    .dispatch-no-trips { font-size:0.78rem; color:var(--text-muted); font-style:italic; padding:6px 0; }
+    .dispatch-card-route { font-size:0.71rem; color:var(--text-secondary); line-height:1.3; margin-top:1px; }
+    .dispatch-card-meta { display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:var(--text-muted); margin-top:2px; border-top:1px dashed var(--border); padding-top:3px; }
+    .dispatch-no-trips { font-size:0.75rem; color:var(--text-muted); font-style:italic; padding:4px 0; }
     .dispatch-month-stats { display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
     .dispatch-stat-chip { background:var(--bg-card); border:1.5px solid var(--border); border-radius:8px; padding:8px 14px; font-size:0.8rem; font-weight:600; color:var(--text-secondary); display:flex; align-items:center; gap:8px; box-shadow:var(--shadow-sm); }
     .dispatch-stat-chip strong { color:var(--gold); font-size:0.95rem; }
