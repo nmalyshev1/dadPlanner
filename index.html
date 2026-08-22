@@ -428,10 +428,10 @@
 
     /* ── DISPATCH WEEK & MONTH SCHEDULE BOARD ─────────── */
     .dispatch-schedule-board { display:flex; flex-direction:column; gap:10px; width:100%; }
-    .dispatch-day-row { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; overflow:hidden; display:grid; grid-template-columns:180px 1fr; transition:all 0.2s; }
+    .dispatch-day-row { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; overflow:hidden; display:grid; grid-template-columns:140px 1fr; transition:all 0.2s; }
     .dispatch-day-row:hover { border-color:var(--border-gold); box-shadow:var(--shadow-sm); }
     .dispatch-day-row.today-row { border-color:var(--gold); box-shadow:0 0 0 1.5px rgba(184,148,42,0.25); }
-    .dispatch-day-sidebar { background:var(--table-hdr); border-right:1.5px solid var(--border); padding:12px 16px; display:flex; flex-direction:column; justify-content:space-between; gap:6px; }
+    .dispatch-day-sidebar { background:rgba(184,148,42,0.08); border-right:2px solid var(--border-gold); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between; gap:6px; }
     .dispatch-day-date { font-size:0.88rem; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px; }
     .dispatch-day-row.today-row .dispatch-day-date { color:var(--gold); }
     .dispatch-day-badge { font-size:0.68rem; font-weight:700; text-transform:uppercase; padding:2px 7px; border-radius:12px; background:rgba(184,148,42,0.15); color:var(--gold); display:inline-block; }
@@ -1304,6 +1304,7 @@
               <div class="alpinbus-form-row"><label>Invoice #:</label><input type="text" id="edit-invoiceNum" placeholder="INV-0001"></div>
               <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-billingPrice"></div>
               <div class="alpinbus-form-row"><label>Payment:</label><select id="edit-paymentBy"><option value="Credit card">Credit card</option><option value="Cash">Cash</option><option value="Bank transfer">Bank transfer</option></select></div>
+              <div class="alpinbus-form-row"><label>Paid status:</label><select id="edit-paymentStatus"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
               <div class="alpinbus-form-row"><label>Paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
               <div class="alpinbus-form-row"><label>Due:</label><span style="font-weight:700;color:var(--status-confirmed);" id="edit-amountDue">€0.00</span></div>
 
@@ -2524,8 +2525,8 @@ function renderStopsInList(listId, stops){
   list.innerHTML='';
   (stops||[]).forEach(s=>addStop(listId,s));
 }
-function changeStatus(id,ns){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].status=ns;saveLocalData();pushToCloud(bookings[i]);showToast(`Status → ${ns}`);}}
-function changePayment(id){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].paymentStatus=bookings[i].paymentStatus==='Paid'?'Unpaid':'Paid';saveLocalData();pushToCloud(bookings[i]);showToast(`Payment → ${bookings[i].paymentStatus}`);}}
+function changeStatus(id,ns){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].status=ns;bookings[i].updated_at=new Date().toISOString();saveLocalData();pushToCloud(bookings[i]);renderAll();showToast(`Status → ${ns}`);}}
+function changePayment(id){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].paymentStatus=bookings[i].paymentStatus==='Paid'?'Unpaid':'Paid';bookings[i].updated_at=new Date().toISOString();saveLocalData();pushToCloud(bookings[i]);renderAll();showToast(`Payment → ${bookings[i].paymentStatus}`);}}
 
 // ═══════════════════════════════════════════════════
 // NOTIFY
@@ -3180,6 +3181,7 @@ function openModal(id){
   document.getElementById('edit-invoiceNum').value=b.invoiceNum||(`INV-${String(b.bookingNumber||1).padStart(4,'0')}`);
   document.getElementById('edit-billingPrice').value=b.price||0;
   document.getElementById('edit-paymentBy').value=b.paymentBy||'Credit card';
+  document.getElementById('edit-paymentStatus').value=b.paymentStatus||'Unpaid';
   document.getElementById('edit-amountPaid').textContent=`€${(b.price||0).toFixed(2)}`;
   document.getElementById('edit-amountDue').textContent=`€0.00`;
   // billingSummary field removed
@@ -3247,6 +3249,7 @@ function handleEditSubmit(e){
     bookings[i].billTo=document.getElementById('edit-billTo').value;
     bookings[i].invoiceNum=document.getElementById('edit-invoiceNum').value||(`INV-${String(bookings[i].bookingNumber||1).padStart(4,'0')}`);
     bookings[i].paymentBy=document.getElementById('edit-paymentBy').value;
+    bookings[i].paymentStatus=document.getElementById('edit-paymentStatus').value;
     // billingSummary field removed
 
     // Save Journey 2 if present
