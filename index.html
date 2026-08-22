@@ -1217,6 +1217,7 @@
               <div class="alpinbus-form-row"><label>Car Type:</label><select id="edit-carType"><option value="Own">Own Car</option><option value="Rented">Rented</option><option value="Commission">Commission</option></select></div>
               <div class="alpinbus-form-row"><label>Payout (€):</label><input type="number" id="edit-payoutAmount" min="0" value="0"></div>
               <div class="alpinbus-form-row"><label>Payout Type:</label><select id="edit-payoutType"><option value="None">None</option><option value="Me">🧑‍✈️ Me (I'm driving)</option><option value="Commission">Commission</option><option value="Rental">Rental</option><option value="Partner">Partner</option></select></div>
+              <div class="alpinbus-form-row"><label>Payout paid:</label><select id="edit-paymentStatus-ops"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
             </div>
           </div>
 
@@ -1250,7 +1251,7 @@
               </div>
 
               <div class="alpinbus-form-row"><label>Price (€):</label><div style="display:flex;align-items:center;gap:6px;"><input type="number" step="0.01" id="edit-price" style="flex:1;"> <span style="font-size:0.72rem;color:var(--text-muted);white-space:nowrap;">(norm €<span id="edit-normalPrice">209.00</span>)</span></div></div>
-              <div class="alpinbus-form-row"><label>Paid status:</label><select id="edit-paymentStatus-j1" onchange="document.getElementById('edit-paymentStatus').value=this.value;document.getElementById('edit-paymentStatus-j2').value=this.value;"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
+              <div class="alpinbus-form-row"><label>Paid status:</label><select id="edit-paymentStatus-j1"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Notes:</label><textarea id="edit-requirements" rows="2"></textarea></div>
 
               <div style="margin-top:8px;">
@@ -1287,7 +1288,7 @@
               </div>
 
               <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-j2-price"></div>
-              <div class="alpinbus-form-row"><label>Paid status:</label><select id="edit-paymentStatus-j2" onchange="document.getElementById('edit-paymentStatus').value=this.value;document.getElementById('edit-paymentStatus-j1').value=this.value;"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
+              <div class="alpinbus-form-row"><label>Paid status:</label><select id="edit-paymentStatus-j2"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Notes:</label><textarea id="edit-j2-requirements" rows="2"></textarea></div>
 
               <div style="margin-top:8px;">
@@ -1306,7 +1307,7 @@
               <div class="alpinbus-form-row"><label>Invoice #:</label><input type="text" id="edit-invoiceNum" placeholder="INV-0001"></div>
               <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-billingPrice"></div>
               <div class="alpinbus-form-row"><label>Payment:</label><select id="edit-paymentBy"><option value="Credit card">Credit card</option><option value="Cash">Cash</option><option value="Bank transfer">Bank transfer</option></select></div>
-              <div class="alpinbus-form-row"><label>Paid status:</label><select id="edit-paymentStatus" onchange="document.getElementById('edit-paymentStatus-j1').value=this.value;document.getElementById('edit-paymentStatus-j2').value=this.value;"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
+              <div class="alpinbus-form-row"><label>Paid status:</label><select id="edit-paymentStatus"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
               <div class="alpinbus-form-row"><label>Paid:</label><span style="font-weight:700;" id="edit-amountPaid">€363.20</span></div>
               <div class="alpinbus-form-row"><label>Due:</label><span style="font-weight:700;color:var(--status-confirmed);" id="edit-amountDue">€0.00</span></div>
 
@@ -3127,6 +3128,7 @@ function openModal(id){
   document.getElementById('edit-carType').value=b.carType||'Own';
   document.getElementById('edit-payoutAmount').value=b.payoutAmount||0;
   document.getElementById('edit-payoutType').value=b.payoutType||'None';
+  document.getElementById('edit-paymentStatus-ops').value=b.operationsPaid||'Unpaid';
 
   // Journey #1
   document.getElementById('edit-passengers').value=b.passengers||1;
@@ -3183,10 +3185,9 @@ function openModal(id){
   document.getElementById('edit-invoiceNum').value=b.invoiceNum||(`INV-${String(b.bookingNumber||1).padStart(4,'0')}`);
   document.getElementById('edit-billingPrice').value=b.price||0;
   document.getElementById('edit-paymentBy').value=b.paymentBy||'Credit card';
-  const ps=b.paymentStatus||'Unpaid';
-  document.getElementById('edit-paymentStatus').value=ps;
-  document.getElementById('edit-paymentStatus-j1').value=ps;
-  document.getElementById('edit-paymentStatus-j2').value=ps;
+  document.getElementById('edit-paymentStatus-j1').value=b.paymentStatus||'Unpaid';
+  document.getElementById('edit-paymentStatus-j2').value=(b.journey2&&b.journey2.paymentStatus)||'Unpaid';
+  document.getElementById('edit-paymentStatus').value=b.billingPaid||'Unpaid';
   document.getElementById('edit-amountPaid').textContent=`€${(b.price||0).toFixed(2)}`;
   document.getElementById('edit-amountDue').textContent=`€0.00`;
   // billingSummary field removed
@@ -3223,6 +3224,8 @@ function handleEditSubmit(e){
     bookings[i].carType=document.getElementById('edit-carType').value||'Own';
     bookings[i].payoutAmount=parseFloat(document.getElementById('edit-payoutAmount').value)||0;
     bookings[i].payoutType=document.getElementById('edit-payoutType').value||'None';
+    bookings[i].operationsPaid=document.getElementById('edit-paymentStatus-ops').value;
+    bookings[i].paymentStatus=document.getElementById('edit-paymentStatus-j1').value;
 
     bookings[i].passengers=parseInt(document.getElementById('edit-passengers').value)||1;
     bookings[i].pickup=document.getElementById('edit-pickup').value;
@@ -3254,7 +3257,7 @@ function handleEditSubmit(e){
     bookings[i].billTo=document.getElementById('edit-billTo').value;
     bookings[i].invoiceNum=document.getElementById('edit-invoiceNum').value||(`INV-${String(bookings[i].bookingNumber||1).padStart(4,'0')}`);
     bookings[i].paymentBy=document.getElementById('edit-paymentBy').value;
-    bookings[i].paymentStatus=document.getElementById('edit-paymentStatus').value;
+    bookings[i].billingPaid=document.getElementById('edit-paymentStatus').value;
     // billingSummary field removed
 
     // Save Journey 2 if present
@@ -3275,6 +3278,7 @@ function handleEditSubmit(e){
         flyingTo: document.getElementById('edit-j2-flyingTo').value,
         datetime: j2Dt,
         price: parseFloat(document.getElementById('edit-j2-price').value)||0,
+        paymentStatus: document.getElementById('edit-paymentStatus-j2').value,
         requirements: document.getElementById('edit-j2-requirements').value||'None'
       };
     }
