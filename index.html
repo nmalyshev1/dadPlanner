@@ -1031,6 +1031,7 @@
             <div class="stat-card expense-card" onclick="showStatDetail('commission')" title="Click to see list"><span class="stat-val" id="stat-commission-exp">€0</span><span class="stat-label" data-i18n="an_commission">💸 Commissions</span><span class="stat-hint">Click to see expenses</span></div>
             <div class="stat-card expense-card" onclick="showStatDetail('rental')" title="Click to see list"><span class="stat-val" id="stat-rental-exp">€0</span><span class="stat-label" data-i18n="an_rental">🏠 Rental</span><span class="stat-hint">Click to see expenses</span></div>
             <div class="stat-card expense-card" onclick="showStatDetail('partner')" title="Click to see list"><span class="stat-val" id="stat-partner-exp">€0</span><span class="stat-label" data-i18n="an_partner">🤝 Partners</span><span class="stat-hint">Click to see expenses</span></div>
+            <div class="stat-card expense-card" title="Total payout amounts on bookings"><span class="stat-val" id="stat-total-payouts">€0</span><span class="stat-label">💸 Payouts</span><span class="stat-hint">Driver/partner payouts on bookings</span></div>
             <div class="stat-card" onclick="showStatDetail('all-bookings')" title="Click to see list"><span class="stat-val" id="stat-total">0</span><span class="stat-label" data-i18n="an_total">Total Bookings</span><span class="stat-hint">Click to see all</span></div>
             <div class="stat-card" onclick="showStatDetail('completed')" title="Click to see list"><span class="stat-val" id="stat-completed">0</span><span class="stat-label" data-i18n="an_completed">Completed Transfers</span><span class="stat-hint">Click to see all</span></div>
           </div>
@@ -1105,7 +1106,9 @@
             <button class="btn btn-secondary" style="color:var(--status-completed);border-color:rgba(26,110,168,0.4);" onclick="fullSyncFromCloud()">⬇️ <span>Full Sync (Cloud to App)</span></button>
             <button class="btn btn-secondary" style="color:var(--gold);border-color:var(--border-gold);" onclick="pushAllToCloud(true)">☁️ <span>Push All (App to Cloud)</span></button>
             <button class="btn btn-secondary" style="color:var(--text-primary);border-color:var(--border-gold);" onclick="renumberBookingsChronologically(false)">🔢 <span>Renumber Orders (Auto-Increment)</span></button>
+            <button class="btn btn-secondary" style="color:var(--status-pending);border-color:rgba(212,134,10,0.4);" onclick="findMislinkedJourneys()">🔍 <span>Find Mislinked Journeys</span></button>
           </div>
+          <div id="mislink-result" style="display:none;margin-top:14px;background:var(--bg-main);border:1.5px solid var(--border-gold);border-radius:10px;padding:14px;font-size:0.82rem;max-height:320px;overflow-y:auto;"></div>
         </div>
       </div>
 
@@ -1214,7 +1217,7 @@
               <div class="alpinbus-box-title">Operations</div>
               <div class="alpinbus-form-row"><label>Vehicle:</label><select id="edit-car"></select></div>
               <div class="alpinbus-form-row"><label>Driver:</label><select id="edit-driver"></select></div>
-              <div class="alpinbus-form-row"><label>Car Type:</label><select id="edit-carType"><option value="Own">Own Car</option><option value="Rented">Rented</option><option value="Commission">Commission</option></select></div>
+              <div class="alpinbus-form-row"><label>Car Type:</label><select id="edit-carType"><option value="Own">Own Car</option><option value="Rented">Rented</option><option value="Commission">Commission</option><option value="Partner">🤝 Partner</option></select></div>
               <div class="alpinbus-form-row"><label>Payout (€):</label><input type="number" id="edit-payoutAmount" min="0" value="0"></div>
               <div class="alpinbus-form-row"><label>Payout Type:</label><select id="edit-payoutType"><option value="None">None</option><option value="Me">🧑‍✈️ Me (I'm driving)</option><option value="Commission">Commission</option><option value="Rental">Rental</option><option value="Partner">Partner</option></select></div>
               <div class="alpinbus-form-row"><label>Payout paid:</label><select id="edit-paymentStatus-ops"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
@@ -1227,6 +1230,7 @@
             <div class="alpinbus-box">
               <div class="alpinbus-box-title">Journey #1</div>
               <div class="alpinbus-form-row"><label>Passengers:</label><input type="number" id="edit-passengers" min="1" max="50" style="max-width:120px;"></div>
+              <div class="alpinbus-form-row"><label>Vehicle:</label><select id="edit-j1-car"></select></div>
               <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-pickup" required></div>
               <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-dropoff" required></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-addressDetail" rows="1"></textarea></div>
@@ -1265,6 +1269,7 @@
             <div class="alpinbus-box" id="j2-panel" style="display:none;">
               <div class="alpinbus-box-title">Journey #2</div>
               <div class="alpinbus-form-row"><label>Passengers:</label><input type="number" id="edit-j2-passengers" min="1" max="50" style="max-width:120px;"></div>
+              <div class="alpinbus-form-row"><label>Vehicle:</label><select id="edit-j2-car"></select></div>
               <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-j2-pickup"></div>
               <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-j2-dropoff"></div>
               <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-j2-addressDetail" rows="1"></textarea></div>
@@ -1800,7 +1805,7 @@ function populateAffiliateSelect(sel, currentVal) {
   }
 }
 function populateAllVehicleSelects() {
-  ['m-car','edit-car'].forEach(id=>{ const s=document.getElementById(id); if(s)populateVehicleSelect(s,s.value); });
+  ['m-car','edit-car','edit-j1-car','edit-j2-car'].forEach(id=>{ const s=document.getElementById(id); if(s)populateVehicleSelect(s,s.value); });
 }
 function populateAllDriverSelects() {
   ['m-driver','edit-driver'].forEach(id=>{ const s=document.getElementById(id); if(s)populateDriverSelect(s,s.value); });
@@ -1932,7 +1937,69 @@ function loadLocalData() {
   }
 }
 function saveLocalData() { localStorage.setItem('vtransfer_bookings',JSON.stringify(bookings)); renderAll(); }
-function saveExpenses() { localStorage.setItem('vtransfer_expenses',JSON.stringify(expenses)); renderExpenses(); updateAnalytics(); }
+function saveExpenses() {
+  const now=new Date().toISOString();
+  expenses.forEach(e=>{ if(!e.updated_at||e.updated_at===e.created_at) e.updated_at=now; });
+  localStorage.setItem('vtransfer_expenses',JSON.stringify(expenses));
+  renderExpenses();
+  updateAnalytics();
+}
+
+function findMislinkedJourneys() {
+  const res=document.getElementById('mislink-result');
+  if(!res)return;
+  const issues=[];
+  const ids=new Set(bookings.map(b=>b.id));
+
+  bookings.forEach(b=>{
+    // roundTripId pointing to missing booking
+    if(b.roundTripId && !ids.has(b.roundTripId)){
+      issues.push(`<div style="padding:6px 0;border-bottom:1px solid var(--border);">
+        <strong>#${(b.bookingNumber||0).toString().padStart(4,'0')} ${b.name||'?'}</strong>
+        — has <code>roundTripId</code> = <code>${b.roundTripId}</code> but that booking no longer exists.
+        <button style="margin-left:8px;font-size:0.72rem;padding:2px 8px;background:var(--status-cancelled);color:#fff;border:none;border-radius:4px;cursor:pointer;" onclick="clearRoundTripId('${b.id}')">Unlink</button>
+      </div>`);
+    }
+    // journey2 exists — show for review
+    if(b.journey2 && b.journey2.pickup){
+      const rtLinked=b.roundTripId&&ids.has(b.roundTripId);
+      issues.push(`<div style="padding:6px 0;border-bottom:1px solid var(--border);">
+        <strong>#${(b.bookingNumber||0).toString().padStart(4,'0')} ${b.name||'?'}</strong>
+        — has embedded Journey #2: <em>${b.journey2.pickup||'?'} ➝ ${b.journey2.dropoff||'?'}</em>
+        ${rtLinked?'<span style="color:var(--status-pending);font-size:0.75rem;"> (also linked via roundTripId)</span>':''}
+        <button style="margin-left:8px;font-size:0.72rem;padding:2px 8px;background:var(--status-cancelled);color:#fff;border:none;border-radius:4px;cursor:pointer;" onclick="removeJourney2('${b.id}')">Remove J2</button>
+      </div>`);
+    }
+  });
+
+  if(!issues.length){
+    res.innerHTML='<span style="color:var(--status-confirmed);font-weight:700;">✅ No mislinked journeys found — all data looks clean.</span>';
+  } else {
+    res.innerHTML=`<div style="font-weight:700;margin-bottom:8px;color:var(--status-pending);">⚠️ Found ${issues.length} item(s) to review:</div>`+issues.join('');
+  }
+  res.style.display='block';
+}
+
+function clearRoundTripId(id){
+  const b=bookings.find(x=>x.id===id);
+  if(!b)return;
+  delete b.roundTripId;
+  b.updated_at=new Date().toISOString();
+  saveLocalData();
+  pushToCloud(b);
+  findMislinkedJourneys();
+  showToast('roundTripId cleared');
+}
+function removeJourney2(id){
+  const b=bookings.find(x=>x.id===id);
+  if(!b)return;
+  delete b.journey2;
+  b.updated_at=new Date().toISOString();
+  saveLocalData();
+  pushToCloud(b);
+  findMislinkedJourneys();
+  showToast('Journey #2 removed from booking');
+}
 function showToast(msg,ok=true) {
   const t=document.getElementById('toast-el');
   t.style.borderColor=ok?'var(--gold)':'var(--status-cancelled)';
@@ -2279,7 +2346,15 @@ function fullSyncFromCloud() {
     });
   }).catch(() => { setSyncIndicator('offline','Sync failed'); showToast('Full sync failed — check network', false); });
 }
-function startAutoSync() { if(autoSyncTimer)clearInterval(autoSyncTimer); autoSyncTimer=setInterval(()=>syncNow(true),10000); }
+function startAutoSync() {
+  if(autoSyncTimer)clearInterval(autoSyncTimer);
+  autoSyncTimer=setInterval(()=>syncNow(true),10000);
+  // Auto-push heartbeat every 60s — pushes all bookings + expenses silently
+  setInterval(()=>{
+    bookings.forEach(b=>{ if(b&&b.id) pushToCloud(b); });
+    expenses.forEach(e=>{ if(e&&e.id) pushExpenseToCloud(e); });
+  },60000);
+}
 
 // ═══════════════════════════════════════════════════
 // NAVIGATION
@@ -2420,7 +2495,7 @@ function buildRow(b,archived) {
   return tr;
 }
 function carTypeBadge(ct){
-  const map={Own:'🚗 Own',Rented:'🏠 Rented',Commission:'💸 Commission'};
+  const map={Own:'🚗 Own',Rented:'🏠 Rented',Commission:'💸 Commission',Partner:'🤝 Partner'};
   const cls=ct?ct.toLowerCase():'own';
   return `<span class="car-type-badge ${cls}">${map[ct]||ct||'—'}</span>`;
 }
@@ -3124,6 +3199,7 @@ function openModal(id){
 
   // Operations
   populateVehicleSelect(document.getElementById('edit-car'),b.car);
+  populateVehicleSelect(document.getElementById('edit-j1-car'),b.j1Car||b.car||'');
   populateDriverSelect(document.getElementById('edit-driver'),b.driver||'');
   document.getElementById('edit-carType').value=b.carType||'Own';
   document.getElementById('edit-payoutAmount').value=b.payoutAmount||0;
@@ -3170,6 +3246,7 @@ function openModal(id){
     j2Panel.style.display='block';
     const j2=b.journey2 || bookings.find(x=>x.id===b.roundTripId) || {};
     document.getElementById('edit-j2-passengers').value=j2.passengers||1;
+    populateVehicleSelect(document.getElementById('edit-j2-car'),j2.car||'');
     document.getElementById('edit-j2-pickup').value=j2.pickup||b.dropoff||'';
     document.getElementById('edit-j2-dropoff').value=j2.dropoff||b.pickup||'';
     document.getElementById('edit-j2-addressDetail').value=j2.addressDetail||'';
@@ -3220,6 +3297,7 @@ function handleEditSubmit(e){
     bookings[i].internalNotes=document.getElementById('edit-internalNotes').value;
 
     bookings[i].car=document.getElementById('edit-car').value;
+    bookings[i].j1Car=document.getElementById('edit-j1-car').value||document.getElementById('edit-car').value;
     bookings[i].driver=document.getElementById('edit-driver').value||'';
     bookings[i].carType=document.getElementById('edit-carType').value||'Own';
     bookings[i].payoutAmount=parseFloat(document.getElementById('edit-payoutAmount').value)||0;
@@ -3271,6 +3349,7 @@ function handleEditSubmit(e){
 
       bookings[i].journey2={
         passengers: parseInt(document.getElementById('edit-j2-passengers').value)||1,
+        car: document.getElementById('edit-j2-car').value||'',
         pickup: document.getElementById('edit-j2-pickup').value,
         dropoff: document.getElementById('edit-j2-dropoff').value,
         addressDetail: document.getElementById('edit-j2-addressDetail').value,
@@ -3535,15 +3614,18 @@ function renderExpenses(){
 // ANALYTICS
 // ═══════════════════════════════════════════════════
 function updateAnalytics(){
-  const confRev=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
+  const activeBookings=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed');
+  const confRev=activeBookings.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
   const paidRev=bookings.filter(b=>(b.paymentStatus||'Unpaid')==='Paid').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
-  const unpaidRev=bookings.filter(b=>(b.status==='Confirmed'||b.status==='Completed')&&(b.paymentStatus||'Unpaid')==='Unpaid').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
+  const unpaidRev=activeBookings.filter(b=>(b.paymentStatus||'Unpaid')==='Unpaid').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
   const comp=bookings.filter(b=>b.status==='Completed').length;
   const totalExp=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
   const rentalExp=expenses.filter(e=>e.category==='rental').reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
   const partnerExp=expenses.filter(e=>e.category==='partner').reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
   const commExp=expenses.filter(e=>e.category==='commission').reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
-  const netProfit=confRev-totalExp;
+  // Include payout amounts (driver/partner payouts stored on bookings) in cost deduction
+  const totalPayouts=activeBookings.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const netProfit=confRev-totalExp-totalPayouts;
   const fmt=n=>'€'+n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0});
   document.getElementById('stat-total').textContent=bookings.length;
   document.getElementById('stat-confirmed-rev').textContent=fmt(confRev);
@@ -3554,6 +3636,8 @@ function updateAnalytics(){
   document.getElementById('stat-rental-exp').textContent=fmt(rentalExp);
   document.getElementById('stat-partner-exp').textContent=fmt(partnerExp);
   document.getElementById('stat-commission-exp').textContent=fmt(commExp);
+  const payoutsEl=document.getElementById('stat-total-payouts');
+  if(payoutsEl)payoutsEl.textContent=fmt(totalPayouts);
   document.getElementById('stat-net-profit').textContent=fmt(netProfit);
   document.getElementById('stat-net-profit').style.color=netProfit>=0?'var(--status-confirmed)':'var(--status-cancelled)';
 }
@@ -3652,12 +3736,16 @@ function showStatDetail(type){
     html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--gold)">${fmtAmt(total)}</td><td colspan="2"></td></tr></tfoot></table>`;
   } else if(type==='net-profit'){
     title.textContent='Net Profit Breakdown';
-    const confRev=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
+    const activeB=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed');
+    const confRev=activeB.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
     const totalExp=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+    const totalPayouts=activeB.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+    const net=confRev-totalExp-totalPayouts;
     html=`<div style="display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap;">
       <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:var(--status-confirmed)">${fmtAmt(confRev)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Revenue</div></div>
       <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:var(--status-cancelled)">${fmtAmt(totalExp)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Expenses</div></div>
-      <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:${confRev-totalExp>=0?'var(--status-confirmed)':'var(--status-cancelled)'}">${fmtAmt(confRev-totalExp)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Net Profit</div></div>
+      <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:var(--status-cancelled)">${fmtAmt(totalPayouts)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Payouts</div></div>
+      <div class="dispatch-sidebar-card" style="flex:1;min-width:120px;text-align:center;"><div style="font-size:1.4rem;font-weight:800;color:${net>=0?'var(--status-confirmed)':'var(--status-cancelled)'}">${fmtAmt(net)}</div><div style="font-size:0.73rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px;">Net Profit</div></div>
     </div>`;
     html+=buildExpenseDetailTable(expenses,'Expense Breakdown', type);
   }
