@@ -1031,7 +1031,7 @@
             <div class="stat-card expense-card" onclick="showStatDetail('commission')" title="Click to see list"><span class="stat-val" id="stat-commission-exp">€0</span><span class="stat-label" data-i18n="an_commission">💸 Commissions</span><span class="stat-hint">Click to see expenses</span></div>
             <div class="stat-card expense-card" onclick="showStatDetail('rental')" title="Click to see list"><span class="stat-val" id="stat-rental-exp">€0</span><span class="stat-label" data-i18n="an_rental">🏠 Rental</span><span class="stat-hint">Click to see expenses</span></div>
             <div class="stat-card expense-card" onclick="showStatDetail('partner')" title="Click to see list"><span class="stat-val" id="stat-partner-exp">€0</span><span class="stat-label" data-i18n="an_partner">🤝 Partners</span><span class="stat-hint">Click to see expenses</span></div>
-            <div class="stat-card expense-card" title="Total payout amounts on bookings"><span class="stat-val" id="stat-total-payouts">€0</span><span class="stat-label">💸 Payouts</span><span class="stat-hint">Driver/partner payouts on bookings</span></div>
+            <div class="stat-card expense-card" onclick="showStatDetail('payouts')" title="Click to see payout breakdown"><span class="stat-val" id="stat-total-payouts">€0</span><span class="stat-label">💸 Payouts</span><span class="stat-hint">Click to see breakdown</span></div>
             <div class="stat-card" onclick="showStatDetail('all-bookings')" title="Click to see list"><span class="stat-val" id="stat-total">0</span><span class="stat-label" data-i18n="an_total">Total Bookings</span><span class="stat-hint">Click to see all</span></div>
             <div class="stat-card" onclick="showStatDetail('completed')" title="Click to see list"><span class="stat-val" id="stat-completed">0</span><span class="stat-label" data-i18n="an_completed">Completed Transfers</span><span class="stat-hint">Click to see all</span></div>
           </div>
@@ -3734,6 +3734,14 @@ function showStatDetail(type){
     list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--gold)">${fmtAmt(b.price)}</td><td><span class="payment-badge ${(b.paymentStatus||'Unpaid').toLowerCase()}" style="cursor:default">${b.paymentStatus||'Unpaid'}</span></td><td style="text-align:center;"><button type="button" class="action-icon delete-btn" onclick="deleteBookingFromAnalytics('${b.id}','${type}')" title="Delete booking"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button></td></tr>`);
     const total=list.reduce((s,b)=>s+(parseFloat(b.price)||0),0);
     html+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Total</td><td style="font-weight:800;color:var(--gold)">${fmtAmt(total)}</td><td colspan="2"></td></tr></tfoot></table>`;
+  } else if(type==='payouts'){
+    title.textContent='Payout Breakdown';
+    const list=bookings.filter(b=>(b.status==='Confirmed'||b.status==='Completed')&&(parseFloat(b.payoutAmount)||0)>0).sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
+    html=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Type</th><th>Payout</th></tr></thead><tbody>`;
+    if(!list.length)html+=`<tr><td colspan="6" class="no-data">No payouts found</td></tr>`;
+    list.forEach(b=>html+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td><span style="font-size:0.75rem;font-weight:600;color:var(--text-secondary)">${b.payoutType||'—'}</span></td><td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(b.payoutAmount||0)}</td></tr>`);
+    const total=list.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+    html+=`</tbody><tfoot><tr><td colspan="5" style="font-weight:700;text-align:right;padding:9px 12px;">Total Payouts</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(total)}</td></tr></tfoot></table>`;
   } else if(type==='net-profit'){
     title.textContent='Net Profit Breakdown';
     const activeB=bookings.filter(b=>b.status==='Confirmed'||b.status==='Completed');
