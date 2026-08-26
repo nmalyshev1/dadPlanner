@@ -3608,14 +3608,19 @@ function updateAnalytics(){
   const paidRev=bookings.filter(b=>(b.paymentStatus||'Unpaid')==='Paid').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
   const unpaidRev=activeBookings.filter(b=>(b.paymentStatus||'Unpaid')==='Unpaid').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
   const comp=bookings.filter(b=>b.status==='Completed').length;
-  const totalExp=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
-  const rentalPayouts=bookings.filter(b=>b.payoutType==='Rental'&&(b.status==='Confirmed'||b.status==='Completed')).reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const totalExpFromSheet=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+  // Booking payouts by type — included regardless of status since cost is already committed
+  const bookingsWithPayout=bookings.filter(b=>(parseFloat(b.payoutAmount)||0)>0);
+  const rentalPayouts=bookingsWithPayout.filter(b=>b.payoutType==='Rental').reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const partnerPayouts=bookingsWithPayout.filter(b=>b.payoutType==='Partner').reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const commPayouts=bookingsWithPayout.filter(b=>b.payoutType==='Commission').reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
   const rentalExp=expenses.filter(e=>e.category==='rental').reduce((s,e)=>s+(parseFloat(e.amount)||0),0)+rentalPayouts;
-  const partnerExp=expenses.filter(e=>e.category==='partner').reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
-  const commExp=expenses.filter(e=>e.category==='commission').reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
-  // Include payout amounts (driver/partner payouts stored on bookings) in cost deduction
+  const partnerExp=expenses.filter(e=>e.category==='partner').reduce((s,e)=>s+(parseFloat(e.amount)||0),0)+partnerPayouts;
+  const commExp=expenses.filter(e=>e.category==='commission').reduce((s,e)=>s+(parseFloat(e.amount)||0),0)+commPayouts;
+  const totalExp=totalExpFromSheet; // alias for display
+  // Total payouts for net profit deduction (only active bookings)
   const totalPayouts=activeBookings.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
-  const netProfit=confRev-totalExp-totalPayouts;
+  const netProfit=confRev-totalExpFromSheet-totalPayouts;
   const fmt=n=>'€'+n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0});
   document.getElementById('stat-total').textContent=bookings.length;
   document.getElementById('stat-confirmed-rev').textContent=fmt(confRev);
