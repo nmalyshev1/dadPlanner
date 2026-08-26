@@ -3608,19 +3608,36 @@ function updateAnalytics(){
   const paidRev=bookings.filter(b=>(b.paymentStatus||'Unpaid')==='Paid').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
   const unpaidRev=activeBookings.filter(b=>(b.paymentStatus||'Unpaid')==='Unpaid').reduce((s,b)=>s+(parseFloat(b.price)||0),0);
   const comp=bookings.filter(b=>b.status==='Completed').length;
+
+  // Expense sheet totals
   const totalExpFromSheet=expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
-  // Booking payouts by type — included regardless of status since cost is already committed
+
+  // Booking payout amounts — all bookings, regardless of status (cost is committed)
+  // A rental = carType 'Rented' OR payoutType 'Rental'
   const bookingsWithPayout=bookings.filter(b=>(parseFloat(b.payoutAmount)||0)>0);
-  const rentalPayouts=bookingsWithPayout.filter(b=>b.payoutType==='Rental').reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
-  const partnerPayouts=bookingsWithPayout.filter(b=>b.payoutType==='Partner').reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
-  const commPayouts=bookingsWithPayout.filter(b=>b.payoutType==='Commission').reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const rentalPayouts=bookingsWithPayout
+    .filter(b=>b.carType==='Rented'||b.payoutType==='Rental')
+    .reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const partnerPayouts=bookingsWithPayout
+    .filter(b=>b.payoutType==='Partner'&&b.carType!=='Rented')
+    .reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const commPayouts=bookingsWithPayout
+    .filter(b=>b.payoutType==='Commission'&&b.carType!=='Rented')
+    .reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const allBookingPayouts=bookingsWithPayout.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+
+  // Combined totals per category
   const rentalExp=expenses.filter(e=>e.category==='rental').reduce((s,e)=>s+(parseFloat(e.amount)||0),0)+rentalPayouts;
   const partnerExp=expenses.filter(e=>e.category==='partner').reduce((s,e)=>s+(parseFloat(e.amount)||0),0)+partnerPayouts;
   const commExp=expenses.filter(e=>e.category==='commission').reduce((s,e)=>s+(parseFloat(e.amount)||0),0)+commPayouts;
-  const totalExp=totalExpFromSheet; // alias for display
-  // Total payouts for net profit deduction (only active bookings)
-  const totalPayouts=activeBookings.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
-  const netProfit=confRev-totalExpFromSheet-totalPayouts;
+
+  // Total expenses = expense sheet + ALL booking payouts
+  const totalExp=totalExpFromSheet+allBookingPayouts;
+
+  // Net profit deducts expense sheet + active booking payouts
+  const activePayouts=activeBookings.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+  const netProfit=confRev-totalExpFromSheet-activePayouts;
+
   const fmt=n=>'€'+n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0});
   document.getElementById('stat-total').textContent=bookings.length;
   document.getElementById('stat-confirmed-rev').textContent=fmt(confRev);
@@ -3632,7 +3649,7 @@ function updateAnalytics(){
   document.getElementById('stat-partner-exp').textContent=fmt(partnerExp);
   document.getElementById('stat-commission-exp').textContent=fmt(commExp);
   const payoutsEl=document.getElementById('stat-total-payouts');
-  if(payoutsEl)payoutsEl.textContent=fmt(totalPayouts);
+  if(payoutsEl)payoutsEl.textContent=fmt(activePayouts);
   document.getElementById('stat-net-profit').textContent=fmt(netProfit);
   document.getElementById('stat-net-profit').style.color=netProfit>=0?'var(--status-confirmed)':'var(--status-cancelled)';
 }
