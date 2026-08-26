@@ -864,63 +864,132 @@
             <button class="client-suggestion-dismiss" onclick="dismissClientSuggestion()">✕</button>
           </div>
           <form id="booking-manual-form" onsubmit="handleManualSubmit(event)">
-            <div class="form-grid">
-              <div class="form-group"><label data-i18n="f_name">Customer Name</label><input type="text" id="m-name" required></div>
-              <div class="form-group"><label>Email</label><input type="email" id="m-email" oninput="checkReturningClient()"></div>
-              <div class="form-group"><label data-i18n="f_phone">Phone (incl. country code)</label><input type="tel" id="m-phone" placeholder="+33 6 12 34 56 78" oninput="checkReturningClient()"></div>
-              <div class="form-group"><label data-i18n="f_datetime">Date &amp; Time</label><input type="datetime-local" id="m-datetime" required></div>
-              <div class="form-group"><label data-i18n="f_pickup">Pickup</label><div class="autocomplete-wrap"><input type="text" id="m-pickup" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-m-pickup"></div></div></div>
-              <!-- MULTI-STOP -->
-              <div class="form-group full-width stops-section" id="m-stops-section">
-                <div class="stops-section-label">
-                  <span>📍 Intermediate Stops <span id="m-stop-count" style="font-weight:400;opacity:0.7"></span></span>
-                  <button type="button" class="add-stop-btn" onclick="addStop('m-stops-list')">+ Add Stop</button>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;">
+
+              <!-- LEFT: Journey #1 -->
+              <div class="alpinbus-box">
+                <div class="alpinbus-box-title">Journey #1</div>
+
+                <!-- Customer -->
+                <div class="alpinbus-form-row"><label>First name:</label><input type="text" id="m-firstName" required></div>
+                <div class="alpinbus-form-row"><label>Last name:</label><input type="text" id="m-lastName"></div>
+                <div class="alpinbus-form-row"><label>Email:</label><input type="email" id="m-email" oninput="checkReturningClient()"></div>
+                <div class="alpinbus-form-row"><label>Mobile:</label><input type="tel" id="m-phone" placeholder="+33 6 12 34 56 78" oninput="checkReturningClient()"></div>
+                <div class="alpinbus-form-row"><label>Alt. Phone:</label><input type="text" id="m-altPhone"></div>
+
+                <div style="border-top:1px dashed var(--border);margin:8px 0;"></div>
+
+                <!-- Status & affiliate -->
+                <div class="alpinbus-form-row">
+                  <label>Status:</label>
+                  <select id="m-status">
+                    <option value="Confirmed">✔ Confirmed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
                 </div>
-                <div id="m-stops-list"></div>
-              </div>
-              <div class="form-group"><label data-i18n="f_dropoff">Dropoff</label><div class="autocomplete-wrap"><input type="text" id="m-dropoff" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-m-dropoff"></div></div></div>
-              <div class="form-group"><label data-i18n="f_vehicle">Vehicle</label><select id="m-car"></select></div>
-              <div class="form-group"><label data-i18n="f_driver">Driver</label><select id="m-driver"></select></div>
-              <div class="form-group"><label data-i18n="f_pax">Passengers</label><input type="number" id="m-passengers" min="1" max="15" value="1"></div>
-              <div class="form-group"><label data-i18n="f_carryon">Carry-on Bags</label><input type="number" id="m-luggage" min="0" max="20" value="0"></div>
-              <div class="form-group"><label data-i18n="f_flight">Flight Info</label><input type="text" id="m-flightInfo" placeholder="13:00 — SK2795"></div>
-              <div class="form-group"><label data-i18n="f_child">Child Seats</label><input type="number" id="m-childSeats" min="0" max="5" value="0"></div>
-              <div class="form-group"><label data-i18n="f_hold">Hold Bags</label><input type="number" id="m-holdBags" min="0" max="20" value="0"></div>
-              <div class="form-group"><label data-i18n="f_price">Price (€)</label><input type="number" id="m-price" min="0" value="0"></div>
-              <div class="form-group"><label>💸 Payout (€) <span style="font-size:0.7rem;color:var(--text-muted);font-weight:400">commission/rental/partner</span></label><input type="number" id="m-payoutAmount" min="0" value="0"></div>
-              <div class="form-group"><label>Payout Type</label><select id="m-payoutType"><option value="None">— None</option><option value="Me">🧑‍✈️ Me</option><option value="Commission">💸 Commission</option><option value="Rental">🏠 Rental</option><option value="Partner">🤝 Partner</option></select></div>
-              <div class="form-group"><label>Source</label><select id="m-source"></select></div>
-              <div class="form-group"><label>From Affiliate / Partner</label><select id="m-fromAffiliate"></select></div>
-              <div class="form-group"><label data-i18n="f_status">Status</label>
-                <select id="m-status">
-                  <option value="Pending" data-i18n-opt="s_pending">Pending</option>
-                  <option value="Confirmed" data-i18n-opt="s_confirmed">Confirmed</option>
-                  <option value="Completed" data-i18n-opt="s_completed">Completed</option>
-                  <option value="Cancelled" data-i18n-opt="s_cancelled">Cancelled</option>
-                </select>
-              </div>
-              <div class="form-group full-width"><label data-i18n="f_notes">Notes &amp; Instructions</label><textarea id="m-requirements" rows="2"></textarea></div>
-            </div>
-            <!-- Round trip -->
-            <div style="margin-bottom:16px;">
-              <div class="round-trip-toggle">
-                <input type="checkbox" id="round-trip-check" onchange="toggleRoundTrip()">
-                <label for="round-trip-check" data-i18n="round_trip">🔄 Round Trip — auto-create return booking</label>
-              </div>
-              <div id="round-trip-fields" style="display:none;" class="round-trip-fields">
-                <div class="form-grid">
-                  <div class="form-group"><label data-i18n="f_return_dt">Return Date &amp; Time</label><input type="datetime-local" id="m-return-datetime"></div>
-                  <div class="form-group"><label data-i18n="f_return_flight">Return Flight</label><input type="text" id="m-return-flight"></div>
-                  <div class="form-group"><label data-i18n="f_return_price">Return Price (€)</label><input type="number" id="m-return-price" min="0" value="0"></div>
+                <div class="alpinbus-form-row">
+                  <label>Source:</label>
+                  <select id="m-source"></select>
+                </div>
+                <div class="alpinbus-form-row"><label>Affiliate:</label><select id="m-fromAffiliate"><option value="">— Select —</option></select></div>
+                <div class="alpinbus-form-row"><label>Cust. Ref.:</label><input type="text" id="m-custRefNum"></div>
+
+                <div style="border-top:1px dashed var(--border);margin:8px 0;"></div>
+
+                <!-- Route -->
+                <div class="alpinbus-form-row"><label>Passengers:</label><input type="number" id="m-passengers" min="1" max="50" value="1" style="max-width:120px;"></div>
+                <div class="alpinbus-form-row"><label>Vehicle:</label><select id="m-car"></select></div>
+                <div class="alpinbus-form-row">
+                  <label>From:</label>
+                  <div class="autocomplete-wrap"><input type="text" id="m-pickup" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-m-pickup"></div></div>
+                </div>
+                <div class="alpinbus-form-row">
+                  <label>To:</label>
+                  <div class="autocomplete-wrap"><input type="text" id="m-dropoff" autocomplete="off" required><div class="autocomplete-dropdown" id="ac-m-dropoff"></div></div>
+                </div>
+                <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="m-addressDetail" rows="1"></textarea></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px;">
+                  <div class="alpinbus-form-row" style="margin-bottom:0;"><label>Flight #:</label><input type="text" id="m-flightInfo" placeholder="SK2795"></div>
+                  <div class="alpinbus-form-row" style="margin-bottom:0;grid-template-columns:55px 1fr;"><label>From:</label><input type="text" id="m-flyingFrom"></div>
+                </div>
+                <div class="alpinbus-form-row" style="margin-bottom:7px;"><label>Date &amp; Time:</label><input type="datetime-local" id="m-datetime" required></div>
+
+                <!-- Options -->
+                <div class="alpinbus-inline-opts">
+                  <div class="opt-item"><label>Baby:</label><select id="m-babySeats"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></div>
+                  <div class="opt-item"><label>Child:</label><select id="m-childSeats"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></div>
+                  <div class="opt-item"><label>Bst:</label><select id="m-boosterSeats"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></div>
+                  <div class="opt-item"><label>Ski:</label><select id="m-ski"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select></div>
+                  <div class="opt-item"><label>Bike:</label><select id="m-bike"><option value="0">0</option><option value="1">1</option></select></div>
+                  <div class="opt-item"><label>Bags:</label><select id="m-luggage"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+                  <div class="opt-item"><label>Bst(H):</label><select id="m-holdBags"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+                </div>
+
+                <div style="border-top:1px dashed var(--border);margin:8px 0;"></div>
+
+                <!-- Driver / Car type -->
+                <div class="alpinbus-form-row"><label>Driver:</label><select id="m-driver"></select></div>
+                <div class="alpinbus-form-row"><label>Car Type:</label>
+                  <select id="m-carType">
+                    <option value="Own">Own Car</option>
+                    <option value="Rented">Rented</option>
+                    <option value="Partner">🤝 Partner</option>
+                  </select>
+                </div>
+
+                <div style="border-top:1px dashed var(--border);margin:8px 0;"></div>
+
+                <!-- Price & Payment -->
+                <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" id="m-price" min="0" value="0" step="0.01"></div>
+                <div class="alpinbus-form-row"><label>Paid status:</label>
+                  <select id="m-paymentStatus">
+                    <option value="Unpaid">❌ Unpaid</option>
+                    <option value="Paid">✅ Paid</option>
+                  </select>
+                </div>
+
+                <div style="border-top:1px dashed var(--border);margin:8px 0;"></div>
+
+                <!-- Payout -->
+                <div class="alpinbus-form-row"><label>Payout (€):</label><input type="number" id="m-payoutAmount" min="0" value="0"></div>
+                <div class="alpinbus-form-row"><label>Payout Type:</label>
+                  <select id="m-payoutType">
+                    <option value="None">None</option>
+                    <option value="Commission">💸 Commission</option>
+                    <option value="Rental">🏠 Rental</option>
+                    <option value="Partner">🤝 Partner</option>
+                  </select>
+                </div>
+                <div class="alpinbus-form-row"><label>Payout paid:</label>
+                  <select id="m-payoutPaid">
+                    <option value="Unpaid">❌ Unpaid</option>
+                    <option value="Paid">✅ Paid</option>
+                  </select>
+                </div>
+
+                <div style="border-top:1px dashed var(--border);margin:8px 0;"></div>
+
+                <!-- Notes -->
+                <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Notes:</label><textarea id="m-requirements" rows="2"></textarea></div>
+                <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Cust. notes:</label><textarea id="m-customerNotes" rows="2"></textarea></div>
+                <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Internal:</label><textarea id="m-internalNotes" rows="2"></textarea></div>
+
+                <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;">
+                  <button type="submit" class="btn">💾 Save Booking</button>
+                  <button type="button" class="btn btn-secondary" onclick="document.getElementById('booking-manual-form').reset();populateAllVehicleSelects();populateAllDriverSelects();populateAllSourceSelects();populateAllAffiliateSelects();">🗑 Clear</button>
                 </div>
               </div>
-            </div>
-            <div style="display:flex;flex-wrap:wrap;gap:11px;align-items:center;">
-              <button type="submit" class="btn">💾 <span data-i18n="btn_save">Save Booking</span></button>
-              <button type="button" class="btn btn-return" onclick="prefillReturnJourney()">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span data-i18n="btn_save_return">Save &amp; Add Return Journey</span>
-              </button>
+
+              <!-- RIGHT: empty / info -->
+              <div>
+                <div class="alpinbus-box" style="text-align:center;color:var(--text-muted);padding:32px 16px;">
+                  <div style="font-size:2rem;margin-bottom:10px;">🗓</div>
+                  <div style="font-size:0.88rem;line-height:1.6;">Journey #2 can be added after saving,<br>by opening the booking and using<br><strong>+ Add journey</strong> in the edit modal.</div>
+                </div>
+              </div>
+
             </div>
           </form>
         </div>
@@ -3404,39 +3473,55 @@ function checkReturningClient(){
   if(retClient){txt.innerHTML=`🔄 ${t('returning_client')}: <strong>${esc(retClient.name)}</strong>`;box.classList.add('visible');}
   else box.classList.remove('visible');
 }
-function fillReturningClient(){if(!retClient)return;if(retClient.name)document.getElementById('m-name').value=retClient.name;if(retClient.email)document.getElementById('m-email').value=retClient.email;if(retClient.phone)document.getElementById('m-phone').value=retClient.phone;document.getElementById('client-suggestion').classList.remove('visible');showToast(currentLang==='ru'?'Данные клиента заполнены!':'Client details auto-filled!');}
+function fillReturningClient(){if(!retClient)return;if(retClient.firstName)document.getElementById('m-firstName').value=retClient.firstName;if(retClient.lastName)document.getElementById('m-lastName').value=retClient.lastName||'';if(!retClient.firstName&&retClient.name){const p=retClient.name.split(' ');const fn=document.getElementById('m-firstName');if(fn)fn.value=p[0]||'';const ln=document.getElementById('m-lastName');if(ln)ln.value=p.slice(1).join(' ')||'';}if(retClient.email)document.getElementById('m-email').value=retClient.email;if(retClient.phone)document.getElementById('m-phone').value=retClient.phone;const cs=document.getElementById('client-suggestion');if(cs)cs.classList.remove('visible');showToast(currentLang==='ru'?'Данные клиента заполнены!':'Client details auto-filled!');}
 function dismissClientSuggestion(){document.getElementById('client-suggestion').classList.remove('visible');}
 function toggleRoundTrip(){document.getElementById('round-trip-fields').style.display=document.getElementById('round-trip-check').checked?'block':'none';}
 function buildBookingFromForm(){
   let maxN = 0;
   bookings.forEach(b => { if((b.bookingNumber || 0) > maxN) maxN = b.bookingNumber; });
   nextNum = Math.max(nextNum, maxN + 1);
+  const fn=(document.getElementById('m-firstName')||{}).value||'';
+  const ln=(document.getElementById('m-lastName')||{}).value||'';
+  const fullName=(fn+' '+ln).trim()||'';
   return {
     id:Date.now()+'_'+Math.random().toString(36).substring(2,9),
     bookingNumber:nextNum++,
-    name:document.getElementById('m-name').value,
-    email:document.getElementById('m-email').value,
-    phone:document.getElementById('m-phone').value,
-    datetime:document.getElementById('m-datetime').value,
-    pickup:document.getElementById('m-pickup').value,
-    stops:collectStops('m-stops-list'),
-    dropoff:document.getElementById('m-dropoff').value,
-    car:document.getElementById('m-car').value,
-    driver:document.getElementById('m-driver').value||'',
-    passengers:parseInt(document.getElementById('m-passengers').value)||1,
-    luggage:parseInt(document.getElementById('m-luggage').value)||0,
-    flightInfo:document.getElementById('m-flightInfo').value||'',
-    childSeats:parseInt(document.getElementById('m-childSeats').value)||0,
-    holdBags:parseInt(document.getElementById('m-holdBags').value)||0,
-    price:parseFloat(document.getElementById('m-price').value)||0,
-    invoiceNum: `INV-${String(nextNum).padStart(4,'0')}`,
-    payoutAmount:parseFloat(document.getElementById('m-payoutAmount').value)||0,
-    payoutType:document.getElementById('m-payoutType').value||'None',
-    source: (document.getElementById('m-source')||{}).value || 'Direct',
-    fromAffiliate: (document.getElementById('m-fromAffiliate')||{}).value || '',
-    status:document.getElementById('m-status').value,
-    paymentStatus:'Unpaid',
-    requirements:document.getElementById('m-requirements').value||'None',
+    firstName:fn, lastName:ln,
+    name:fullName,
+    email:(document.getElementById('m-email')||{}).value||'',
+    phone:(document.getElementById('m-phone')||{}).value||'',
+    altPhone:(document.getElementById('m-altPhone')||{}).value||'',
+    datetime:(document.getElementById('m-datetime')||{}).value||'',
+    pickup:(document.getElementById('m-pickup')||{}).value||'',
+    dropoff:(document.getElementById('m-dropoff')||{}).value||'',
+    addressDetail:(document.getElementById('m-addressDetail')||{}).value||'',
+    flyingFrom:(document.getElementById('m-flyingFrom')||{}).value||'',
+    flightInfo:(document.getElementById('m-flightInfo')||{}).value||'',
+    car:(document.getElementById('m-car')||{}).value||'',
+    j1Car:(document.getElementById('m-car')||{}).value||'',
+    driver:(document.getElementById('m-driver')||{}).value||'',
+    carType:(document.getElementById('m-carType')||{}).value||'Own',
+    passengers:parseInt((document.getElementById('m-passengers')||{}).value)||1,
+    luggage:parseInt((document.getElementById('m-luggage')||{}).value)||0,
+    babySeats:parseInt((document.getElementById('m-babySeats')||{}).value)||0,
+    childSeats:parseInt((document.getElementById('m-childSeats')||{}).value)||0,
+    boosterSeats:parseInt((document.getElementById('m-boosterSeats')||{}).value)||0,
+    ski:parseInt((document.getElementById('m-ski')||{}).value)||0,
+    bike:parseInt((document.getElementById('m-bike')||{}).value)||0,
+    holdBags:parseInt((document.getElementById('m-holdBags')||{}).value)||0,
+    price:parseFloat((document.getElementById('m-price')||{}).value)||0,
+    paymentStatus:(document.getElementById('m-paymentStatus')||{}).value||'Unpaid',
+    invoiceNum:`INV-${String(nextNum).padStart(4,'0')}`,
+    payoutAmount:parseFloat((document.getElementById('m-payoutAmount')||{}).value)||0,
+    payoutType:(document.getElementById('m-payoutType')||{}).value||'None',
+    operationsPaid:(document.getElementById('m-payoutPaid')||{}).value||'Unpaid',
+    source:(document.getElementById('m-source')||{}).value||'Direct',
+    fromAffiliate:(document.getElementById('m-fromAffiliate')||{}).value||'',
+    custRefNum:(document.getElementById('m-custRefNum')||{}).value||'',
+    status:(document.getElementById('m-status')||{}).value||'Confirmed',
+    requirements:(document.getElementById('m-requirements')||{}).value||'',
+    customerNotes:(document.getElementById('m-customerNotes')||{}).value||'',
+    internalNotes:(document.getElementById('m-internalNotes')||{}).value||'',
     notified:false,
     created_at:new Date().toISOString(),
     updated_at:new Date().toISOString()
@@ -3445,26 +3530,15 @@ function buildBookingFromForm(){
 function handleManualSubmit(e){
   e.preventDefault();
   const nb=buildBookingFromForm();
-  const isRound=document.getElementById('round-trip-check').checked;
-  const returnDt=document.getElementById('m-return-datetime').value;
-  if(isRound&&!returnDt){showToast(currentLang==='ru'?'Введите дату возврата':'Enter return date/time',false);nextNum--;return;}
   localStorage.setItem(COUNTER_KEY,nextNum);
   bookings.push(nb);pushToCloud(nb);
-  if(isRound&&returnDt){
-    const rt={...nb,id:Date.now()+'_'+Math.random().toString(36).substring(2,9)+'_r',bookingNumber:nextNum++,pickup:nb.dropoff,dropoff:nb.pickup,datetime:returnDt,flightInfo:document.getElementById('m-return-flight').value||'',price:parseInt(document.getElementById('m-return-price').value)||nb.price,roundTripId:nb.id,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
-    nb.roundTripId=rt.id;bookings.push(rt);pushToCloud(rt);localStorage.setItem(COUNTER_KEY,nextNum);
-    showToast(`✅ Round trip #${nb.bookingNumber} + #${rt.bookingNumber}`);
-  } else showToast(`${currentLang==='ru'?'Заказ':'Booking'} #${nb.bookingNumber} ${currentLang==='ru'?'сохранён':'saved'}!`);
+  showToast(`${currentLang==='ru'?'Заказ':'Booking'} #${nb.bookingNumber} ${currentLang==='ru'?'сохранён':'saved'}!`);
   saveLocalData();resetAddForm();switchTab('excel-tab',document.getElementById('nav-excel'));setMobileNav('mnav-excel');
 }
 function resetAddForm(){
   document.getElementById('booking-manual-form').reset();
-  document.getElementById('client-suggestion').classList.remove('visible');
-  document.getElementById('return-journey-banner').style.display='none';
-  document.getElementById('round-trip-fields').style.display='none';
-  document.getElementById('round-trip-check').checked=false;
-  document.getElementById('m-stops-list').innerHTML='';
-  const cnt=document.getElementById('m-stop-count');if(cnt)cnt.textContent='';
+  const cs=document.getElementById('client-suggestion');if(cs)cs.classList.remove('visible');
+  const rb=document.getElementById('return-journey-banner');if(rb)rb.style.display='none';
   retClient=null;
   populateAllVehicleSelects();populateAllDriverSelects();populateAllSourceSelects();populateAllAffiliateSelects();
 }
@@ -3726,11 +3800,40 @@ function showStatDetail(type){
     title.textContent='Commission Expenses';
     html=buildExpenseDetailTable(expenses.filter(e=>e.category==='commission'), '', type);
   } else if(type==='rental'){
-    title.textContent='Rental Expenses';
-    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='rental'), '', type);
+    title.textContent='🏠 Rental Costs Breakdown';
+    const rentalExpList=expenses.filter(e=>e.category==='rental');
+    const rentalBookings=bookings.filter(b=>(parseFloat(b.payoutAmount)||0)>0&&(b.carType==='Rented'||b.payoutType==='Rental')).sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
+    let rHtml='';
+    if(rentalBookings.length){
+      rHtml+=`<div style="font-weight:700;margin-bottom:8px;font-size:0.82rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">From Bookings</div>`;
+      rHtml+=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Car</th><th>Payout</th></tr></thead><tbody>`;
+      rentalBookings.forEach(b=>rHtml+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-size:0.8rem;color:var(--text-muted)">${esc(b.car||'—')}</td><td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(b.payoutAmount||0)}</td></tr>`);
+      const bTotal=rentalBookings.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+      rHtml+=`</tbody><tfoot><tr><td colspan="5" style="font-weight:700;text-align:right;padding:9px 12px;">Subtotal</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(bTotal)}</td></tr></tfoot></table>`;
+    }
+    if(rentalExpList.length){
+      rHtml+=`<div style="font-weight:700;margin:14px 0 8px;font-size:0.82rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">From Expenses Tab</div>`;
+      rHtml+=buildExpenseDetailTable(rentalExpList,'',type);
+    }
+    if(!rentalBookings.length&&!rentalExpList.length) rHtml='<div class="no-data" style="padding:20px;text-align:center;">No rental costs recorded</div>';
+    const grandTotal=rentalBookings.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0)+rentalExpList.reduce((s,e)=>s+(parseFloat(e.amount)||0),0);
+    if(rentalBookings.length||rentalExpList.length) rHtml+=`<div style="margin-top:12px;padding:10px 14px;background:var(--bg-main);border-radius:8px;border:1.5px solid var(--border-gold);display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:700;">Total Rental Costs</span><span style="font-weight:800;font-size:1.1rem;color:var(--status-cancelled)">${fmtAmt(grandTotal)}</span></div>`;
+    html=rHtml;
   } else if(type==='partner'){
-    title.textContent='Partner Expenses';
-    html=buildExpenseDetailTable(expenses.filter(e=>e.category==='partner'), '', type);
+    title.textContent='🤝 Partner Expenses Breakdown';
+    const partnerExpList=expenses.filter(e=>e.category==='partner');
+    const partnerBookings=bookings.filter(b=>(parseFloat(b.payoutAmount)||0)>0&&b.payoutType==='Partner'&&b.carType!=='Rented').sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
+    let pHtml='';
+    if(partnerBookings.length){
+      pHtml+=`<div style="font-weight:700;margin-bottom:8px;font-size:0.82rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">From Bookings</div>`;
+      pHtml+=`<table class="stat-detail-table"><thead><tr><th>#</th><th>Client</th><th>Date</th><th>Route</th><th>Payout</th></tr></thead><tbody>`;
+      partnerBookings.forEach(b=>pHtml+=`<tr><td class="booking-num">#${(b.bookingNumber||0).toString().padStart(4,'0')}</td><td>${esc(b.name)}</td><td style="white-space:nowrap;font-size:0.8rem">${fmtDt(b.datetime)}</td><td style="font-size:0.79rem">${esc(b.pickup)} ➝ ${esc(b.dropoff)}</td><td style="font-weight:700;color:var(--status-cancelled)">${fmtAmt(b.payoutAmount||0)}</td></tr>`);
+      const bTotal=partnerBookings.reduce((s,b)=>s+(parseFloat(b.payoutAmount)||0),0);
+      pHtml+=`</tbody><tfoot><tr><td colspan="4" style="font-weight:700;text-align:right;padding:9px 12px;">Subtotal</td><td style="font-weight:800;color:var(--status-cancelled)">${fmtAmt(bTotal)}</td></tr></tfoot></table>`;
+    }
+    if(partnerExpList.length){pHtml+=`<div style="font-weight:700;margin:14px 0 8px;font-size:0.82rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">From Expenses Tab</div>`;pHtml+=buildExpenseDetailTable(partnerExpList,'',type);}
+    if(!partnerBookings.length&&!partnerExpList.length) pHtml='<div class="no-data" style="padding:20px;text-align:center;">No partner costs recorded</div>';
+    html=pHtml;
   } else if(type==='all-bookings'){
     title.textContent='All Bookings';
     const list=[...bookings].sort((a,b)=>(b.datetime||'').localeCompare(a.datetime||''));
