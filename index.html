@@ -163,6 +163,19 @@
     .autocomplete-loading::before { content:'⟳'; animation:spin 1s linear infinite; display:inline-block; margin-right:6px; }
     @keyframes spin { to{transform:rotate(360deg)} }
 
+    /* ── CLIENT NAME AUTOCOMPLETE ─────────────────────── */
+    .client-ac-wrap { position:relative; width:100%; }
+    .client-ac-wrap input { width:100%; }
+    .client-ac-dropdown { position:absolute; top:calc(100% + 3px); left:0; right:0; background:var(--bg-card); border:1.5px solid var(--border-gold); border-radius:10px; box-shadow:0 8px 28px rgba(0,0,0,0.18); z-index:10000; max-height:240px; overflow-y:auto; animation:fadeIn 0.15s ease; }
+    .client-ac-item { padding:9px 14px; cursor:pointer; display:flex; align-items:center; gap:11px; border-bottom:1px solid var(--border); transition:background 0.14s; }
+    .client-ac-item:last-child { border-bottom:none; }
+    .client-ac-item:hover, .client-ac-item.cac-highlighted { background:rgba(184,148,42,0.09); }
+    .client-ac-avatar { width:30px; height:30px; border-radius:50%; background:var(--gold-gradient); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; flex-shrink:0; letter-spacing:0.5px; }
+    .client-ac-info { flex:1; min-width:0; }
+    .client-ac-name { font-size:0.85rem; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .client-ac-meta { font-size:0.72rem; color:var(--text-muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .client-ac-trips { font-size:0.7rem; font-weight:700; color:var(--gold); background:rgba(184,148,42,0.1); padding:2px 7px; border-radius:10px; flex-shrink:0; }
+
     /* ── BADGES ─────────────────────────────────────── */
     .status-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.7rem; font-weight:700; text-transform:uppercase; }
     .status-badge.pending  { background:rgba(212,134,10,0.12); color:var(--status-pending); border:1px solid rgba(212,134,10,0.25); }
@@ -864,15 +877,15 @@
             <button class="client-suggestion-dismiss" onclick="dismissClientSuggestion()">✕</button>
           </div>
           <form id="booking-manual-form" onsubmit="handleManualSubmit(event)">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;">
+            <div style="display:grid;grid-template-columns:1fr;gap:14px;align-items:start;">
 
-              <!-- LEFT: Journey #1 -->
+              <!-- Journey #1 -->
               <div class="alpinbus-box">
                 <div class="alpinbus-box-title">Journey #1</div>
 
                 <!-- Customer -->
-                <div class="alpinbus-form-row"><label>First name:</label><input type="text" id="m-firstName" required></div>
-                <div class="alpinbus-form-row"><label>Last name:</label><input type="text" id="m-lastName"></div>
+                <div class="alpinbus-form-row"><label>First name:</label><div class="client-ac-wrap" style="position:relative;"><input type="text" id="m-firstName" autocomplete="off" required oninput="onClientNameInput()" onkeydown="handleClientAcKey(event,'first')" onblur="setTimeout(()=>closeClientAcDrop('first'),180)"><div class="client-ac-dropdown" id="client-ac-drop" style="display:none;"></div></div></div>
+                <div class="alpinbus-form-row"><label>Last name:</label><div class="client-ac-wrap" style="position:relative;"><input type="text" id="m-lastName" autocomplete="off" oninput="onClientNameInput()" onkeydown="handleClientAcKey(event,'last')" onblur="setTimeout(()=>closeClientAcDrop('last'),180)"><div class="client-ac-dropdown" id="client-ac-drop-last" style="display:none;"></div></div></div>
                 <div class="alpinbus-form-row"><label>Email:</label><input type="email" id="m-email" oninput="checkReturningClient()"></div>
                 <div class="alpinbus-form-row"><label>Mobile:</label><input type="tel" id="m-phone" placeholder="+33 6 12 34 56 78" oninput="checkReturningClient()"></div>
                 <div class="alpinbus-form-row"><label>Alt. Phone:</label><input type="text" id="m-altPhone"></div>
@@ -979,14 +992,6 @@
                 <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;">
                   <button type="submit" class="btn">💾 Save Booking</button>
                   <button type="button" class="btn btn-secondary" onclick="document.getElementById('booking-manual-form').reset();populateAllVehicleSelects();populateAllDriverSelects();populateAllSourceSelects();populateAllAffiliateSelects();">🗑 Clear</button>
-                </div>
-              </div>
-
-              <!-- RIGHT: empty / info -->
-              <div>
-                <div class="alpinbus-box" style="text-align:center;color:var(--text-muted);padding:32px 16px;">
-                  <div style="font-size:2rem;margin-bottom:10px;">🗓</div>
-                  <div style="font-size:0.88rem;line-height:1.6;">Journey #2 can be added after saving,<br>by opening the booking and using<br><strong>+ Add journey</strong> in the edit modal.</div>
                 </div>
               </div>
 
@@ -1323,46 +1328,12 @@
                 <button type="button" class="alpinbus-link-blue" onclick="switchTab('calendar-tab',document.getElementById('nav-calendar'));closeModal();">Show in calendar</button>
                 <button type="button" class="alpinbus-link-blue" onclick="changeStatus(document.getElementById('edit-id').value,'Cancelled')">Cancel booking</button>
                 <button type="button" class="alpinbus-link-red" onclick="deleteBooking(document.getElementById('edit-id').value);closeModal();">Delete booking</button>
-                <button type="button" class="alpinbus-link-blue" onclick="addTripForClient(document.getElementById('edit-id').value)">+ Add journey</button>
               </div>
             </div>
           </div>
 
-          <!-- COLUMN 2: Journey #2 -->
+          <!-- COLUMN 2: hidden billing fields only -->
           <div>
-            <!-- Box: Journey #2 (Round trip panel) -->
-            <div class="alpinbus-box" id="j2-panel" style="display:none;">
-              <div class="alpinbus-box-title">Journey #2</div>
-              <div class="alpinbus-form-row"><label>Passengers:</label><input type="number" id="edit-j2-passengers" min="1" max="50" style="max-width:120px;"></div>
-              <div class="alpinbus-form-row"><label>Vehicle:</label><select id="edit-j2-car"></select></div>
-              <div class="alpinbus-form-row"><label>From:</label><input type="text" id="edit-j2-pickup"></div>
-              <div class="alpinbus-form-row"><label>To:</label><input type="text" id="edit-j2-dropoff"></div>
-              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Address:</label><textarea id="edit-j2-addressDetail" rows="1"></textarea></div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="margin-bottom:0;"><label>Flight #:</label><input type="text" id="edit-j2-flightInfo"></div>
-                <div class="alpinbus-form-row" style="margin-bottom:0;grid-template-columns:55px 1fr;"><label>To:</label><input type="text" id="edit-j2-flyingTo"></div>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:7px;">
-                <div class="alpinbus-form-row" style="margin-bottom:0;"><label>Flight out:</label><div style="display:flex;gap:3px;"><input type="date" id="edit-j2-flightDate" style="flex:1;min-width:0;"><input type="time" id="edit-j2-flightTime" style="width:75px;"></div></div>
-                <div class="alpinbus-form-row" style="margin-bottom:0;grid-template-columns:55px 1fr;"><label>Pickup:</label><div style="display:flex;gap:3px;"><input type="date" id="edit-j2-pickupDate" style="flex:1;min-width:0;"><input type="time" id="edit-j2-pickupTime" style="width:75px;"></div></div>
-              </div>
-              <div class="alpinbus-inline-opts">
-                <div class="opt-item"><label>Baby:</label><select id="edit-j2-babySeats"><option value="0">0</option><option value="1">1</option></select></div>
-                <div class="opt-item"><label>Child:</label><select id="edit-j2-childSeats"><option value="0">0</option><option value="1">1</option></select></div>
-                <div class="opt-item"><label>Bst:</label><select id="edit-j2-boosterSeats"><option value="0">0</option><option value="1">1</option></select></div>
-                <div class="opt-item"><label>Ski:</label><select id="edit-j2-ski"><option value="0">0</option><option value="1">1</option></select></div>
-                <div class="opt-item"><label>Bike:</label><select id="edit-j2-bike"><option value="0">0</option><option value="1">1</option></select></div>
-                <div class="opt-item"><label>Bags:</label><select id="edit-j2-luggage"><option value="0">0</option><option value="1">1</option><option value="4">4</option></select></div>
-                <div class="opt-item"><label>Bst (H):</label><select id="edit-j2-holdBags"><option value="0">0</option><option value="1">1</option></select></div>
-              </div>
-              <div class="alpinbus-form-row"><label>Price (€):</label><input type="number" step="0.01" id="edit-j2-price"></div>
-              <div class="alpinbus-form-row"><label>Paid status:</label><select id="edit-paymentStatus-j2"><option value="Unpaid">❌ Unpaid</option><option value="Paid">✅ Paid</option></select></div>
-              <div class="alpinbus-form-row" style="align-items:flex-start;"><label>Notes:</label><textarea id="edit-j2-requirements" rows="2"></textarea></div>
-              <div style="margin-top:8px;">
-                <button type="button" class="alpinbus-link-blue" onclick="switchTab('calendar-tab',document.getElementById('nav-calendar'));closeModal();">Show in calendar</button>
-                <button type="button" class="alpinbus-link-red" onclick="removeJourney2(document.getElementById('edit-id').value);closeModal();">Remove J2</button>
-              </div>
-            </div>
 
             <!-- Hidden billing fields (kept for data compatibility) -->
             <input type="hidden" id="edit-billTo" value="Customer">
@@ -1677,7 +1648,7 @@ function unlockApp(animate) {
   loadLocalData();
   autoCompleteTrips();
   renderAll();
-  syncNow(true);
+  fullSyncFromCloud(true);
   startAutoSync();
   updateLogistPhoneDisplay();
   populateExpBookingLink();
@@ -2018,16 +1989,7 @@ function findMislinkedJourneys() {
         <button style="margin-left:8px;font-size:0.72rem;padding:2px 8px;background:var(--status-cancelled);color:#fff;border:none;border-radius:4px;cursor:pointer;" onclick="clearRoundTripId('${b.id}')">Unlink</button>
       </div>`);
     }
-    // journey2 exists — show for review
-    if(b.journey2 && b.journey2.pickup){
-      const rtLinked=b.roundTripId&&ids.has(b.roundTripId);
-      issues.push(`<div style="padding:6px 0;border-bottom:1px solid var(--border);">
-        <strong>#${(b.bookingNumber||0).toString().padStart(4,'0')} ${b.name||'?'}</strong>
-        — has embedded Journey #2: <em>${b.journey2.pickup||'?'} ➝ ${b.journey2.dropoff||'?'}</em>
-        ${rtLinked?'<span style="color:var(--status-pending);font-size:0.75rem;"> (also linked via roundTripId)</span>':''}
-        <button style="margin-left:8px;font-size:0.72rem;padding:2px 8px;background:var(--status-cancelled);color:#fff;border:none;border-radius:4px;cursor:pointer;" onclick="removeJourney2('${b.id}')">Remove J2</button>
-      </div>`);
-    }
+    // journey2 check removed (feature disabled)
   });
 
   if(!issues.length){
@@ -2048,16 +2010,7 @@ function clearRoundTripId(id){
   findMislinkedJourneys();
   showToast('roundTripId cleared');
 }
-function removeJourney2(id){
-  const b=bookings.find(x=>x.id===id);
-  if(!b)return;
-  delete b.journey2;
-  b.updated_at=new Date().toISOString();
-  saveLocalData();
-  pushToCloud(b);
-  findMislinkedJourneys();
-  showToast('Journey #2 removed from booking');
-}
+// removeJourney2 removed — Journey 2 feature disabled
 function showToast(msg,ok=true) {
   const t=document.getElementById('toast-el');
   t.style.borderColor=ok?'var(--gold)':'var(--status-cancelled)';
@@ -2347,9 +2300,9 @@ function pushAllToCloud(skipConfirm = false) {
     });
 }
 
-function fullSyncFromCloud() {
+function fullSyncFromCloud(silent=false) {
   setSyncIndicator('pending','Full sync...');
-  showToast('⬇️ Downloading all data from cloud...');
+  if(!silent) showToast('⬇️ Downloading all data from cloud...');
   // Fetch BOTH booking and expense ID lists in parallel
   Promise.all([
     fetchListFromCloud(listKey),
@@ -2378,8 +2331,8 @@ function fullSyncFromCloud() {
       localStorage.setItem('vtransfer_expenses', JSON.stringify(expenses));
       renderAll();
       updateAnalytics();
-      setSyncIndicator('online','Already up to date ✓');
-      showToast('✓ Already fully synced — no new data');
+      setSyncIndicator('online','Synced ✓');
+      if(!silent) showToast('✓ Already fully synced — no new data');
       return;
     }
     Promise.all([
@@ -2399,10 +2352,11 @@ function fullSyncFromCloud() {
       renderAll();
       updateAnalytics();
       const now = new Date(), ts = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-      setSyncIndicator('online', `Full sync ${ts}`);
-      showToast(`✅ Full sync — ${addedB} booking${addedB!==1?'s':''} + ${addedE} expense${addedE!==1?'s':''} downloaded`);
+      setSyncIndicator('online', `Synced ${ts}`);
+      if(!silent) showToast(`✅ Full sync — ${addedB} booking${addedB!==1?'s':''} + ${addedE} expense${addedE!==1?'s':''} downloaded`);
+      else if(addedB>0||addedE>0) showToast(`☁️ Synced ${addedB+addedE} new item${addedB+addedE>1?'s':''}`);
     });
-  }).catch(() => { setSyncIndicator('offline','Sync failed'); showToast('Full sync failed — check network', false); });
+  }).catch(() => { setSyncIndicator('offline','Sync failed'); if(!silent) showToast('Full sync failed — check network', false); });
 }
 function startAutoSync() {
   if(autoSyncTimer)clearInterval(autoSyncTimer);
@@ -3298,22 +3252,7 @@ function openModal(id){
   document.getElementById('edit-normalPrice').textContent=((b.price||0)*1.05).toFixed(2);
   document.getElementById('edit-requirements').value=b.requirements&&b.requirements!=='None'?b.requirements:'';
 
-  // Journey #2 (if round trip exists)
-  const j2Panel=document.getElementById('j2-panel');
-  if(b.roundTripId || b.journey2){
-    j2Panel.style.display='block';
-    const j2=b.journey2 || bookings.find(x=>x.id===b.roundTripId) || {};
-    document.getElementById('edit-j2-passengers').value=j2.passengers||1;
-    populateVehicleSelect(document.getElementById('edit-j2-car'),j2.car||'');
-    document.getElementById('edit-j2-pickup').value=j2.pickup||b.dropoff||'';
-    document.getElementById('edit-j2-dropoff').value=j2.dropoff||b.pickup||'';
-    document.getElementById('edit-j2-addressDetail').value=j2.addressDetail||'';
-    document.getElementById('edit-j2-flightInfo').value=j2.flightInfo||'';
-    document.getElementById('edit-j2-flyingTo').value=j2.flyingTo||'';
-    document.getElementById('edit-j2-price').value=j2.price||0;
-  } else {
-    j2Panel.style.display='none';
-  }
+  // Journey #2 removed — data preserved in booking object but not shown/edited
 
   // Billing details
   document.getElementById('edit-billTo').value=b.billTo||'Customer';
@@ -3321,7 +3260,6 @@ function openModal(id){
   document.getElementById('edit-billingPrice').value=b.price||0;
   document.getElementById('edit-paymentBy').value=b.paymentBy||'Credit card';
   document.getElementById('edit-paymentStatus-j1').value=b.paymentStatus||'Unpaid';
-  document.getElementById('edit-paymentStatus-j2').value=(b.journey2&&b.journey2.paymentStatus)||'Unpaid';
   document.getElementById('edit-paymentStatus').value=b.billingPaid||'Unpaid';
   document.getElementById('edit-amountPaid').textContent=`€${(b.price||0).toFixed(2)}`;
   document.getElementById('edit-amountDue').textContent=`€0.00`;
@@ -3396,29 +3334,7 @@ function handleEditSubmit(e){
     bookings[i].billingPaid=document.getElementById('edit-paymentStatus').value;
     // billingSummary field removed
 
-    // Save Journey 2 if present
-    const j2pickup=document.getElementById('edit-j2-pickup');
-    if(j2pickup&&j2pickup.value.trim()){
-      const j2pDate=document.getElementById('edit-j2-pickupDate').value;
-      const j2pTime=document.getElementById('edit-j2-pickupTime').value;
-      let j2Dt='';
-      if(j2pDate&&j2pTime) j2Dt=`${j2pDate}T${j2pTime}`;
-      else if(j2pDate) j2Dt=`${j2pDate}T12:00`;
-
-      bookings[i].journey2={
-        passengers: parseInt(document.getElementById('edit-j2-passengers').value)||1,
-        car: document.getElementById('edit-j2-car').value||'',
-        pickup: document.getElementById('edit-j2-pickup').value,
-        dropoff: document.getElementById('edit-j2-dropoff').value,
-        addressDetail: document.getElementById('edit-j2-addressDetail').value,
-        flightInfo: document.getElementById('edit-j2-flightInfo').value,
-        flyingTo: document.getElementById('edit-j2-flyingTo').value,
-        datetime: j2Dt,
-        price: parseFloat(document.getElementById('edit-j2-price').value)||0,
-        paymentStatus: document.getElementById('edit-paymentStatus-j2').value,
-        requirements: document.getElementById('edit-j2-requirements').value||'None'
-      };
-    }
+    // Journey 2 removed — no longer saved
 
     bookings[i].updated_at=new Date().toISOString();
     saveLocalData();
@@ -3475,6 +3391,103 @@ function checkReturningClient(){
 }
 function fillReturningClient(){if(!retClient)return;if(retClient.firstName)document.getElementById('m-firstName').value=retClient.firstName;if(retClient.lastName)document.getElementById('m-lastName').value=retClient.lastName||'';if(!retClient.firstName&&retClient.name){const p=retClient.name.split(' ');const fn=document.getElementById('m-firstName');if(fn)fn.value=p[0]||'';const ln=document.getElementById('m-lastName');if(ln)ln.value=p.slice(1).join(' ')||'';}if(retClient.email)document.getElementById('m-email').value=retClient.email;if(retClient.phone)document.getElementById('m-phone').value=retClient.phone;const cs=document.getElementById('client-suggestion');if(cs)cs.classList.remove('visible');showToast(currentLang==='ru'?'Данные клиента заполнены!':'Client details auto-filled!');}
 function dismissClientSuggestion(){document.getElementById('client-suggestion').classList.remove('visible');}
+
+// ═══════════════════════════════════════════════════
+// CLIENT NAME AUTOCOMPLETE (Google Maps style)
+// ═══════════════════════════════════════════════════
+let cacHighlighted = { first: -1, last: -1 };
+function onClientNameInput() {
+  const fnVal = (document.getElementById('m-firstName').value||'').trim();
+  const lnVal = (document.getElementById('m-lastName').value||'').trim();
+  const query = (fnVal + ' ' + lnVal).trim().toLowerCase();
+  const dropFirst = document.getElementById('client-ac-drop');
+  const dropLast = document.getElementById('client-ac-drop-last');
+  if (query.length < 1) { closeClientAcDrop('first'); closeClientAcDrop('last'); return; }
+  // Deduplicate clients by name
+  const seen = new Set();
+  const clientMap = {};
+  for (let i = bookings.length - 1; i >= 0; i--) {
+    const b = bookings[i];
+    if (!b.name) continue;
+    const key = b.name.trim().toLowerCase();
+    if (seen.has(key)) { clientMap[key].trips++; continue; }
+    seen.add(key);
+    clientMap[key] = { b, trips: 1 };
+  }
+  const matches = Object.values(clientMap)
+    .filter(({b}) => b.name.toLowerCase().includes(query))
+    .sort((a,b) => b.trips - a.trips)
+    .slice(0, 8);
+  if (!matches.length) { closeClientAcDrop('first'); closeClientAcDrop('last'); return; }
+  // Show dropdown on whichever field the user just typed in (first name by default)
+  const activeId = document.activeElement && document.activeElement.id;
+  const targetDrop = (activeId === 'm-lastName') ? dropLast : dropFirst;
+  const targetKey = (activeId === 'm-lastName') ? 'last' : 'first';
+  if (activeId === 'm-lastName') closeClientAcDrop('first'); else closeClientAcDrop('last');
+  renderClientAcDrop(targetDrop, matches, targetKey);
+}
+function renderClientAcDrop(drop, matches, key) {
+  cacHighlighted[key] = -1;
+  drop.innerHTML = '';
+  matches.forEach(({b, trips}, idx) => {
+    const initials = b.name.trim().split(' ').map(w=>w[0]||'').slice(0,2).join('').toUpperCase();
+    const meta = [b.phone, b.email].filter(Boolean).join(' · ') || '—';
+    const item = document.createElement('div');
+    item.className = 'client-ac-item';
+    item.innerHTML = `<div class="client-ac-avatar">${escHTML(initials)}</div><div class="client-ac-info"><div class="client-ac-name">${escHTML(b.name)}</div><div class="client-ac-meta">${escHTML(meta)}</div></div><div class="client-ac-trips">${trips} ride${trips>1?'s':''}</div>`;
+    item.addEventListener('mousedown', e => e.preventDefault());
+    item.addEventListener('click', () => selectClientAc(b, key));
+    drop.appendChild(item);
+  });
+  drop.style.display = 'block';
+  // Keyboard navigation
+  const inp = document.getElementById(key === 'last' ? 'm-lastName' : 'm-firstName');
+  inp._acItems = drop.querySelectorAll('.client-ac-item');
+}
+function selectClientAc(b, key) {
+  // Fill name fields
+  if (b.firstName) {
+    document.getElementById('m-firstName').value = b.firstName;
+    document.getElementById('m-lastName').value = b.lastName || '';
+  } else {
+    const parts = b.name.trim().split(' ');
+    document.getElementById('m-firstName').value = parts[0] || '';
+    document.getElementById('m-lastName').value = parts.slice(1).join(' ') || '';
+  }
+  // Fill contact fields
+  if (b.email) document.getElementById('m-email').value = b.email;
+  if (b.phone) document.getElementById('m-phone').value = b.phone;
+  if (b.altPhone) { const ap = document.getElementById('m-altPhone'); if(ap) ap.value = b.altPhone; }
+  closeClientAcDrop('first'); closeClientAcDrop('last');
+  // Hide client suggestion banner (no longer needed)
+  const cs = document.getElementById('client-suggestion'); if(cs) cs.classList.remove('visible');
+  showToast('👤 Client details filled!');
+}
+function closeClientAcDrop(key) {
+  const drop = document.getElementById(key === 'last' ? 'client-ac-drop-last' : 'client-ac-drop');
+  if (drop) { drop.style.display = 'none'; drop.innerHTML = ''; }
+  cacHighlighted[key] = -1;
+}
+function handleClientAcKey(e, key) {
+  const drop = document.getElementById(key === 'last' ? 'client-ac-drop-last' : 'client-ac-drop');
+  if (!drop || drop.style.display === 'none') return;
+  const items = drop.querySelectorAll('.client-ac-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    cacHighlighted[key] = Math.min(cacHighlighted[key] + 1, items.length - 1);
+    items.forEach((it,i) => it.classList.toggle('cac-highlighted', i === cacHighlighted[key]));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    cacHighlighted[key] = Math.max(cacHighlighted[key] - 1, 0);
+    items.forEach((it,i) => it.classList.toggle('cac-highlighted', i === cacHighlighted[key]));
+  } else if (e.key === 'Enter' && cacHighlighted[key] >= 0) {
+    e.preventDefault();
+    items[cacHighlighted[key]].click();
+  } else if (e.key === 'Escape') {
+    closeClientAcDrop(key);
+  }
+}
 function toggleRoundTrip(){document.getElementById('round-trip-fields').style.display=document.getElementById('round-trip-check').checked?'block':'none';}
 function buildBookingFromForm(){
   let maxN = 0;
