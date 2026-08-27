@@ -3573,19 +3573,7 @@ function prefillReturnJourney(){
 function clearReturnMode(){document.getElementById('return-journey-banner').style.display='none';document.getElementById('booking-manual-form').reset();populateAllVehicleSelects();populateAllDriverSelects();}
 
 // (duplicate openModal/closeModal/handleEditSubmit removed — correct versions are above at line ~2803)
-function addTripForClient(bookingId){
-  const b=bookings.find(x=>x.id===bookingId);
-  if(!b)return;
-  closeModal();
-  switchTab('add-tab',document.getElementById('nav-add'));setMobileNav('mnav-add');
-  setTimeout(()=>{
-    if(b.name)document.getElementById('m-name').value=b.name;
-    if(b.email)document.getElementById('m-email').value=b.email;
-    if(b.phone)document.getElementById('m-phone').value=b.phone;
-    document.getElementById('add-tab').scrollIntoView({behavior:'smooth'});
-    showToast('✅ Client pre-filled — add the new trip details');
-  },200);
-}
+
 function deleteBooking(id){
   if(!confirm(currentLang==='ru'?'Удалить этот заказ?':'Delete this booking?'))return;
   const i=bookings.findIndex(b=>b.id===id);
