@@ -414,9 +414,9 @@
     .alpinbus-popover-invoicelink { color:var(--gold); text-decoration:underline; font-size:0.8rem; cursor:pointer; font-weight:600; }
 
     /* Screenshot 3 - Modal Layout */
-    .alpinbus-modal-layout { display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; }
-    @media (max-width:1200px) { .alpinbus-modal-layout { grid-template-columns:1fr 1fr; } }
-    @media (max-width:800px) { .alpinbus-modal-layout { grid-template-columns:1fr; } }
+    .alpinbus-modal-layout { display:block; }
+    @media (max-width:1200px) { .alpinbus-modal-layout { } }
+    @media (max-width:800px) { .alpinbus-modal-layout { } }
     .alpinbus-box { background:var(--bg-card); border:1.5px solid var(--border); border-radius:10px; padding:14px; margin-bottom:12px; box-shadow:var(--shadow-sm); }
     .alpinbus-box-title { font-size:0.82rem; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--gold); margin-bottom:10px; border-bottom:1px solid var(--border-gold); padding-bottom:5px; }
     .alpinbus-form-row { display:grid; grid-template-columns:90px 1fr; align-items:center; margin-bottom:7px; gap:6px; font-size:0.8rem; }
@@ -1329,26 +1329,19 @@
                 <button type="button" class="alpinbus-link-blue" onclick="changeStatus(document.getElementById('edit-id').value,'Cancelled')">Cancel booking</button>
                 <button type="button" class="alpinbus-link-red" onclick="deleteBooking(document.getElementById('edit-id').value);closeModal();">Delete booking</button>
               </div>
-            </div>
-          </div>
-
-          <!-- COLUMN 2: hidden billing fields only -->
-          <div>
-
-            <!-- Hidden billing fields (kept for data compatibility) -->
-            <input type="hidden" id="edit-billTo" value="Customer">
-            <input type="hidden" id="edit-invoiceNum">
-            <input type="hidden" id="edit-billingPrice">
-            <input type="hidden" id="edit-paymentBy" value="Credit card">
-            <input type="hidden" id="edit-paymentStatus">
-            <span id="edit-amountPaid" style="display:none;"></span>
-            <span id="edit-amountDue" style="display:none;"></span>
-
-            <!-- Main vehicle hidden (used by operations save, mirrors j1 car) -->
-            <input type="hidden" id="edit-car">
-            <input type="hidden" id="edit-address">
-          </div>
-        </div>
+            </div><!-- /alpinbus-box -->
+          </div><!-- /column -->
+        </div><!-- /alpinbus-modal-layout -->
+        <!-- Hidden billing fields (kept for data compatibility) -->
+        <input type="hidden" id="edit-billTo" value="Customer">
+        <input type="hidden" id="edit-invoiceNum">
+        <input type="hidden" id="edit-billingPrice">
+        <input type="hidden" id="edit-paymentBy" value="Credit card">
+        <input type="hidden" id="edit-paymentStatus">
+        <span id="edit-amountPaid" style="display:none;"></span>
+        <span id="edit-amountDue" style="display:none;"></span>
+        <input type="hidden" id="edit-car">
+        <input type="hidden" id="edit-address">
 
         <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:center;">
           <button type="submit" class="alpinbus-save-btn">Save</button>
