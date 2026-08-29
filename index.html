@@ -2515,7 +2515,12 @@ function buildMobileCard(b){
   card.innerHTML=`
     <div class="m-card-header">
       <div class="m-card-name">${esc(b.name)}</div>
-      <span class="status-badge ${statusClass}" style="font-size:0.66rem;padding:2px 7px;">${b.status||'Pending'}</span>
+      <select class="status-badge ${statusClass}" data-bid="${b.id}" style="font-size:0.66rem;padding:2px 5px;border:none;font-weight:700;background:transparent;cursor:pointer;border-radius:6px;" onclick="event.stopPropagation()" onchange="event.stopPropagation();changeStatus('${b.id}',this.value)">
+        <option value="Pending" ${(b.status||'Pending')==='Pending'?'selected':''}>⏳ ${t('s_pending')}</option>
+        <option value="Confirmed" ${b.status==='Confirmed'?'selected':''}>✓ ${t('s_confirmed')}</option>
+        <option value="Completed" ${b.status==='Completed'?'selected':''}>✈ ${t('s_completed')}</option>
+        <option value="Cancelled" ${b.status==='Cancelled'?'selected':''}>✕ ${t('s_cancelled')}</option>
+      </select>
     </div>
     <div class="m-card-num">#${(b.bookingNumber||0).toString().padStart(4,'0')} &middot; <span style="color:var(--gold)">${dateStr}</span></div>
     <div class="m-card-route" style="margin-top:6px">
@@ -2534,6 +2539,7 @@ function buildMobileCard(b){
       </div>
       <div class="m-card-actions">
         <button class="action-pill" onclick="event.stopPropagation();openModal('${b.id}')" style="min-height:38px">✏️ Edit</button>
+        <button class="action-pill" onclick="event.stopPropagation();copyReport('${b.id}')" style="min-height:38px">📋 Copy</button>
         <button class="action-pill" onclick="event.stopPropagation();showNotifyMenu(event,'${b.id}')" style="min-height:38px">📞 Notify</button>
         <button class="action-pill delete-pill" onclick="event.stopPropagation();deleteBooking('${b.id}')" style="min-height:38px">🗑️</button>
       </div>
@@ -2541,6 +2547,7 @@ function buildMobileCard(b){
   card.addEventListener('click',()=>openModal(b.id));
   return card;
 }
+
 function saveLogistPhone(){
   const ph=(document.getElementById('logist-phone-input').value||'').trim();
   if(!ph){showToast('Enter logist phone',false);return;}
