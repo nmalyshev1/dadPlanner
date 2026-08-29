@@ -2400,7 +2400,7 @@ function renderTable() {
     const ms=!srch||(b.name||'').toLowerCase().includes(srch)||(b.phone||'').toLowerCase().includes(srch)||
       (b.email||'').toLowerCase().includes(srch)||(b.pickup||'').toLowerCase().includes(srch)||
       (b.dropoff||'').toLowerCase().includes(srch)||(b.car||'').toLowerCase().includes(srch)||(b.bookingNumber+'').includes(srch);
-    let mSt; if(fSt==='ALL')mSt=true;else if(fSt==='ACTIVE')mSt=b.status!=='Completed';else mSt=b.status===fSt;
+    let mSt; if(fSt==='ALL')mSt=b.status!=='Cancelled';else if(fSt==='ACTIVE')mSt=b.status!=='Completed'&&b.status!=='Cancelled';else mSt=b.status===fSt;
     const mPay=fPay==='ALL'||(b.paymentStatus||'Unpaid')===fPay;
     const mCar=fCar==='ALL'||b.car===fCar;
     const mDrv=fDrv==='ALL'||(b.driver||'')===(fDrv==='ALL'?'':fDrv);
@@ -2604,7 +2604,7 @@ function renderStopsInList(listId, stops){
   list.innerHTML='';
   (stops||[]).forEach(s=>addStop(listId,s));
 }
-function changeStatus(id,ns){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].status=ns;bookings[i].updated_at=new Date().toISOString();saveLocalData();pushToCloud(bookings[i]);renderAll();showToast(`Status → ${ns}`);}}
+function changeStatus(id,ns){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].status=ns;bookings[i].updated_at=new Date().toISOString();saveLocalData();pushToCloud(bookings[i]);renderAll();showToast(`Status → ${ns}`);if(ns==='Cancelled'){const archBtn=document.getElementById('nav-archive');if(archBtn)switchTab('archive-tab',archBtn);}}}
 function changePayment(id){const i=bookings.findIndex(b=>b.id===id);if(i>=0){bookings[i].paymentStatus=bookings[i].paymentStatus==='Paid'?'Unpaid':'Paid';bookings[i].updated_at=new Date().toISOString();saveLocalData();pushToCloud(bookings[i]);renderAll();showToast(`Payment → ${bookings[i].paymentStatus}`);}}
 
 // ═══════════════════════════════════════════════════
@@ -2681,10 +2681,10 @@ function renderArchive(){
   const srch=(document.getElementById('archive-search').value||'').toLowerCase();
   const fPay=document.getElementById('archive-filter-payment').value, fDate=document.getElementById('archive-filter-date').value;
   const now=new Date();
-  // Archive = Completed, OR past trips (datetime > 2h ago) that are Confirmed/Pending (auto-complete may have missed them)
+  // Archive = Completed, Cancelled, OR past trips (datetime > 2h ago) that are Confirmed/Pending (auto-complete may have missed them)
   const completed=bookings.filter(b=>{
     if(b.status==='Completed') return true;
-    if(b.status==='Cancelled') return false;
+    if(b.status==='Cancelled') return true;
     if(b.datetime){const dt=new Date(b.datetime);if(dt<new Date(now.getTime()-2*60*60*1000))return true;}
     return false;
   });
